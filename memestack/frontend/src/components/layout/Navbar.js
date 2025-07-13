@@ -76,6 +76,7 @@ const Navbar = () => {
 
     const privateNavItems = [
         { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
+        { label: 'Feed', path: '/feed', icon: <GalleryIcon /> },
         { label: 'Create', path: '/create', icon: <AddIcon /> },
     ];
 

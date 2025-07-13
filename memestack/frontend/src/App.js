@@ -23,6 +23,7 @@ import MemeGallery from './pages/MemeGallery';
 import MemeDetail from './pages/MemeDetail';
 import CreateMeme from './pages/CreateMeme';
 import Profile from './pages/Profile';
+import FollowingFeed from './pages/FollowingFeed';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -157,6 +158,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/feed" 
+                    element={
+                      <ProtectedRoute>
+                        <FollowingFeed />
                       </ProtectedRoute>
                     } 
                   />

@@ -302,6 +302,72 @@ export const uploadAPI = {
 };
 
 // ========================================
+// FOLLOW SERVICES
+// ========================================
+
+export const followAPI = {
+    // Follow a user
+    followUser: async (userId) => {
+        try {
+            const response = await API.post(`/follows/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to follow user' };
+        }
+    },
+
+    // Unfollow a user
+    unfollowUser: async (userId) => {
+        try {
+            const response = await API.delete(`/follows/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to unfollow user' };
+        }
+    },
+
+    // Check if following a user
+    getFollowStatus: async (userId) => {
+        try {
+            const response = await API.get(`/follows/${userId}/status`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get follow status' };
+        }
+    },
+
+    // Get user's followers
+    getFollowers: async (userId, params = {}) => {
+        try {
+            const response = await API.get(`/follows/${userId}/followers`, { params });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get followers' };
+        }
+    },
+
+    // Get user's following list
+    getFollowing: async (userId, params = {}) => {
+        try {
+            const response = await API.get(`/follows/${userId}/following`, { params });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get following list' };
+        }
+    },
+
+    // Get feed from followed users
+    getFollowingFeed: async (params = {}) => {
+        try {
+            const response = await API.get('/follows/feed', { params });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get following feed' };
+        }
+    },
+};
+
+// ========================================
 // COMMENT SERVICES
 // ========================================
 

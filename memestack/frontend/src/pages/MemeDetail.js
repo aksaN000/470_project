@@ -27,6 +27,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
 import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import FollowButton from '../components/common/FollowButton';
 import CommentSection from '../components/comments/CommentSection';
 
 const MemeDetail = () => {
@@ -183,16 +184,24 @@ const MemeDetail = () => {
                                 {currentMeme.title}
                             </Typography>
                             
-                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Avatar 
-                                    src={currentMeme.creator.avatar}
-                                    sx={{ width: 32, height: 32, mr: 1 }}
-                                >
-                                    {currentMeme.creator.username.charAt(0).toUpperCase()}
-                                </Avatar>
-                                <Typography variant="body2" color="text.secondary">
-                                    by {currentMeme.creator.username}
-                                </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar 
+                                        src={currentMeme.creator.avatar}
+                                        sx={{ width: 32, height: 32, mr: 1 }}
+                                    >
+                                        {currentMeme.creator.username.charAt(0).toUpperCase()}
+                                    </Avatar>
+                                    <Typography variant="body2" color="text.secondary">
+                                        by {currentMeme.creator.username}
+                                    </Typography>
+                                </Box>
+                                <FollowButton 
+                                    userId={currentMeme.creator._id || currentMeme.creator.id} 
+                                    username={currentMeme.creator.username}
+                                    variant="chip"
+                                    size="small"
+                                />
                             </Box>
 
                             <Chip 
