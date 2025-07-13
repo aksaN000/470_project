@@ -30,11 +30,6 @@ const FollowButton = ({
     const [loading, setLoading] = useState(false);
     const [checkingStatus, setCheckingStatus] = useState(true);
 
-    // Don't show follow button for current user
-    if (!currentUser || currentUser._id === userId) {
-        return null;
-    }
-
     // Check follow status on mount
     useEffect(() => {
         const checkFollowStatus = async () => {
@@ -51,8 +46,15 @@ const FollowButton = ({
 
         if (userId && currentUser) {
             checkFollowStatus();
+        } else {
+            setCheckingStatus(false);
         }
     }, [userId, currentUser]);
+
+    // Don't show follow button for current user or if not logged in
+    if (!currentUser || currentUser._id === userId) {
+        return null;
+    }
 
     const handleFollowToggle = async () => {
         try {
