@@ -368,6 +368,46 @@ export const followAPI = {
 };
 
 // ========================================
+// ANALYTICS SERVICES
+// ========================================
+
+export const analyticsAPI = {
+    // Get user dashboard analytics
+    getDashboardAnalytics: async (timeRange = 30) => {
+        try {
+            const response = await API.get('/analytics/dashboard', {
+                params: { timeRange }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch dashboard analytics' };
+        }
+    },
+
+    // Get meme-specific analytics
+    getMemeAnalytics: async (memeId) => {
+        try {
+            const response = await API.get(`/analytics/meme/${memeId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch meme analytics' };
+        }
+    },
+
+    // Get platform analytics (admin)
+    getPlatformAnalytics: async (timeRange = 30) => {
+        try {
+            const response = await API.get('/analytics/platform', {
+                params: { timeRange }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch platform analytics' };
+        }
+    },
+};
+
+// ========================================
 // COMMENT SERVICES
 // ========================================
 
