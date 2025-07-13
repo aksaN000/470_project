@@ -29,6 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
 import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import ReportButton from '../components/moderation/ReportButton';
 
 const MemeGallery = () => {
     const navigate = useNavigate();
@@ -253,7 +254,14 @@ const MemeGallery = () => {
                                             {meme.description || 'No description available'}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ justifyContent: 'flex-end' }}>
+                                    <CardActions sx={{ justifyContent: 'space-between' }}>
+                                        <ReportButton
+                                            contentType="meme"
+                                            contentId={meme.id}
+                                            reportedUserId={meme.createdBy?.id || meme.createdBy}
+                                            variant="icon"
+                                            size="small"
+                                        />
                                         <IconButton
                                             size="small"
                                             onClick={(e) => handleDownload(meme, e)}

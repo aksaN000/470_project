@@ -245,6 +245,8 @@ app.use('/api/follows', require('./routes/follows'));
 console.log('✅ Follow routes loaded');
 app.use('/api/analytics', require('./routes/analytics'));
 console.log('✅ Analytics routes loaded');
+app.use('/api/moderation', require('./routes/moderation'));
+console.log('✅ Moderation routes loaded');
 // app.use('/api/users', require('./routes/users'));
 
 // ========================================

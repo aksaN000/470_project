@@ -97,6 +97,50 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    
+    // Moderation information
+    moderation: {
+        isBanned: {
+            type: Boolean,
+            default: false
+        },
+        banReason: {
+            type: String,
+            default: ''
+        },
+        banDate: {
+            type: Date
+        },
+        isSuspended: {
+            type: Boolean,
+            default: false
+        },
+        suspensionEnd: {
+            type: Date
+        },
+        suspensionReason: {
+            type: String,
+            default: ''
+        },
+        warningCount: {
+            type: Number,
+            default: 0
+        },
+        warnings: [{
+            reason: String,
+            date: {
+                type: Date,
+                default: Date.now
+            },
+            reportId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Report'
+            }
+        }],
+        lastViolation: {
+            type: Date
+        }
     }
     
 }, {

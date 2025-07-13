@@ -25,6 +25,7 @@ import CreateMeme from './pages/CreateMeme';
 import Profile from './pages/Profile';
 import FollowingFeed from './pages/FollowingFeed';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import ModerationDashboard from './pages/ModerationDashboard';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -175,6 +176,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <AnalyticsDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/moderation" 
+                    element={
+                      <ProtectedRoute>
+                        <ModerationDashboard />
                       </ProtectedRoute>
                     } 
                   />

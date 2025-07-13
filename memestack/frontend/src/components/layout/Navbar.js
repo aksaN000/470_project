@@ -81,6 +81,11 @@ const Navbar = () => {
         { label: 'Create', path: '/create', icon: <AddIcon /> },
     ];
 
+    // Admin-only nav items
+    const adminNavItems = [
+        { label: 'Moderation', path: '/moderation', icon: <DashboardIcon /> },
+    ];
+
     const authNavItems = [
         { label: 'Login', path: '/login', icon: <LoginIcon /> },
         { label: 'Register', path: '/register', icon: <RegisterIcon /> },
@@ -110,6 +115,23 @@ const Navbar = () => {
             ))}
 
             {isAuthenticated && privateNavItems.map((item) => (
+                <Button
+                    key={item.path}
+                    color="inherit"
+                    onClick={() => navigate(item.path)}
+                    sx={{
+                        fontWeight: isActive(item.path) ? 600 : 400,
+                        backgroundColor: isActive(item.path) ? 'rgba(255,255,255,0.1)' : 'transparent',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255,255,255,0.1)',
+                        },
+                    }}
+                >
+                    {item.label}
+                </Button>
+            ))}
+
+            {isAuthenticated && user?.role === 'admin' && adminNavItems.map((item) => (
                 <Button
                     key={item.path}
                     color="inherit"
@@ -172,6 +194,21 @@ const Navbar = () => {
                     <>
                         <Divider sx={{ my: 1 }} />
                         {privateNavItems.map((item) => (
+                            <ListItem
+                                button
+                                key={item.path}
+                                onClick={() => {
+                                    navigate(item.path);
+                                    handleDrawerToggle();
+                                }}
+                                selected={isActive(item.path)}
+                            >
+                                <ListItemIcon>{item.icon}</ListItemIcon>
+                                <ListItemText primary={item.label} />
+                            </ListItem>
+                        ))}
+                        
+                        {user?.role === 'admin' && adminNavItems.map((item) => (
                             <ListItem
                                 button
                                 key={item.path}
