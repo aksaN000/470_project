@@ -26,6 +26,7 @@ import Profile from './pages/Profile';
 import FollowingFeed from './pages/FollowingFeed';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import ModerationDashboard from './pages/ModerationDashboard';
+import FolderManager from './pages/FolderManager';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -184,6 +185,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <ModerationDashboard />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/folders" 
+                    element={
+                      <ProtectedRoute>
+                        <FolderManager />
                       </ProtectedRoute>
                     } 
                   />
