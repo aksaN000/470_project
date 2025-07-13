@@ -1,0 +1,32 @@
+I have to make a project on MemeStack: A Meme Management & Design platform for creators.
+here are the project constraints:Project Constraints
+Students may develop either a web application, an Android application, an iOS application, or a desktop application.
+Students may use any tech stack/programming language/scripting to develop their application
+The application developed MUST follow the MVC architecture
+Students may use existing frameworks (Laravel, Express, Angular, Vue) to help with the development as long as they implement the MVC architecture. (Django is not permitted since it implements MVT instead of MVC architecture, and using Flask is highly discouraged.)
+Students may use libraries/packages to help with the development of their project as long as it does not implement any major feature of the project. A library/package implementing any major feature is considered illegal, and the student using the library will be penalized. Consulting the respective faculty member before using a library/package is recommended.
+Students must develop the project individually and from scratch. They may not take help from any source, copy code from any source, or use any tutorials that directly show how to implement the project that they have chosen.
+Students may not use a code base that they/others may have worked on before.
+Students must select a project that they want to implement, which is of lower to moderate complexity
+Login/registration will not be considered a feature.
+Students must define the requirements and the features of their project while submitting their project idea
+The project will have a minimum of 10 features.
+There will be four sprints to complete the entire software implementation.
+The sprint duration will be 12-14 days.
+Students need to submit their work progress through a Google form at the end of each sprint.
+Each student must use GitHub as a version control tool for their project.
+Each student must push their code to the project repo at the end of each sprint, regardless of whether there are incomplete features, errors, or bugs.
+Students must complete their projects within four (4) sprints.
+After the sprints, each student must attend a 10-minute viva where
+They will show their project demo in 5 minutes.
+They will be asked questions about their project code individually for 5 minutes.
+All vivas will be recorded and stored for review purposes, if possible.
+The viva may be taken offline or online, and the dates and times will be assigned by the section faculty.
+Students MUST create the GitHub repository for their project and add the section faculty as a collaborator to the repository during the first sprint.
+Students MUST submit their project idea, requirements, and feature before the beginning of the first sprint.
+A section faculty may change the project, the requirements, and/or the features if the section faculty determines that the project is not complex enough, or too complex, or for purposes of removing potential duplication.
+
+
+My preferred stack is: MERN. 
+My current skills: I know html5, css and a little javascript. So while building, you must teach me everything like a teacher. 
+

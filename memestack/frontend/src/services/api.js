@@ -36,12 +36,38 @@ API.interceptors.response.use(
         return response;
     },
     (error) => {
+        // Handle network errors
+        if (!error.response) {
+            console.error('Network Error:', error.message);
+            // Check if backend is running
+            if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+                const backendRunning = error.config?.url?.includes('localhost:5000');
+                if (backendRunning) {
+                    error.message = 'Backend server is not running. Please start the backend server on port 5000.';
+                }
+            }
+            return Promise.reject(error);
+        }
+
+        // Handle HTTP errors
         if (error.response?.status === 401) {
             // Token expired or invalid
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            // Only redirect if not already on login page
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login';
+            }
         }
+        
+        // Log API errors for debugging
+        console.error('API Error:', {
+            status: error.response?.status,
+            url: error.config?.url,
+            method: error.config?.method,
+            data: error.response?.data
+        });
+        
         return Promise.reject(error);
     }
 );
@@ -368,12 +394,88 @@ export const followAPI = {
 };
 
 // ========================================
-// ANALYTICS SERVICES
+// TEMPLATES API
+// ========================================
+
+export const templatesAPI = {
+    // Get all templates
+    getTemplates: async (params = {}) => {
+        try {
+            const response = await API.get('/templates', { params });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch templates' };
+        }
+    },
+
+    // Get template by ID
+    getTemplateById: async (id) => {
+        try {
+            const response = await API.get(`/templates/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch template' };
+        }
+    },
+
+    // Create new template
+    createTemplate: async (templateData) => {
+        try {
+            const response = await API.post('/templates', templateData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to create template' };
+        }
+    },
+
+    // Update template
+    updateTemplate: async (id, templateData) => {
+        try {
+            const response = await API.put(`/templates/${id}`, templateData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update template' };
+        }
+    },
+
+    // Delete template
+    deleteTemplate: async (id) => {
+        try {
+            const response = await API.delete(`/templates/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete template' };
+        }
+    },
+
+    // Get template categories
+    getCategories: async () => {
+        try {
+            const response = await API.get('/templates/categories');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch template categories' };
+        }
+    },
+
+    // Get user's templates
+    getUserTemplates: async () => {
+        try {
+            const response = await API.get('/templates/my-templates');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch user templates' };
+        }
+    }
+};
+
+// ========================================
+// ANALYTICS API
 // ========================================
 
 export const analyticsAPI = {
-    // Get user dashboard analytics
-    getDashboardAnalytics: async (timeRange = 30) => {
+    // Get dashboard analytics
+    getDashboard: async (timeRange = '30') => {
         try {
             const response = await API.get('/analytics/dashboard', {
                 params: { timeRange }
@@ -384,7 +486,7 @@ export const analyticsAPI = {
         }
     },
 
-    // Get meme-specific analytics
+    // Get meme analytics
     getMemeAnalytics: async (memeId) => {
         try {
             const response = await API.get(`/analytics/meme/${memeId}`);
@@ -394,110 +496,126 @@ export const analyticsAPI = {
         }
     },
 
-    // Get platform analytics (admin)
-    getPlatformAnalytics: async (timeRange = 30) => {
+    // Get platform analytics
+    getPlatformAnalytics: async () => {
         try {
-            const response = await API.get('/analytics/platform', {
-                params: { timeRange }
-            });
+            const response = await API.get('/analytics/platform');
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fetch platform analytics' };
         }
-    },
+    }
 };
 
 // ========================================
-// COMMENT SERVICES
+// FOLDERS API
 // ========================================
 
-export const commentsAPI = {
-    // Get comments for a meme
-    getComments: async (memeId, options = {}) => {
+export const foldersAPI = {
+    // Get user folders
+    getFolders: async (params = {}) => {
         try {
-            const { page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = options;
-            const response = await API.get(`/memes/${memeId}/comments`, {
-                params: { page, limit, sortBy, sortOrder }
-            });
+            const response = await API.get('/folders', { params });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to fetch comments' };
+            throw error.response?.data || { message: 'Failed to fetch folders' };
         }
     },
 
-    // Add new comment
-    addComment: async (memeId, commentData) => {
+    // Get folder by ID
+    getFolderById: async (id) => {
         try {
-            const response = await API.post(`/memes/${memeId}/comments`, commentData);
+            const response = await API.get(`/folders/${id}`);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to add comment' };
+            throw error.response?.data || { message: 'Failed to fetch folder' };
         }
     },
 
-    // Update comment
-    updateComment: async (commentId, commentData) => {
+    // Create new folder
+    createFolder: async (folderData) => {
         try {
-            const response = await API.put(`/comments/${commentId}`, commentData);
+            const response = await API.post('/folders', folderData);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to update comment' };
+            throw error.response?.data || { message: 'Failed to create folder' };
         }
     },
 
-    // Delete comment
-    deleteComment: async (commentId) => {
+    // Update folder
+    updateFolder: async (id, folderData) => {
         try {
-            const response = await API.delete(`/comments/${commentId}`);
+            const response = await API.put(`/folders/${id}`, folderData);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to delete comment' };
+            throw error.response?.data || { message: 'Failed to update folder' };
         }
     },
 
-    // Toggle like on comment
-    toggleLike: async (commentId) => {
+    // Delete folder
+    deleteFolder: async (id) => {
         try {
-            const response = await API.post(`/comments/${commentId}/like`);
+            const response = await API.delete(`/folders/${id}`);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to toggle like' };
+            throw error.response?.data || { message: 'Failed to delete folder' };
         }
     },
 
-    // Get replies to a comment
-    getReplies: async (commentId, options = {}) => {
+    // Add meme to folder
+    addMemeToFolder: async (folderId, memeId) => {
         try {
-            const { page = 1, limit = 10 } = options;
-            const response = await API.get(`/comments/${commentId}/replies`, {
-                params: { page, limit }
-            });
+            const response = await API.post(`/folders/${folderId}/memes/${memeId}`);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to fetch replies' };
+            throw error.response?.data || { message: 'Failed to add meme to folder' };
         }
     },
 
-    // Report comment
-    reportComment: async (commentId, reportData) => {
+    // Remove meme from folder
+    removeMemeFromFolder: async (folderId, memeId) => {
         try {
-            const response = await API.post(`/comments/${commentId}/report`, reportData);
+            const response = await API.delete(`/folders/${folderId}/memes/${memeId}`);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to report comment' };
+            throw error.response?.data || { message: 'Failed to remove meme from folder' };
         }
     },
 
-    // Get user's comments
-    getUserComments: async (userId, options = {}) => {
+    // Bulk add memes to folder
+    bulkAddMemesToFolder: async (folderId, memeIds) => {
         try {
-            const { page = 1, limit = 20 } = options;
-            const response = await API.get(`/users/${userId}/comments`, {
-                params: { page, limit }
-            });
+            const response = await API.post(`/folders/${folderId}/memes/bulk`, { memeIds });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to fetch user comments' };
+            throw error.response?.data || { message: 'Failed to add memes to folder' };
+        }
+    },
+
+    // Generate share link for folder
+    generateShareLink: async (folderId) => {
+        try {
+            const response = await API.post(`/folders/${folderId}/share`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to generate share link' };
+        }
+    }
+};
+
+
+// ========================================
+// HEALTH CHECK API
+// ========================================
+
+export const healthAPI = {
+    // Check API health
+    checkHealth: async () => {
+        try {
+            const response = await API.get('/health');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to check API health' };
         }
     }
 };
@@ -548,6 +666,98 @@ export const handleAPIError = (error) => {
     } else {
         // Something else happened
         return error.message || 'An unexpected error occurred';
+    }
+};
+
+// ========================================
+// COMMENTS API
+// ========================================
+
+export const commentsAPI = {
+    // Get comments for a meme
+    getComments: async (memeId, options = {}) => {
+        try {
+            const response = await API.get(`/comments/memes/${memeId}/comments`, {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch comments' };
+        }
+    },
+
+    // Add comment to meme
+    addComment: async (memeId, commentData) => {
+        try {
+            const response = await API.post(`/comments/memes/${memeId}/comments`, commentData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to add comment' };
+        }
+    },
+
+    // Update comment
+    updateComment: async (commentId, commentData) => {
+        try {
+            const response = await API.put(`/comments/${commentId}`, commentData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update comment' };
+        }
+    },
+
+    // Delete comment
+    deleteComment: async (commentId) => {
+        try {
+            const response = await API.delete(`/comments/${commentId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete comment' };
+        }
+    },
+
+    // Toggle like on comment
+    toggleLikeComment: async (commentId) => {
+        try {
+            const response = await API.post(`/comments/${commentId}/like`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to toggle like' };
+        }
+    },
+
+    // Get replies for a comment
+    getReplies: async (commentId, options = {}) => {
+        try {
+            const response = await API.get(`/comments/${commentId}/replies`, {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch replies' };
+        }
+    },
+
+    // Report comment
+    reportComment: async (commentId, reportData) => {
+        try {
+            const response = await API.post(`/comments/${commentId}/report`, reportData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to report comment' };
+        }
+    },
+
+    // Get user's comments
+    getUserComments: async (userId, options = {}) => {
+        try {
+            const response = await API.get(`/comments/users/${userId}/comments`, {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch user comments' };
+        }
     }
 };
 

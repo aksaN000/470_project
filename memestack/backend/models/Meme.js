@@ -157,6 +157,38 @@ const memeSchema = new mongoose.Schema({
         }
     },
     
+    // Collaboration features
+    group: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+        default: null
+    },
+    
+    collaboration: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Collaboration',
+        default: null
+    },
+    
+    challenge: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Challenge',
+        default: null
+    },
+    
+    // Original meme reference (for remixes)
+    originalMeme: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Meme',
+        default: null
+    },
+    
+    remixType: {
+        type: String,
+        enum: ['reaction', 'response', 'continuation', 'parody', 'mashup', 'template_variation'],
+        default: null
+    },
+    
     // Meme creation details (for generated memes)
     memeData: {
         templateId: String,

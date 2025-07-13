@@ -116,21 +116,6 @@ const Login = () => {
         }
     };
 
-    // Handle demo login
-    const handleDemoLogin = async () => {
-        const demoCredentials = {
-            email: 'demo@memestack.com',
-            password: 'demo123'
-        };
-
-        setFormData(demoCredentials);
-        const result = await login(demoCredentials);
-        
-        if (result.success) {
-            navigate(from, { replace: true });
-        }
-    };
-
     return (
         <Container maxWidth="sm" sx={{ py: 8 }}>
             <Paper
@@ -253,45 +238,6 @@ const Login = () => {
                         ) : (
                             'Sign In'
                         )}
-                    </Button>
-
-                    {/* Demo Account Info */}
-                    <Box 
-                        sx={{ 
-                            mb: 2, 
-                            p: 2, 
-                            bgcolor: 'primary.50',
-                            border: '1px solid',
-                            borderColor: 'primary.200',
-                            borderRadius: 2,
-                            textAlign: 'center'
-                        }}
-                    >
-                        <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600, mb: 1 }}>
-                            🎭 Try Demo Account
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                            Email: demo@memestack.com
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                            Password: demo123
-                        </Typography>
-                    </Box>
-
-                    {/* Demo Login Button */}
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        size="large"
-                        onClick={handleDemoLogin}
-                        disabled={isLoading}
-                        sx={{ 
-                            mb: 3,
-                            py: 1.5,
-                            fontWeight: 500,
-                        }}
-                    >
-                        Try Demo Account
                     </Button>
 
                     {/* Links */}

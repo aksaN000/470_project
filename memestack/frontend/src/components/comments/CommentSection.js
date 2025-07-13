@@ -64,13 +64,17 @@ const CommentSection = ({ memeId }) => {
     const loadComments = async () => {
         try {
             setLoading(true);
+            setError('');
             const response = await commentsAPI.getComments(memeId);
             if (response.success) {
                 setComments(response.data.comments);
+            } else {
+                throw new Error(response.message || 'Failed to load comments');
             }
         } catch (error) {
-            setError('Failed to load comments');
             console.error('Error loading comments:', error);
+            setError('Failed to load comments. Please try again.');
+            setComments([]); // Clear comments on error
         } finally {
             setLoading(false);
         }
@@ -78,7 +82,12 @@ const CommentSection = ({ memeId }) => {
 
     const handleSubmitComment = async (e) => {
         e.preventDefault();
-        if (!newComment.trim() || !isAuthenticated) return;
+        if (!newComment.trim()) return;
+
+        if (!isAuthenticated) {
+            setError('Please log in to add comments');
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -92,17 +101,25 @@ const CommentSection = ({ memeId }) => {
                 setNewComment('');
                 setSuccess('Comment added successfully!');
                 setTimeout(() => setSuccess(''), 3000);
-                loadComments(); // Reload comments
+                loadComments(); // Reload comments to get updated list
+            } else {
+                throw new Error(response.message || 'Failed to add comment');
             }
         } catch (error) {
-            setError(error.message || 'Failed to add comment');
+            console.error('Error adding comment:', error);
+            setError(error.message || 'Failed to add comment. Please try again.');
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleSubmitReply = async (commentId) => {
-        if (!replyText.trim() || !isAuthenticated) return;
+        if (!replyText.trim()) return;
+
+        if (!isAuthenticated) {
+            setError('Please log in to reply to comments');
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -118,17 +135,23 @@ const CommentSection = ({ memeId }) => {
                 setReplyText('');
                 setSuccess('Reply added successfully!');
                 setTimeout(() => setSuccess(''), 3000);
-                loadComments(); // Reload comments
+                loadComments(); // Reload comments to show new reply
+            } else {
+                throw new Error(response.message || 'Failed to add reply');
             }
         } catch (error) {
-            setError(error.message || 'Failed to add reply');
+            console.error('Error adding reply:', error);
+            setError(error.message || 'Failed to add reply. Please try again.');
         } finally {
             setSubmitting(false);
         }
     };
 
     const handleLikeComment = async (commentId) => {
-        if (!isAuthenticated) return;
+        if (!isAuthenticated) {
+            setError('Please log in to like comments');
+            return;
+        }
 
         try {
             const response = await commentsAPI.toggleLike(commentId);
@@ -136,15 +159,22 @@ const CommentSection = ({ memeId }) => {
                 // Update the comment in state
                 setComments(comments.map(comment => 
                     comment.id === commentId 
-                        ? { ...comment, 
+                        ? { 
+                            ...comment, 
                             isLiked: response.data.isLiked, 
-                            stats: { ...comment.stats, likesCount: response.data.likesCount } 
+                            stats: { 
+                                ...comment.stats, 
+                                likesCount: response.data.likesCount 
+                            } 
                           }
                         : comment
                 ));
+            } else {
+                throw new Error(response.message || 'Failed to update like');
             }
         } catch (error) {
-            setError('Failed to update like');
+            console.error('Error toggling comment like:', error);
+            setError('Failed to update like. Please try again.');
         }
     };
 
@@ -304,7 +334,7 @@ const CommentSection = ({ memeId }) => {
                 <Card sx={{ mb: 3 }}>
                     <CardContent>
                         <Typography color="text.secondary" textAlign="center">
-                            Please log in to add comments
+                            Please <Button onClick={() => window.location.href = '/login'} variant="text">log in</Button> to add comments
                         </Typography>
                     </CardContent>
                 </Card>
@@ -323,15 +353,17 @@ const CommentSection = ({ memeId }) => {
                                 {/* Comment Header */}
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                     <Avatar 
-                                        src={comment.author.profile?.avatar}
+                                        src={comment.author.profilePicture || comment.author.profile?.avatar}
                                         sx={{ width: 32, height: 32, mr: 2 }}
                                     >
                                         {comment.author.username.charAt(0).toUpperCase()}
                                     </Avatar>
                                     <Box sx={{ flex: 1 }}>
-                                        <Typography variant="body2" fontWeight="bold">
-                                            {comment.author.username}
-                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Typography variant="body2" fontWeight="bold">
+                                                {comment.author.username}
+                                            </Typography>
+                                        </Box>
                                         <Typography variant="caption" color="text.secondary">
                                             {formatDate(comment.createdAt)}
                                         </Typography>

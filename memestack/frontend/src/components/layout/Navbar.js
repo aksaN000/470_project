@@ -28,9 +28,12 @@ import {
     Add as AddIcon,
     Dashboard as DashboardIcon,
     Person as PersonIcon,
-    Logout as LogoutIcon,
     Login as LoginIcon,
     PersonAdd as RegisterIcon,
+    Logout as LogoutIcon,
+    EmojiEvents,
+    Groups,
+    Handshake
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -72,14 +75,19 @@ const Navbar = () => {
     const publicNavItems = [
         { label: 'Home', path: '/', icon: <HomeIcon /> },
         { label: 'Gallery', path: '/gallery', icon: <GalleryIcon /> },
+        { label: 'Challenges', path: '/challenges', icon: <EmojiEvents /> },
+        { label: 'Groups', path: '/groups', icon: <Groups /> },
+        { label: 'Collaborations', path: '/collaborations', icon: <Handshake /> },
     ];
 
     const privateNavItems = [
         { label: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
         { label: 'Feed', path: '/feed', icon: <GalleryIcon /> },
+        { label: 'Create', path: '/create', icon: <AddIcon /> },
+        { label: 'Templates', path: '/templates', icon: <DashboardIcon /> },
+        { label: 'Batch Process', path: '/batch', icon: <DashboardIcon /> },
         { label: 'Folders', path: '/folders', icon: <DashboardIcon /> },
         { label: 'Analytics', path: '/analytics', icon: <DashboardIcon /> },
-        { label: 'Create', path: '/create', icon: <AddIcon /> },
     ];
 
     // Admin-only nav items

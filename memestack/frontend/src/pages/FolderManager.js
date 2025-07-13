@@ -41,20 +41,14 @@ import {
     School as SchoolIcon,
     Home as HomeIcon,
     Sports as SportsIcon,
-    Music as MusicIcon,
+    MusicNote as MusicIcon,
     TrendingUp as TrendingUpIcon,
     Favorite as FavoriteIcon,
     Public as PublicIcon,
-    Tag as TagIcon
+    Label as TagIcon
 } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
-import {
-    getUserFolders,
-    createFolder,
-    updateFolder,
-    deleteFolder,
-    generateShareLink
-} from '../../services/folderAPI';
+import { useAuth } from '../contexts/AuthContext';
+import { foldersAPI } from '../services/api';
 
 const FolderManager = () => {
     const { user } = useAuth();
@@ -103,7 +97,7 @@ const FolderManager = () => {
     const loadFolders = async () => {
         try {
             setLoading(true);
-            const response = await getUserFolders();
+            const response = await foldersAPI.getFolders();
             setFolders(response.folders || []);
         } catch (err) {
             setError('Failed to load folders');
@@ -140,10 +134,10 @@ const FolderManager = () => {
     const handleSubmit = async () => {
         try {
             if (selectedFolder) {
-                await updateFolder(selectedFolder._id, formData);
+                await foldersAPI.updateFolder(selectedFolder._id, formData);
                 setSuccess('Folder updated successfully');
             } else {
-                await createFolder(formData);
+                await foldersAPI.createFolder(formData);
                 setSuccess('Folder created successfully');
             }
             setDialogOpen(false);
@@ -156,7 +150,7 @@ const FolderManager = () => {
     const handleDeleteFolder = async (folderId) => {
         if (window.confirm('Are you sure you want to delete this folder? This action cannot be undone.')) {
             try {
-                await deleteFolder(folderId);
+                await foldersAPI.deleteFolder(folderId);
                 setSuccess('Folder deleted successfully');
                 loadFolders();
             } catch (err) {
@@ -168,7 +162,7 @@ const FolderManager = () => {
 
     const handleShareFolder = async (folderId) => {
         try {
-            const response = await generateShareLink(folderId);
+            const response = await foldersAPI.generateShareLink(folderId);
             const shareUrl = `${window.location.origin}${response.shareUrl}`;
             
             // Copy to clipboard

@@ -239,7 +239,7 @@ app.use('/api/memes', require('./routes/memes'));
 console.log('✅ Memes routes loaded');
 app.use('/api/upload', require('./routes/upload-simple-clean')); // Clean upload routes
 console.log('✅ Upload routes loaded');
-app.use('/api', require('./routes/comments'));
+app.use('/api/comments', require('./routes/comments'));
 console.log('✅ Comment routes loaded');
 app.use('/api/follows', require('./routes/follows'));
 console.log('✅ Follow routes loaded');
@@ -249,7 +249,19 @@ app.use('/api/moderation', require('./routes/moderation'));
 console.log('✅ Moderation routes loaded');
 app.use('/api/folders', require('./routes/folders'));
 console.log('✅ Folder routes loaded');
+app.use('/api/templates', require('./routes/templates'));
+console.log('✅ Template routes loaded');
 // app.use('/api/users', require('./routes/users'));
+
+// ========================================
+// COLLABORATION FEATURE ROUTES
+// ========================================
+app.use('/api/challenges', require('./routes/challenges'));
+console.log('✅ Challenge routes loaded');
+app.use('/api/groups', require('./routes/groups'));
+console.log('✅ Group routes loaded');
+app.use('/api/collaborations', require('./routes/collaborations'));
+console.log('✅ Collaboration routes loaded');
 
 // ========================================
 // ERROR HANDLING MIDDLEWARE

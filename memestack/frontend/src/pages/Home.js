@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useMemes } from '../contexts/MemeContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { healthAPI } from '../services/api';
 
 const Home = () => {
     const navigate = useNavigate();

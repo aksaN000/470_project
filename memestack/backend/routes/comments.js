@@ -23,12 +23,12 @@ const { protect, optionalAuth } = require('../middleware/auth');
 // MEME COMMENTS ROUTES
 // ========================================
 
-// @route   GET /api/memes/:memeId/comments
+// @route   GET /api/comments/memes/:memeId/comments
 // @desc    Get comments for a meme
 // @access  Public (but user-specific data if authenticated)
 router.get('/memes/:memeId/comments', optionalAuth, getComments);
 
-// @route   POST /api/memes/:memeId/comments
+// @route   POST /api/comments/memes/:memeId/comments
 // @desc    Add new comment to meme
 // @access  Private
 router.post('/memes/:memeId/comments', protect, addComment);
@@ -40,27 +40,27 @@ router.post('/memes/:memeId/comments', protect, addComment);
 // @route   PUT /api/comments/:id
 // @desc    Update comment
 // @access  Private (author only)
-router.put('/comments/:id', protect, updateComment);
+router.put('/:id', protect, updateComment);
 
 // @route   DELETE /api/comments/:id
 // @desc    Delete comment
 // @access  Private (author or admin only)
-router.delete('/comments/:id', protect, deleteComment);
+router.delete('/:id', protect, deleteComment);
 
 // @route   POST /api/comments/:id/like
 // @desc    Toggle like on comment
 // @access  Private
-router.post('/comments/:id/like', protect, toggleLikeComment);
+router.post('/:id/like', protect, toggleLikeComment);
 
 // @route   GET /api/comments/:id/replies
 // @desc    Get replies to a comment
 // @access  Public (but user-specific data if authenticated)
-router.get('/comments/:id/replies', optionalAuth, getReplies);
+router.get('/:id/replies', optionalAuth, getReplies);
 
 // @route   POST /api/comments/:id/report
 // @desc    Report comment
 // @access  Private
-router.post('/comments/:id/report', protect, reportComment);
+router.post('/:id/report', protect, reportComment);
 
 // ========================================
 // USER COMMENTS ROUTES

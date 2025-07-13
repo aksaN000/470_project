@@ -11,6 +11,9 @@ const Follow = require('../models/Follow');
 // @access  Private
 const getDashboardAnalytics = async (req, res) => {
     try {
+        console.log('📊 Dashboard analytics requested for user:', req.user._id);
+        console.log('📊 Time range:', req.query.timeRange || '30');
+        
         const userId = req.user._id;
         const { timeRange = '30' } = req.query; // days
 

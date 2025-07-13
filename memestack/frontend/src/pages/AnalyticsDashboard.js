@@ -54,7 +54,7 @@ const AnalyticsDashboard = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await analyticsAPI.getDashboardAnalytics(range);
+            const response = await analyticsAPI.getDashboard(range);
             setAnalytics(response.data);
         } catch (error) {
             console.error('Error fetching analytics:', error);

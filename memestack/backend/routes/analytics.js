@@ -99,4 +99,19 @@ router.get('/help/routes', (req, res) => {
     });
 });
 
+// Test endpoint to verify analytics routes are working
+router.get('/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Analytics routes are working!',
+        timestamp: new Date().toISOString(),
+        availableRoutes: [
+            'GET /api/analytics/dashboard?timeRange=30',
+            'GET /api/analytics/meme/:memeId',
+            'GET /api/analytics/platform',
+            'GET /api/analytics/test'
+        ]
+    });
+});
+
 module.exports = router;

@@ -27,6 +27,11 @@ import FollowingFeed from './pages/FollowingFeed';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import ModerationDashboard from './pages/ModerationDashboard';
 import FolderManager from './pages/FolderManager';
+import TemplateManager from './pages/TemplateManager';
+import BatchProcessor from './pages/BatchProcessor';
+import Challenges from './pages/Challenges';
+import Groups from './pages/Groups';
+import Collaborations from './pages/Collaborations';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -196,6 +201,27 @@ function App() {
                       </ProtectedRoute>
                     } 
                   />
+                  <Route 
+                    path="/templates" 
+                    element={
+                      <ProtectedRoute>
+                        <TemplateManager />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/batch" 
+                    element={
+                      <ProtectedRoute>
+                        <BatchProcessor />
+                      </ProtectedRoute>
+                    } 
+                  />
+
+                  {/* Collaboration Feature Routes */}
+                  <Route path="/challenges" element={<Challenges />} />
+                  <Route path="/groups" element={<Groups />} />
+                  <Route path="/collaborations" element={<Collaborations />} />
 
                   {/* Redirect /memes to /gallery for consistency */}
                   <Route path="/memes" element={<Navigate to="/gallery" replace />} />
