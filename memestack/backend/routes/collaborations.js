@@ -18,7 +18,7 @@ const {
     getMemeRemixes,
     deleteCollaboration
 } = require('../controllers/collaborationController');
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 // Validation middleware

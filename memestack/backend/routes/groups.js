@@ -17,7 +17,7 @@ const {
     searchGroups,
     deleteGroup
 } = require('../controllers/groupController');
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 // Validation middleware

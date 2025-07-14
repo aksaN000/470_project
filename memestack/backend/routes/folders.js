@@ -12,7 +12,7 @@ const {
     generateShareLink,
     getSharedFolder
 } = require('../controllers/folderController');
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 
 // Get help information about all folder endpoints
 router.get('/help', (req, res) => {

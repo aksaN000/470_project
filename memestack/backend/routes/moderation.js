@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const moderationController = require('../controllers/moderationController');
-const auth = require('../middleware/auth');
+const { protect: auth } = require('../middleware/auth');
 const adminAuth = require('../middleware/adminAuth');
 
 // Get help information about all moderation endpoints
