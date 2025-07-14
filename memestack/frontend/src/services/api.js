@@ -761,4 +761,115 @@ export const commentsAPI = {
     }
 };
 
+// ========================================
+// GROUPS API
+// ========================================
+export const groupsAPI = {
+    // Get all groups
+    getGroups: async (options = {}) => {
+        try {
+            const response = await API.get('/groups', {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch groups' };
+        }
+    },
+
+    // Get trending groups
+    getTrending: async () => {
+        try {
+            const response = await API.get('/groups/trending');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch trending groups' };
+        }
+    },
+
+    // Get user's groups
+    getUserGroups: async () => {
+        try {
+            const response = await API.get('/groups/user/groups');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch user groups' };
+        }
+    }
+};
+
+// ========================================
+// COLLABORATIONS API
+// ========================================
+export const collaborationsAPI = {
+    // Get all collaborations
+    getCollaborations: async (options = {}) => {
+        try {
+            const response = await API.get('/collaborations', {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch collaborations' };
+        }
+    },
+
+    // Get trending collaborations
+    getTrending: async () => {
+        try {
+            const response = await API.get('/collaborations/trending');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch trending collaborations' };
+        }
+    },
+
+    // Get user's collaborations
+    getUserCollaborations: async () => {
+        try {
+            const response = await API.get('/collaborations/user/collaborations');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch user collaborations' };
+        }
+    }
+};
+
+// ========================================
+// CHALLENGES API
+// ========================================
+export const challengesAPI = {
+    // Get all challenges
+    getChallenges: async (options = {}) => {
+        try {
+            const response = await API.get('/challenges', {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch challenges' };
+        }
+    },
+
+    // Get trending challenges
+    getTrending: async () => {
+        try {
+            const response = await API.get('/challenges/trending');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch trending challenges' };
+        }
+    },
+
+    // Get user's challenges
+    getUserChallenges: async () => {
+        try {
+            const response = await API.get('/challenges/user/challenges');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch user challenges' };
+        }
+    }
+};
+
 export default API;

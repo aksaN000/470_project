@@ -47,7 +47,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import api, { collaborationsAPI } from '../services/api';
 
 const Collaborations = () => {
     const navigate = useNavigate();
@@ -93,7 +93,7 @@ const Collaborations = () => {
             
             if (tabValue === 1) {
                 // Trending
-                const response = await api.get('/api/collaborations/trending');
+                const response = await collaborationsAPI.getTrending();
                 setCollaborations(response.data);
                 setLoading(false);
                 return;
@@ -104,24 +104,24 @@ const Collaborations = () => {
                     setLoading(false);
                     return;
                 }
-                const response = await api.get('/api/collaborations/user/collaborations');
+                const response = await collaborationsAPI.getUserCollaborations();
                 setCollaborations(response.data);
                 setLoading(false);
                 return;
             }
 
             // All collaborations
-            const params = new URLSearchParams({
+            const paramsObj = {
                 page: currentPage,
                 limit: 12,
                 sort: sortBy
-            });
+            };
 
-            if (searchTerm) params.append('search', searchTerm);
-            if (typeFilter) params.append('type', typeFilter);
-            if (statusFilter) params.append('status', statusFilter);
+            if (searchTerm) paramsObj.search = searchTerm;
+            if (typeFilter) paramsObj.type = typeFilter;
+            if (statusFilter) paramsObj.status = statusFilter;
 
-            const response = await api.get(`/api/collaborations?${params}`);
+            const response = await collaborationsAPI.getCollaborations(paramsObj);
             setCollaborations(response.data.collaborations);
             setTotalPages(response.data.totalPages);
             setLoading(false);

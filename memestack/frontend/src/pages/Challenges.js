@@ -43,7 +43,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import api, { challengesAPI } from '../services/api';
 
 const Challenges = () => {
     const navigate = useNavigate();
@@ -86,19 +86,19 @@ const Challenges = () => {
     const fetchChallenges = async () => {
         try {
             setLoading(true);
-            const params = new URLSearchParams({
+            const paramsObj = {
                 page: currentPage,
                 limit: 12,
                 sort: sortBy
-            });
+            };
 
             if (tabValue === 0) {
                 // All challenges
-                if (searchTerm) params.append('search', searchTerm);
-                if (categoryFilter) params.append('category', categoryFilter);
+                if (searchTerm) paramsObj.search = searchTerm;
+                if (categoryFilter) paramsObj.category = categoryFilter;
             } else if (tabValue === 1) {
                 // Trending
-                const response = await api.get('/api/challenges/trending');
+                const response = await challengesAPI.getTrending();
                 setChallenges(response.data);
                 setLoading(false);
                 return;
@@ -109,13 +109,13 @@ const Challenges = () => {
                     setLoading(false);
                     return;
                 }
-                const response = await api.get('/api/challenges/user/challenges');
+                const response = await challengesAPI.getUserChallenges();
                 setChallenges(response.data);
                 setLoading(false);
                 return;
             }
 
-            const response = await api.get(`/api/challenges?${params}`);
+            const response = await challengesAPI.getChallenges(paramsObj);
             setChallenges(response.data.challenges);
             setTotalPages(response.data.totalPages);
             setLoading(false);

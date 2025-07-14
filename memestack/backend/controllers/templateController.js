@@ -113,10 +113,14 @@ const getTemplates = async (req, res) => {
         // Build query
         const query = {
             $or: [
-                { isPublic: true },
-                { creator: req.user._id }
+                { isPublic: true }
             ]
         };
+
+        // If user is authenticated, also include their private templates
+        if (req.user) {
+            query.$or.push({ creator: req.user._id });
+        }
 
         if (category && category !== 'all') {
             query.category = category;
@@ -137,7 +141,7 @@ const getTemplates = async (req, res) => {
             .sort(sort)
             .skip(skip)
             .limit(parseInt(limit))
-            .populate('creator', 'username email')
+            .populate('creator', 'username email', null, { optional: true })
             .lean();
 
         const total = await MemeTemplate.countDocuments(query);

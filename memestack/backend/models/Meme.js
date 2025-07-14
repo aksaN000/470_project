@@ -237,9 +237,10 @@ memeSchema.index({ title: 'text', description: 'text', tags: 'text' }); // Text 
 
 // Check if user has liked this meme
 memeSchema.virtual('isLikedBy').get(function() {
+    const self = this;
     return function(userId) {
         if (!userId) return false;
-        return this.likes.some(like => like.user.toString() === userId.toString());
+        return self.likes.some(like => like.user.toString() === userId.toString());
     };
 });
 

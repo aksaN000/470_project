@@ -45,7 +45,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import api, { groupsAPI } from '../services/api';
 
 const Groups = () => {
     const navigate = useNavigate();
@@ -84,7 +84,7 @@ const Groups = () => {
             
             if (tabValue === 1) {
                 // Trending
-                const response = await api.get('/api/groups/trending');
+                const response = await groupsAPI.getTrending();
                 setGroups(response.data);
                 setLoading(false);
                 return;
@@ -95,23 +95,23 @@ const Groups = () => {
                     setLoading(false);
                     return;
                 }
-                const response = await api.get('/api/groups/user/groups');
+                const response = await groupsAPI.getUserGroups();
                 setGroups(response.data);
                 setLoading(false);
                 return;
             }
 
             // All groups
-            const params = new URLSearchParams({
+            const paramsObj = {
                 page: currentPage,
                 limit: 12,
                 sort: sortBy
-            });
+            };
 
-            if (searchTerm) params.append('search', searchTerm);
-            if (categoryFilter) params.append('category', categoryFilter);
+            if (searchTerm) paramsObj.search = searchTerm;
+            if (categoryFilter) paramsObj.category = categoryFilter;
 
-            const response = await api.get(`/api/groups?${params}`);
+            const response = await groupsAPI.getGroups(paramsObj);
             setGroups(response.data.groups);
             setTotalPages(response.data.totalPages);
             setLoading(false);
