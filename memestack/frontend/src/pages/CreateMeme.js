@@ -1,7 +1,7 @@
-// ➕ Create Meme Page Component
-// Meme creation interface
+// ➕ Enhanced Create Meme Page Component
+// Modern meme creation interface with AI-powered tools
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     Container,
     Typography,
@@ -17,20 +17,45 @@ import {
     Paper,
     Alert,
     LinearProgress,
+    useTheme,
+    Stack,
+    Chip,
+    IconButton,
+    Stepper,
+    Step,
+    StepLabel,
+    StepContent,
+    Fade,
+    Slide,
+    Avatar,
+    Divider,
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
     Create as CreateIcon,
+    PhotoLibrary as TemplateIcon,
+    AutoAwesome as AIIcon,
+    Preview as PreviewIcon,
+    Publish as PublishIcon,
+    Add as AddIcon,
+    Close as CloseIcon,
+    CameraAlt as CameraIcon,
+    Palette as PaletteIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import { uploadAPI } from '../services/api';
 import MemeEditor from '../components/MemeEditor';
 
 const CreateMeme = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const { mode } = useThemeMode();
     const { createMeme, loading } = useMemes();
+    const fileInputRef = useRef(null);
 
+    const [activeStep, setActiveStep] = useState(0);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -47,10 +72,46 @@ const CreateMeme = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
     const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [tags, setTags] = useState([]);
+    const [currentTag, setCurrentTag] = useState('');
+
+    const steps = [
+        {
+            label: 'Choose Source',
+            description: 'Upload an image or select a template',
+            icon: <UploadIcon />,
+        },
+        {
+            label: 'Edit & Design',
+            description: 'Add text, effects, and customize your meme',
+            icon: <PaletteIcon />,
+        },
+        {
+            label: 'Details & Publish',
+            description: 'Add title, description, and publish settings',
+            icon: <PublishIcon />,
+        },
+    ];
 
     const categories = [
-        'funny', 'reaction', 'gaming', 'sports', 
-        'political', 'wholesome', 'dark', 'custom'
+        { value: 'funny', label: '😂 Funny', color: '#f59e0b' },
+        { value: 'reaction', label: '😮 Reaction', color: '#ef4444' },
+        { value: 'political', label: '🏛️ Political', color: '#6366f1' },
+        { value: 'sports', label: '⚽ Sports', color: '#10b981' },
+        { value: 'tech', label: '💻 Tech', color: '#8b5cf6' },
+        { value: 'gaming', label: '🎮 Gaming', color: '#ec4899' },
+        { value: 'anime', label: '🦸 Anime', color: '#06b6d4' },
+        { value: 'other', label: '🤷 Other', color: '#64748b' },
+    ];
+
+    const popularTemplates = [
+        { id: 1, name: 'Drake Pointing', url: '/api/placeholder/300/300', category: 'reaction' },
+        { id: 2, name: 'Distracted Boyfriend', url: '/api/placeholder/300/300', category: 'funny' },
+        { id: 3, name: 'Two Buttons', url: '/api/placeholder/300/300', category: 'decision' },
+        { id: 4, name: 'Change My Mind', url: '/api/placeholder/300/300', category: 'opinion' },
+        { id: 5, name: 'Galaxy Brain', url: '/api/placeholder/300/300', category: 'smart' },
+        { id: 6, name: 'This Is Fine', url: '/api/placeholder/300/300', category: 'reaction' },
     ];
 
     const handleInputChange = (e) => {
@@ -376,8 +437,8 @@ const CreateMeme = () => {
                                         label="Category"
                                     >
                                         {categories.map((category) => (
-                                            <MenuItem key={category} value={category}>
-                                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                                            <MenuItem key={category.value} value={category.value}>
+                                                {category.label}
                                             </MenuItem>
                                         ))}
                                     </Select>

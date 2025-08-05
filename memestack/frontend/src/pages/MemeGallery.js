@@ -21,6 +21,10 @@ import {
     Pagination,
     IconButton,
     Avatar,
+    Paper,
+    useTheme,
+    Fade,
+    Slide,
 } from '@mui/material';
 import { 
     Search as SearchIcon,
@@ -30,6 +34,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ReportButton from '../components/moderation/ReportButton';
@@ -37,6 +42,8 @@ import FollowButton from '../components/common/FollowButton';
 
 const MemeGallery = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const { mode } = useThemeMode();
     const { 
         memes, 
         pagination, 
@@ -137,224 +144,444 @@ const MemeGallery = () => {
     ];
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    🖼️ Meme Gallery
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Discover and enjoy the best memes from our community
-                </Typography>
-            </Box>
-
-            {/* Filters */}
-            <Box sx={{ mb: 4 }}>
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={6} md={4}>
-                        <TextField
-                            fullWidth
-                            placeholder="Search memes..."
-                            value={localFilters.search}
-                            onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value })}
-                            onKeyPress={handleSearch}
-                        />
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <FormControl fullWidth>
-                            <InputLabel>Category</InputLabel>
-                            <Select
-                                value={localFilters.category}
-                                onChange={(e) => handleFilterChange('category', e.target.value)}
-                                label="Category"
-                            >
-                                {categories.map((category) => (
-                                    <MenuItem key={category} value={category}>
-                                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <FormControl fullWidth>
-                            <InputLabel>Sort By</InputLabel>
-                            <Select
-                                value={localFilters.sortBy}
-                                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                                label="Sort By"
-                            >
-                                <MenuItem value="createdAt">Newest</MenuItem>
-                                <MenuItem value="stats.likesCount">Most Liked</MenuItem>
-                                <MenuItem value="stats.views">Most Viewed</MenuItem>
-                                <MenuItem value="title">Title</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={2}>
-                        <Button
-                            fullWidth
-                            variant="contained"
-                            onClick={handleSearch}
-                            startIcon={<SearchIcon />}
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        }}>
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+                {/* Enhanced Header */}
+                <Fade in={true} timeout={1000}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 4,
+                            mb: 4,
+                            background: mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(20px)',
+                            border: mode === 'dark'
+                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                : '1px solid rgba(99, 102, 241, 0.1)',
+                            borderRadius: '24px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '4px',
+                                background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                            },
+                        }}
+                    >
+                        <Typography 
+                            variant="h3" 
+                            component="h1" 
+                            sx={{
+                                fontWeight: 800,
+                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                color: 'transparent',
+                                mb: 2,
+                            }}
                         >
-                            Search
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Box>
+                            🖼️ Meme Gallery
+                        </Typography>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                color: theme.palette.text.secondary,
+                                fontWeight: 500,
+                            }}
+                        >
+                            Discover and enjoy the best memes from our community
+                        </Typography>
+                    </Paper>
+                </Fade>
 
-            {/* Loading State */}
-            {loading.memes ? (
-                <LoadingSpinner message="Loading memes..." />
-            ) : (
-                <>
-                    {/* Memes Grid */}
-                    <Grid container spacing={3}>
-                        {memes.map((meme) => (
-                            <Grid item xs={12} sm={6} md={4} key={meme.id}>
-                                <Card
+                {/* Enhanced Filters */}
+                <Fade in={true} timeout={1200}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            mb: 4,
+                            background: mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(20px)',
+                            border: mode === 'dark'
+                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                : '1px solid rgba(99, 102, 241, 0.1)',
+                            borderRadius: '20px',
+                        }}
+                    >
+                        <Grid container spacing={3} alignItems="center">
+                            <Grid item xs={12} sm={6} md={4}>
+                                <TextField
+                                    fullWidth
+                                    placeholder="Search memes..."
+                                    value={localFilters.search}
+                                    onChange={(e) => setLocalFilters({ ...localFilters, search: e.target.value })}
+                                    onKeyPress={handleSearch}
                                     sx={{
-                                        height: '100%',
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s ease-in-out',
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '12px',
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.05)'
+                                                : 'rgba(255, 255, 255, 0.8)',
+                                        }
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select
+                                        value={localFilters.category}
+                                        onChange={(e) => handleFilterChange('category', e.target.value)}
+                                        label="Category"
+                                        sx={{
+                                            borderRadius: '12px',
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.05)'
+                                                : 'rgba(255, 255, 255, 0.8)',
+                                        }}
+                                    >
+                                        {categories.map((category) => (
+                                            <MenuItem key={category} value={category}>
+                                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Sort By</InputLabel>
+                                    <Select
+                                        value={localFilters.sortBy}
+                                        onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                                        label="Sort By"
+                                        sx={{
+                                            borderRadius: '12px',
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.05)'
+                                                : 'rgba(255, 255, 255, 0.8)',
+                                        }}
+                                    >
+                                        <MenuItem value="createdAt">Newest</MenuItem>
+                                        <MenuItem value="stats.likesCount">Most Liked</MenuItem>
+                                        <MenuItem value="stats.views">Most Viewed</MenuItem>
+                                        <MenuItem value="title">Title</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={2}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={handleSearch}
+                                    startIcon={<SearchIcon />}
+                                    sx={{
+                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        borderRadius: '12px',
+                                        py: 1.5,
+                                        fontWeight: 600,
+                                        textTransform: 'none',
+                                        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
                                         '&:hover': {
-                                            transform: 'translateY(-2px)',
+                                            background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
+                                            boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
                                         },
                                     }}
-                                    onClick={() => navigate(`/meme/${meme.id}`)}
                                 >
-                                    <CardMedia
-                                        component="img"
-                                        height="200"
-                                        image={meme.imageUrl}
-                                        alt={meme.title}
-                                        sx={{ objectFit: 'cover' }}
-                                    />
-                                    <CardContent>
-                                        <Typography 
-                                            variant="h6" 
-                                            component="h3" 
-                                            gutterBottom
+                                    Search
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                </Fade>
+
+                {/* Loading State */}
+                {loading.memes ? (
+                    <LoadingSpinner message="Loading memes..." />
+                ) : (
+                    <>
+                        {/* Enhanced Memes Grid */}
+                        <Grid container spacing={3}>
+                            {memes.map((meme, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={meme.id}>
+                                    <Slide direction="up" in={true} timeout={800 + index * 100}>
+                                        <Card
                                             sx={{
+                                                height: '500px',
+                                                background: mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(255, 255, 255, 0.9)',
+                                                backdropFilter: 'blur(20px)',
+                                                border: mode === 'dark'
+                                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                                borderRadius: '20px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
                                                 overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                '&:hover': {
+                                                    transform: 'translateY(-8px)',
+                                                    background: mode === 'dark'
+                                                        ? 'rgba(255, 255, 255, 0.08)'
+                                                        : 'rgba(255, 255, 255, 1)',
+                                                    boxShadow: mode === 'dark'
+                                                        ? '0 20px 60px rgba(99, 102, 241, 0.3)'
+                                                        : '0 20px 60px rgba(99, 102, 241, 0.2)',
+                                                    borderColor: mode === 'dark'
+                                                        ? 'rgba(99, 102, 241, 0.4)'
+                                                        : 'rgba(99, 102, 241, 0.3)',
+                                                },
                                             }}
+                                            onClick={() => navigate(`/meme/${meme.id}`)}
                                         >
-                                            {meme.title}
-                                        </Typography>
-                                        
-                                        {/* Creator Info */}
-                                        {meme.creator && (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                                <Avatar 
-                                                    src={meme.creator.profile?.avatar} 
-                                                    sx={{ width: 24, height: 24, mr: 1 }}
+                                            <CardMedia
+                                                component="img"
+                                                height="200"
+                                                image={meme.imageUrl}
+                                                alt={meme.title}
+                                                sx={{ 
+                                                    objectFit: 'cover',
+                                                    borderRadius: '16px 16px 0 0',
+                                                }}
+                                            />
+                                            <CardContent sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
+                                                <Typography 
+                                                    variant="h6" 
+                                                    component="h3" 
+                                                    gutterBottom
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap',
+                                                        fontWeight: 600,
+                                                        color: theme.palette.text.primary,
+                                                        mb: 2,
+                                                    }}
                                                 >
-                                                    {meme.creator.username?.charAt(0).toUpperCase()}
-                                                </Avatar>
-                                                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
-                                                    by {meme.creator.profile?.displayName || meme.creator.username}
+                                                    {meme.title}
                                                 </Typography>
-                                                <Box onClick={(e) => e.stopPropagation()}>
-                                                    <FollowButton 
-                                                        userId={meme.creator._id} 
-                                                        username={meme.creator.username}
-                                                        variant="chip"
+                                                
+                                                {/* Creator Info */}
+                                                {meme.creator && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                                        <Avatar 
+                                                            src={meme.creator.profile?.avatar} 
+                                                            sx={{ 
+                                                                width: 24, 
+                                                                height: 24, 
+                                                                mr: 1,
+                                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                            }}
+                                                        >
+                                                            {meme.creator.username?.charAt(0).toUpperCase()}
+                                                        </Avatar>
+                                                        <Typography 
+                                                            variant="body2" 
+                                                            sx={{ 
+                                                                flexGrow: 1,
+                                                                color: theme.palette.text.secondary,
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap',
+                                                            }}
+                                                        >
+                                                            by {meme.creator.profile?.displayName || meme.creator.username}
+                                                        </Typography>
+                                                        <Box onClick={(e) => e.stopPropagation()}>
+                                                            <FollowButton 
+                                                                userId={meme.creator._id} 
+                                                                username={meme.creator.username}
+                                                                variant="chip"
+                                                                size="small"
+                                                            />
+                                                        </Box>
+                                                    </Box>
+                                                )}
+                                                
+                                                <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                                                    <Chip 
+                                                        label={meme.category} 
+                                                        size="small" 
+                                                        sx={{
+                                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                            color: 'white',
+                                                            fontWeight: 600,
+                                                            '& .MuiChip-label': {
+                                                                color: 'white'
+                                                            }
+                                                        }}
+                                                    />
+                                                    <Chip 
+                                                        label={`❤️ ${meme.stats.likesCount}`} 
+                                                        size="small" 
+                                                        variant="outlined"
+                                                        sx={{
+                                                            borderColor: theme.palette.primary.main,
+                                                            color: theme.palette.primary.main,
+                                                        }}
+                                                    />
+                                                </Box>
+                                                <Typography 
+                                                    variant="body2" 
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 3,
+                                                        WebkitBoxOrient: 'vertical',
+                                                        color: theme.palette.text.secondary,
+                                                        lineHeight: 1.5,
+                                                        flex: 1,
+                                                    }}
+                                                >
+                                                    {meme.description || 'No description available'}
+                                                </Typography>
+                                            </CardContent>
+                                            <CardActions sx={{ justifyContent: 'space-between', p: 2 }} onClick={(e) => e.stopPropagation()}>
+                                                <Box>
+                                                    <IconButton
+                                                        size="small"
+                                                        color={meme.isLiked ? 'error' : 'default'}
+                                                        onClick={(e) => handleLike(meme.id, e)}
+                                                        title="Like meme"
+                                                        sx={{
+                                                            '&:hover': {
+                                                                background: 'rgba(239, 68, 68, 0.1)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        {meme.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={(e) => handleDownload(meme, e)}
+                                                        title="Download meme"
+                                                        sx={{
+                                                            '&:hover': {
+                                                                background: 'rgba(99, 102, 241, 0.1)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        <DownloadIcon />
+                                                    </IconButton>
+                                                    <ReportButton
+                                                        contentType="meme"
+                                                        contentId={meme.id}
+                                                        reportedUserId={meme.createdBy?.id || meme.createdBy}
+                                                        variant="icon"
                                                         size="small"
                                                     />
                                                 </Box>
-                                            </Box>
-                                        )}
-                                        
-                                        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                                            <Chip 
-                                                label={meme.category} 
-                                                size="small" 
-                                                color="primary" 
-                                            />
-                                            <Chip 
-                                                label={`❤️ ${meme.stats.likesCount}`} 
-                                                size="small" 
-                                                variant="outlined" 
-                                            />
-                                        </Box>
-                                        <Typography 
-                                            variant="body2" 
-                                            color="text.secondary"
+                                                <Typography 
+                                                    variant="caption" 
+                                                    sx={{ color: theme.palette.text.secondary }}
+                                                >
+                                                    {new Date(meme.createdAt).toLocaleDateString()}
+                                                </Typography>
+                                            </CardActions>
+                                        </Card>
+                                    </Slide>
+                                </Grid>
+                            ))}
+                        </Grid>
+
+                        {/* Enhanced Pagination */}
+                        {pagination.totalPages > 1 && (
+                            <Fade in={true} timeout={1500}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: 2,
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.05)'
+                                                : 'rgba(255, 255, 255, 0.9)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                            borderRadius: '16px',
+                                        }}
+                                    >
+                                        <Pagination
+                                            count={pagination.totalPages}
+                                            page={pagination.currentPage}
+                                            onChange={handlePageChange}
+                                            color="primary"
+                                            size="large"
                                             sx={{
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
+                                                '& .MuiPaginationItem-root': {
+                                                    borderRadius: '12px',
+                                                    fontWeight: 600,
+                                                },
+                                                '& .Mui-selected': {
+                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6) !important',
+                                                    color: 'white',
+                                                }
                                             }}
-                                        >
-                                            {meme.description || 'No description available'}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions sx={{ justifyContent: 'space-between' }} onClick={(e) => e.stopPropagation()}>
-                                        <Box>
-                                            <IconButton
-                                                size="small"
-                                                color={meme.isLiked ? 'error' : 'default'}
-                                                onClick={(e) => handleLike(meme.id, e)}
-                                                title="Like meme"
-                                            >
-                                                {meme.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={(e) => handleDownload(meme, e)}
-                                                title="Download meme"
-                                            >
-                                                <DownloadIcon />
-                                            </IconButton>
-                                            <ReportButton
-                                                contentType="meme"
-                                                contentId={meme.id}
-                                                reportedUserId={meme.createdBy?.id || meme.createdBy}
-                                                variant="icon"
-                                                size="small"
-                                            />
-                                        </Box>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {new Date(meme.createdAt).toLocaleDateString()}
-                                        </Typography>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
+                                        />
+                                    </Paper>
+                                </Box>
+                            </Fade>
+                        )}
 
-                    {/* Pagination */}
-                    {pagination.totalPages > 1 && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                            <Pagination
-                                count={pagination.totalPages}
-                                page={pagination.currentPage}
-                                onChange={handlePageChange}
-                                color="primary"
-                                size="large"
-                            />
-                        </Box>
-                    )}
-
-                    {/* No Results */}
-                    {memes.length === 0 && !loading.memes && (
-                        <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography variant="h6" gutterBottom>
-                                No memes found
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                Try adjusting your search criteria or create the first meme!
-                            </Typography>
-                        </Box>
-                    )}
-                </>
-            )}
-        </Container>
+                        {/* Enhanced No Results */}
+                        {memes.length === 0 && !loading.memes && (
+                            <Fade in={true} timeout={1000}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 8,
+                                        textAlign: 'center',
+                                        background: mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.05)'
+                                            : 'rgba(255, 255, 255, 0.9)',
+                                        backdropFilter: 'blur(20px)',
+                                        border: mode === 'dark'
+                                            ? '1px solid rgba(255, 255, 255, 0.1)'
+                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                        borderRadius: '20px',
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="h6" 
+                                        gutterBottom
+                                        sx={{ 
+                                            fontWeight: 600,
+                                            color: theme.palette.text.primary,
+                                        }}
+                                    >
+                                        No memes found
+                                    </Typography>
+                                    <Typography 
+                                        variant="body2" 
+                                        sx={{ color: theme.palette.text.secondary }}
+                                    >
+                                        Try adjusting your search criteria or create the first meme!
+                                    </Typography>
+                                </Paper>
+                            </Fade>
+                        )}
+                    </>
+                )}
+            </Container>
+        </Box>
     );
 };
 

@@ -41,12 +41,12 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 const AccountSettings = () => {
     const navigate = useNavigate();
     const { user, updateProfile } = useAuth();
-    const { mode, toggleTheme } = useTheme();
+    const { mode, toggleTheme } = useThemeMode();
 
     const [formData, setFormData] = useState({
         username: user?.username || '',

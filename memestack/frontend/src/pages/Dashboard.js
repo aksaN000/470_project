@@ -1,7 +1,7 @@
-// 📊 Dashboard Page Component
-// User dashboard with personal meme collection and stats
+// 📊 Enhanced Dashboard Page Component
+// Modern user dashboard with comprehensive stats and quick actions
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Typography,
@@ -10,6 +10,16 @@ import {
     CardContent,
     Grid,
     Button,
+    useTheme,
+    Paper,
+    Avatar,
+    Chip,
+    LinearProgress,
+    Stack,
+    IconButton,
+    Fade,
+    Slide,
+    Zoom,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -18,97 +28,422 @@ import {
     Favorite as FavoriteIcon,
     Visibility as VisibilityIcon,
     Share as ShareIcon,
+    TrendingUp as TrendingIcon,
+    EmojiEvents as AchievementIcon,
+    Timeline as AnalyticsIcon,
+    Notifications as NotificationIcon,
+    Settings as SettingsIcon,
+    CloudUpload as UploadIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import StatCard from '../components/common/StatCard';
 import ActionCard from '../components/common/ActionCard';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const { mode } = useThemeMode();
     const { user } = useAuth();
+    const [animationStep, setAnimationStep] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setAnimationStep(prev => (prev + 1) % 3);
+        }, 2000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // Enhanced stats data
+    const userStats = [
+        {
+            icon: <MemoryIcon sx={{ fontSize: 28 }} />,
+            title: 'Total Memes',
+            value: user?.stats?.totalMemes || '12',
+            change: '+3 this week',
+        },
+        {
+            icon: <FavoriteIcon sx={{ fontSize: 28 }} />,
+            title: 'Total Likes',
+            value: user?.stats?.totalLikes || '1.2k',
+            change: '+127 this week',
+        },
+        {
+            icon: <VisibilityIcon sx={{ fontSize: 28 }} />,
+            title: 'Total Views',
+            value: user?.stats?.totalViews || '15.7k',
+            change: '+2.1k this week',
+        },
+        {
+            icon: <ShareIcon sx={{ fontSize: 28 }} />,
+            title: 'Shares',
+            value: user?.stats?.totalShares || '89',
+            change: '+12 this week',
+        },
+    ];
+
+    // Quick actions with enhanced styling
+    const quickActions = [
+        {
+            title: 'Create New Meme',
+            description: 'Use our AI-powered editor to create viral content',
+            icon: <AddIcon sx={{ fontSize: 40 }} />,
+            action: () => navigate('/create'),
+            badge: 'Popular'
+        },
+        {
+            title: 'Browse Templates',
+            description: 'Explore thousands of trending meme templates',
+            icon: <GalleryIcon sx={{ fontSize: 40 }} />,
+            action: () => navigate('/templates'),
+            badge: 'New'
+        },
+        {
+            title: 'View Analytics',
+            description: 'Track your meme performance and engagement',
+            icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+            action: () => navigate('/analytics'),
+            badge: 'Pro'
+        },
+    ];
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Welcome back, {user?.username}! 👋
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    Ready to create some amazing memes?
-                </Typography>
-            </Box>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        }}>
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+                {/* Enhanced Header Section */}
+                <Fade in={true} timeout={1000}>
+                    <Box sx={{ mb: 6 }}>
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 4,
+                                background: mode === 'light'
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)'
+                                    : 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.7) 100%)',
+                                backdropFilter: 'blur(20px)',
+                                border: `1px solid ${mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+                                borderRadius: '24px',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                '&::before': {
+                                    content: '""',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '4px',
+                                    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                },
+                            }}
+                        >
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} alignItems="center">
+                                <Avatar
+                                    src={user?.profilePicture}
+                                    sx={{
+                                        width: 80,
+                                        height: 80,
+                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        fontSize: '2rem',
+                                        fontWeight: 700,
+                                        border: '4px solid rgba(255, 255, 255, 0.2)',
+                                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                                    }}
+                                >
+                                    {user?.username?.[0]?.toUpperCase() || 'U'}
+                                </Avatar>
+                                
+                                <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+                                    <Typography 
+                                        variant="h3" 
+                                        component="h1" 
+                                        sx={{ 
+                                            fontWeight: 800,
+                                            mb: 1,
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                            backgroundClip: 'text',
+                                            WebkitBackgroundClip: 'text',
+                                            color: 'transparent',
+                                        }}
+                                    >
+                                        Welcome back, {user?.username}! 👋
+                                    </Typography>
+                                    <Typography 
+                                        variant="h6" 
+                                        color="text.secondary"
+                                        sx={{ mb: 2 }}
+                                    >
+                                        Ready to create your next viral masterpiece?
+                                    </Typography>
+                                    <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
+                                        <Chip
+                                            icon={<TrendingIcon />}
+                                            label="Trending Creator"
+                                            size="small"
+                                            sx={{
+                                                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                                                color: 'white',
+                                                fontWeight: 600,
+                                            }}
+                                        />
+                                        <Chip
+                                            icon={<AchievementIcon />}
+                                            label={`Level ${user?.level || 5}`}
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ borderColor: theme.palette.primary.main, color: theme.palette.primary.main }}
+                                        />
+                                    </Stack>
+                                </Box>
 
-            <Grid container spacing={3}>
-                {/* Quick Actions */}
-                <Grid item xs={12} md={6}>
-                    <ActionCard
-                        title="Create New Meme"
-                        description="Start creating your next viral meme"
-                        icon={<AddIcon />}
-                        buttonText="Create Meme"
-                        buttonStartIcon={<AddIcon />}
-                        onClick={() => navigate('/create')}
-                        color="primary"
-                    />
+                                <Stack direction="row" spacing={1}>
+                                    <IconButton
+                                        onClick={() => navigate('/settings')}
+                                        sx={{
+                                            background: 'rgba(99, 102, 241, 0.1)',
+                                            '&:hover': { background: 'rgba(99, 102, 241, 0.2)' }
+                                        }}
+                                    >
+                                        <SettingsIcon sx={{ color: theme.palette.primary.main }} />
+                                    </IconButton>
+                                    <IconButton
+                                        sx={{
+                                            background: 'rgba(236, 72, 153, 0.1)',
+                                            '&:hover': { background: 'rgba(236, 72, 153, 0.2)' }
+                                        }}
+                                    >
+                                        <NotificationIcon sx={{ color: theme.palette.secondary.main }} />
+                                    </IconButton>
+                                </Stack>
+                            </Stack>
+                        </Paper>
+                    </Box>
+                </Fade>
+
+                {/* Enhanced Stats Grid */}
+                <Grid container spacing={3} sx={{ mb: 6 }}>
+                    {userStats.map((stat, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Zoom in={true} timeout={1000 + index * 200}>
+                                <Card
+                                    sx={{
+                                        height: '200px',
+                                        background: mode === 'dark' 
+                                            ? 'rgba(255, 255, 255, 0.05)' 
+                                            : 'rgba(255, 255, 255, 0.9)',
+                                        backdropFilter: 'blur(20px)',
+                                        border: mode === 'dark'
+                                            ? '1px solid rgba(255, 255, 255, 0.1)'
+                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                        borderRadius: '20px',
+                                        overflow: 'hidden',
+                                        position: 'relative',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-8px)',
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 1)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 20px 60px rgba(99, 102, 241, 0.3)'
+                                                : '0 20px 60px rgba(99, 102, 241, 0.2)',
+                                            borderColor: mode === 'dark'
+                                                ? 'rgba(99, 102, 241, 0.4)'
+                                                : 'rgba(99, 102, 241, 0.3)',
+                                        },
+                                    }}
+                                >
+                                    <CardContent sx={{ p: 3, position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                            <Box
+                                                sx={{
+                                                    p: 1.5,
+                                                    borderRadius: '12px',
+                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    color: 'white',
+                                                    mr: 2,
+                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                }}
+                                            >
+                                                {stat.icon}
+                                            </Box>
+                                            <Typography 
+                                                variant="h6" 
+                                                sx={{ 
+                                                    fontWeight: 600,
+                                                    color: theme.palette.text.primary
+                                                }}
+                                            >
+                                                {stat.title}
+                                            </Typography>
+                                        </Box>
+                                        
+                                        <Typography 
+                                            variant="h4" 
+                                            sx={{ 
+                                                fontWeight: 800, 
+                                                mb: 1,
+                                                color: theme.palette.text.primary
+                                            }}
+                                        >
+                                            {stat.value}
+                                        </Typography>
+                                        
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                opacity: 0.7,
+                                                color: theme.palette.text.secondary,
+                                                mt: 'auto'
+                                            }}
+                                        >
+                                            {stat.change}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Zoom>
+                        </Grid>
+                    ))}
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                    <ActionCard
-                        title="Browse Gallery"
-                        description="Discover trending memes from the community"
-                        icon={<GalleryIcon />}
-                        buttonText="View Gallery"
-                        buttonStartIcon={<GalleryIcon />}
-                        buttonVariant="outlined"
-                        buttonColor="secondary"
-                        onClick={() => navigate('/gallery')}
-                        color="secondary"
-                    />
-                </Grid>
-
-                {/* Stats Cards */}
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="Memes Created"
-                        value={user?.stats?.memesCreated || 0}
-                        color="primary"
-                        variant="compact"
-                        icon={<MemoryIcon />}
-                    />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="Total Likes"
-                        value={user?.stats?.totalLikes || 0}
-                        color="secondary"
-                        variant="compact"
-                        icon={<FavoriteIcon />}
-                    />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="Total Views"
-                        value={user?.stats?.totalViews || 0}
-                        color="success"
-                        variant="compact"
-                        icon={<VisibilityIcon />}
-                    />
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <StatCard
-                        title="Total Shares"
-                        value={user?.stats?.totalShares || 0}
-                        color="warning"
-                        variant="compact"
-                        icon={<ShareIcon />}
-                    />
-                </Grid>
-            </Grid>
-        </Container>
+                {/* Quick Actions Section */}
+                <Box sx={{ mb: 6 }}>
+                    <Typography 
+                        variant="h4" 
+                        component="h2" 
+                        sx={{ 
+                            fontWeight: 700, 
+                            mb: 4,
+                            textAlign: 'center',
+                            color: theme.palette.text.primary,
+                        }}
+                    >
+                        Quick Actions
+                    </Typography>
+                    
+                    <Grid container spacing={4}>
+                        {quickActions.map((action, index) => (
+                            <Grid item xs={12} md={4} key={index}>
+                                <Slide direction="up" in={true} timeout={1000 + index * 200}>
+                                    <Card
+                                        onClick={action.action}
+                                        sx={{
+                                            height: '320px',
+                                            background: mode === 'dark' 
+                                                ? 'rgba(255, 255, 255, 0.05)' 
+                                                : 'rgba(255, 255, 255, 0.9)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                            borderRadius: '24px',
+                                            cursor: 'pointer',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                            '&:hover': {
+                                                transform: 'translateY(-12px)',
+                                                background: mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                    : 'rgba(255, 255, 255, 1)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 25px 80px rgba(99, 102, 241, 0.3)'
+                                                    : '0 25px 80px rgba(99, 102, 241, 0.2)',
+                                                borderColor: mode === 'dark'
+                                                    ? 'rgba(99, 102, 241, 0.4)'
+                                                    : 'rgba(99, 102, 241, 0.3)',
+                                            },
+                                        }}
+                                    >
+                                        <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 2 }}>
+                                            <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                                                <Chip
+                                                    label={action.badge}
+                                                    size="small"
+                                                    sx={{
+                                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                        color: 'white',
+                                                        fontWeight: 600,
+                                                        border: 'none',
+                                                        '& .MuiChip-label': {
+                                                            color: 'white'
+                                                        }
+                                                    }}
+                                                />
+                                            </Box>
+                                            
+                                            <Box
+                                                sx={{
+                                                    width: '80px',
+                                                    height: '80px',
+                                                    borderRadius: '20px',
+                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    mb: 3,
+                                                    color: 'white',
+                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                }}
+                                            >
+                                                {action.icon}
+                                            </Box>
+                                            
+                                            <Typography 
+                                                variant="h5" 
+                                                sx={{ 
+                                                    fontWeight: 700, 
+                                                    mb: 2,
+                                                    color: theme.palette.text.primary
+                                                }}
+                                            >
+                                                {action.title}
+                                            </Typography>
+                                            
+                                            <Typography 
+                                                variant="body1" 
+                                                sx={{ 
+                                                    opacity: 0.8, 
+                                                    flex: 1,
+                                                    color: theme.palette.text.secondary
+                                                }}
+                                            >
+                                                {action.description}
+                                            </Typography>
+                                            
+                                            <Button
+                                                variant="contained"
+                                                sx={{
+                                                    mt: 2,
+                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    color: 'white',
+                                                    fontWeight: 600,
+                                                    borderRadius: '12px',
+                                                    textTransform: 'none',
+                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                    '&:hover': {
+                                                        background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
+                                                        boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                    },
+                                                }}
+                                            >
+                                                Get Started
+                                            </Button>
+                                        </CardContent>
+                                    </Card>
+                                </Slide>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

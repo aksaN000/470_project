@@ -46,9 +46,9 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
-    <ThemeProvider>
-      <CssBaseline />
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <CssBaseline />
         <MemeProvider>
           <Router>
             <Box 
@@ -188,8 +188,8 @@ function App() {
             </Box>
           </Router>
         </MemeProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

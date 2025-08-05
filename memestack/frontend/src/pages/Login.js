@@ -14,6 +14,9 @@ import {
     InputAdornment,
     IconButton,
     CircularProgress,
+    useTheme,
+    Fade,
+    Zoom,
 } from '@mui/material';
 import {
     Visibility,
@@ -23,10 +26,13 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const theme = useTheme();
+    const { mode } = useThemeMode();
     const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
 
     // Form state
@@ -117,170 +123,330 @@ const Login = () => {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ py: 8 }}>
-            <Paper
-                elevation={3}
-                sx={{
-                    p: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                {/* Header */}
-                <Typography 
-                    variant="h4" 
-                    component="h1" 
-                    gutterBottom
-                    sx={{ fontWeight: 700, mb: 1 }}
-                >
-                    🎭 Welcome Back
-                </Typography>
-                
-                <Typography 
-                    variant="body1" 
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ mb: 3 }}
-                >
-                    Sign in to your MemeStack account to continue creating and sharing memes.
-                </Typography>
-
-                {/* Error Alert */}
-                {error && (
-                    <Alert 
-                        severity="error" 
-                        sx={{ width: '100%', mb: 3 }}
-                        onClose={clearError}
-                    >
-                        {error}
-                    </Alert>
-                )}
-
-                {/* Login Form */}
-                <Box 
-                    component="form" 
-                    onSubmit={handleSubmit}
-                    sx={{ width: '100%' }}
-                >
-                    {/* Email Field */}
-                    <TextField
-                        fullWidth
-                        id="email"
-                        name="email"
-                        label="Email Address"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        error={!!validationErrors.email}
-                        helperText={validationErrors.email}
-                        margin="normal"
-                        autoComplete="email"
-                        autoFocus
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <EmailIcon color="action" />
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-
-                    {/* Password Field */}
-                    <TextField
-                        fullWidth
-                        id="password"
-                        name="password"
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.password}
-                        onChange={handleChange}
-                        error={!!validationErrors.password}
-                        helperText={validationErrors.password}
-                        margin="normal"
-                        autoComplete="current-password"
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <LockIcon color="action" />
-                                </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleTogglePassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-
-                    {/* Submit Button */}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        size="large"
-                        disabled={isLoading}
-                        sx={{ 
-                            mt: 3, 
-                            mb: 2,
-                            py: 1.5,
-                            fontWeight: 600,
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            py: 4,
+        }}>
+            <Container maxWidth="sm">
+                <Fade in={true} timeout={1000}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 6,
+                            background: mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(20px)',
+                            border: mode === 'dark'
+                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                : '1px solid rgba(99, 102, 241, 0.1)',
+                            borderRadius: '24px',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '4px',
+                                background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                            },
                         }}
                     >
-                        {isLoading ? (
-                            <CircularProgress size={24} color="inherit" />
-                        ) : (
-                            'Sign In'
+                        {/* Enhanced Header */}
+                        <Zoom in={true} timeout={1200}>
+                            <Box sx={{ textAlign: 'center', mb: 4 }}>
+                                <Typography 
+                                    variant="h3" 
+                                    component="h1" 
+                                    sx={{
+                                        fontWeight: 800,
+                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        backgroundClip: 'text',
+                                        WebkitBackgroundClip: 'text',
+                                        color: 'transparent',
+                                        mb: 2,
+                                    }}
+                                >
+                                    🎭 Welcome Back
+                                </Typography>
+                                
+                                <Typography 
+                                    variant="h6" 
+                                    sx={{ 
+                                        color: theme.palette.text.secondary,
+                                        fontWeight: 500,
+                                        lineHeight: 1.6,
+                                    }}
+                                >
+                                    Sign in to your MemeStack account to continue creating and sharing memes.
+                                </Typography>
+                            </Box>
+                        </Zoom>
+
+                        {/* Error Alert */}
+                        {error && (
+                            <Fade in={true} timeout={800}>
+                                <Alert 
+                                    severity="error" 
+                                    sx={{ 
+                                        width: '100%', 
+                                        mb: 3,
+                                        borderRadius: '12px',
+                                        background: mode === 'dark'
+                                            ? 'rgba(244, 67, 54, 0.1)'
+                                            : 'rgba(244, 67, 54, 0.05)',
+                                        backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(244, 67, 54, 0.2)',
+                                    }}
+                                    onClose={clearError}
+                                >
+                                    {error}
+                                </Alert>
+                            </Fade>
                         )}
-                    </Button>
 
-                    {/* Links */}
-                    <Box sx={{ textAlign: 'center' }}>
-                        <Link
-                            component={RouterLink}
-                            to="/forgot-password"
-                            variant="body2"
-                            sx={{ 
-                                display: 'block', 
-                                mb: 2,
-                                textDecoration: 'none',
-                                '&:hover': { textDecoration: 'underline' }
-                            }}
+                        {/* Enhanced Login Form */}
+                        <Box 
+                            component="form" 
+                            onSubmit={handleSubmit}
+                            sx={{ width: '100%' }}
                         >
-                            Forgot your password?
-                        </Link>
-                        
-                        <Typography variant="body2" color="text.secondary">
-                            Don't have an account?{' '}
-                            <Link
-                                component={RouterLink}
-                                to="/register"
+                            {/* Email Field */}
+                            <TextField
+                                fullWidth
+                                id="email"
+                                name="email"
+                                label="Email Address"
+                                type="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                error={!!validationErrors.email}
+                                helperText={validationErrors.email}
+                                margin="normal"
+                                autoComplete="email"
+                                autoFocus
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        background: mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.05)'
+                                            : 'rgba(255, 255, 255, 0.8)',
+                                        backdropFilter: 'blur(10px)',
+                                        '&:hover': {
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 1)',
+                                        },
+                                        '&.Mui-focused': {
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 1)',
+                                        },
+                                    },
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <EmailIcon sx={{ color: theme.palette.primary.main }} />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+
+                            {/* Password Field */}
+                            <TextField
+                                fullWidth
+                                id="password"
+                                name="password"
+                                label="Password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={formData.password}
+                                onChange={handleChange}
+                                error={!!validationErrors.password}
+                                helperText={validationErrors.password}
+                                margin="normal"
+                                autoComplete="current-password"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '12px',
+                                        background: mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.05)'
+                                            : 'rgba(255, 255, 255, 0.8)',
+                                        backdropFilter: 'blur(10px)',
+                                        '&:hover': {
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 1)',
+                                        },
+                                        '&.Mui-focused': {
+                                            background: mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 1)',
+                                        },
+                                    },
+                                }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <LockIcon sx={{ color: theme.palette.primary.main }} />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleTogglePassword}
+                                                edge="end"
+                                                sx={{
+                                                    color: theme.palette.primary.main,
+                                                    '&:hover': {
+                                                        background: 'rgba(99, 102, 241, 0.1)',
+                                                    },
+                                                }}
+                                            >
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+
+                            {/* Enhanced Submit Button */}
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                size="large"
+                                disabled={isLoading}
                                 sx={{ 
+                                    mt: 4, 
+                                    mb: 3,
+                                    py: 2,
                                     fontWeight: 600,
-                                    textDecoration: 'none',
-                                    '&:hover': { textDecoration: 'underline' }
+                                    fontSize: '1.1rem',
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                    textTransform: 'none',
+                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
+                                        boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                        transform: 'translateY(-2px)',
+                                    },
+                                    '&:disabled': {
+                                        background: 'rgba(99, 102, 241, 0.5)',
+                                        color: 'white',
+                                    },
                                 }}
                             >
-                                Sign up here
-                            </Link>
-                        </Typography>
-                    </Box>
-                </Box>
-            </Paper>
+                                {isLoading ? (
+                                    <CircularProgress size={24} color="inherit" />
+                                ) : (
+                                    'Sign In'
+                                )}
+                            </Button>
 
-            {/* Additional Info */}
-            <Box sx={{ mt: 4, textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                    🔒 Your data is secure and protected with industry-standard encryption.
-                </Typography>
-            </Box>
-        </Container>
+                            {/* Enhanced Links */}
+                            <Box sx={{ textAlign: 'center' }}>
+                                <Link
+                                    component={RouterLink}
+                                    to="/forgot-password"
+                                    variant="body2"
+                                    sx={{ 
+                                        display: 'block', 
+                                        mb: 3,
+                                        color: theme.palette.primary.main,
+                                        fontWeight: 500,
+                                        textDecoration: 'none',
+                                        '&:hover': { 
+                                            textDecoration: 'underline',
+                                            color: theme.palette.primary.dark,
+                                        }
+                                    }}
+                                >
+                                    Forgot your password?
+                                </Link>
+                                
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2,
+                                        background: mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.05)'
+                                            : 'rgba(255, 255, 255, 0.6)',
+                                        backdropFilter: 'blur(10px)',
+                                        border: mode === 'dark'
+                                            ? '1px solid rgba(255, 255, 255, 0.1)'
+                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                        borderRadius: '12px',
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="body2" 
+                                        sx={{ color: theme.palette.text.secondary }}
+                                    >
+                                        Don't have an account?{' '}
+                                        <Link
+                                            component={RouterLink}
+                                            to="/register"
+                                            sx={{ 
+                                                fontWeight: 600,
+                                                color: theme.palette.primary.main,
+                                                textDecoration: 'none',
+                                                '&:hover': { 
+                                                    textDecoration: 'underline',
+                                                    color: theme.palette.primary.dark,
+                                                }
+                                            }}
+                                        >
+                                            Sign up here
+                                        </Link>
+                                    </Typography>
+                                </Paper>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Fade>
+
+                {/* Enhanced Additional Info */}
+                <Fade in={true} timeout={1500}>
+                    <Box sx={{ mt: 4, textAlign: 'center' }}>
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 3,
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.6)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '16px',
+                            }}
+                        >
+                            <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                    color: theme.palette.text.secondary,
+                                    fontWeight: 500,
+                                }}
+                            >
+                                🔒 Your data is secure and protected with industry-standard encryption.
+                            </Typography>
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
+        </Box>
     );
 };
 
