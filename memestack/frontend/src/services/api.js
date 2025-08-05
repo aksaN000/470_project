@@ -470,6 +470,32 @@ export const templatesAPI = {
 };
 
 // ========================================
+// USER SERVICES
+// ========================================
+
+export const userAPI = {
+    // Get all users for browsing/discovery
+    getUsers: async (params = {}) => {
+        try {
+            const response = await API.get('/users', { params });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch users' };
+        }
+    },
+
+    // Get user profile by ID
+    getUserById: async (userId) => {
+        try {
+            const response = await API.get(`/users/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get user profile' };
+        }
+    },
+};
+
+// ========================================
 // ANALYTICS API
 // ========================================
 

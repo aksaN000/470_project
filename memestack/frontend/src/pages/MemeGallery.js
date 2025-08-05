@@ -20,16 +20,20 @@ import {
     MenuItem,
     Pagination,
     IconButton,
+    Avatar,
 } from '@mui/material';
 import { 
     Search as SearchIcon,
     Download as DownloadIcon,
+    Favorite as FavoriteIcon,
+    FavoriteBorder as FavoriteBorderIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
 import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ReportButton from '../components/moderation/ReportButton';
+import FollowButton from '../components/common/FollowButton';
 
 const MemeGallery = () => {
     const navigate = useNavigate();
@@ -112,6 +116,19 @@ const MemeGallery = () => {
         } catch (error) {
             console.error('Download failed:', error);
             alert('Failed to download meme. Please try again.');
+        }
+    };
+
+    // Handle like toggle
+    const handleLike = async (memeId, event) => {
+        event.stopPropagation();
+        
+        try {
+            await memeAPI.toggleLike(memeId);
+            // Refresh memes to get updated data
+            fetchMemes(filters);
+        } catch (error) {
+            console.error('Error toggling like:', error);
         }
     };
 
@@ -228,6 +245,28 @@ const MemeGallery = () => {
                                         >
                                             {meme.title}
                                         </Typography>
+                                        
+                                        {/* Creator Info */}
+                                        {meme.creator && (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                                <Avatar 
+                                                    src={meme.creator.profile?.avatar} 
+                                                    sx={{ width: 24, height: 24, mr: 1 }}
+                                                >
+                                                    {meme.creator.username?.charAt(0).toUpperCase()}
+                                                </Avatar>
+                                                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+                                                    by {meme.creator.username}
+                                                </Typography>
+                                                <FollowButton 
+                                                    userId={meme.creator._id} 
+                                                    username={meme.creator.username}
+                                                    variant="chip"
+                                                    size="small"
+                                                />
+                                            </Box>
+                                        )}
+                                        
                                         <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                                             <Chip 
                                                 label={meme.category} 
@@ -255,20 +294,33 @@ const MemeGallery = () => {
                                         </Typography>
                                     </CardContent>
                                     <CardActions sx={{ justifyContent: 'space-between' }}>
-                                        <ReportButton
-                                            contentType="meme"
-                                            contentId={meme.id}
-                                            reportedUserId={meme.createdBy?.id || meme.createdBy}
-                                            variant="icon"
-                                            size="small"
-                                        />
-                                        <IconButton
-                                            size="small"
-                                            onClick={(e) => handleDownload(meme, e)}
-                                            title="Download meme"
-                                        >
-                                            <DownloadIcon />
-                                        </IconButton>
+                                        <Box>
+                                            <IconButton
+                                                size="small"
+                                                color={meme.isLiked ? 'error' : 'default'}
+                                                onClick={(e) => handleLike(meme.id, e)}
+                                                title="Like meme"
+                                            >
+                                                {meme.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                onClick={(e) => handleDownload(meme, e)}
+                                                title="Download meme"
+                                            >
+                                                <DownloadIcon />
+                                            </IconButton>
+                                            <ReportButton
+                                                contentType="meme"
+                                                contentId={meme.id}
+                                                reportedUserId={meme.createdBy?.id || meme.createdBy}
+                                                variant="icon"
+                                                size="small"
+                                            />
+                                        </Box>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {new Date(meme.createdAt).toLocaleDateString()}
+                                        </Typography>
                                     </CardActions>
                                 </Card>
                             </Grid>

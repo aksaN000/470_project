@@ -28,6 +28,7 @@ import {
     Add as AddIcon,
     Dashboard as DashboardIcon,
     Person as PersonIcon,
+    People as PeopleIcon,
     Login as LoginIcon,
     PersonAdd as RegisterIcon,
     Logout as LogoutIcon,
@@ -75,6 +76,7 @@ const Navbar = () => {
     const publicNavItems = [
         { label: 'Home', path: '/', icon: <HomeIcon /> },
         { label: 'Gallery', path: '/gallery', icon: <GalleryIcon /> },
+        { label: 'Browse Users', path: '/browse-users', icon: <PeopleIcon /> },
         { label: 'Challenges', path: '/challenges', icon: <EmojiEvents /> },
         { label: 'Groups', path: '/groups', icon: <Groups /> },
         { label: 'Collaborations', path: '/collaborations', icon: <Handshake /> },

@@ -60,6 +60,10 @@ const createInitialData = async () => {
             console.log('📧 Email: demo@memestack.com');
             console.log('🔑 Password: demo123');
             
+            // Create additional demo data
+            const { createDemoData } = require('./utils/demoData');
+            await createDemoData();
+            
         } else {
             console.log('🏭 Production mode: No demo users created');
         }
@@ -251,7 +255,8 @@ app.use('/api/folders', require('./routes/folders'));
 console.log('✅ Folder routes loaded');
 app.use('/api/templates', require('./routes/templates'));
 console.log('✅ Template routes loaded');
-// app.use('/api/users', require('./routes/users'));
+app.use('/api/users', require('./routes/users'));
+console.log('✅ User routes loaded');
 
 // ========================================
 // COLLABORATION FEATURE ROUTES

@@ -24,6 +24,7 @@ import MemeDetail from './pages/MemeDetail';
 import CreateMeme from './pages/CreateMeme';
 import Profile from './pages/Profile';
 import FollowingFeed from './pages/FollowingFeed';
+import BrowseUsers from './pages/BrowseUsers';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import ModerationDashboard from './pages/ModerationDashboard';
 import FolderManager from './pages/FolderManager';
@@ -143,6 +144,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/gallery" element={<MemeGallery />} />
                   <Route path="/meme/:id" element={<MemeDetail />} />
+                  <Route path="/browse-users" element={<BrowseUsers />} />
 
                   {/* Protected Routes */}
                   <Route 
