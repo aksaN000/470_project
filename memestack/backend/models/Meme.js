@@ -100,6 +100,20 @@ const memeSchema = new mongoose.Schema({
         default: true
     },
     
+    // Granular visibility controls
+    visibility: {
+        type: String,
+        enum: [
+            'public',           // Visible everywhere (gallery, feed, search)
+            'followers_only',   // Only visible to followers (feed + direct link)
+            'gallery_only',     // Only visible in public gallery, not in followers' feed
+            'feed_only',        // Only visible in followers' feed, not in public gallery
+            'private',          // Only visible to creator (private)
+            'unlisted'          // Accessible via direct link only, not in gallery or feed
+        ],
+        default: 'public'
+    },
+    
     isActive: {
         type: Boolean,
         default: true
@@ -332,6 +346,7 @@ memeSchema.methods.getPublicData = function(userId = null) {
         creator: this.creator,
         category: this.category,
         tags: this.tags,
+        visibility: this.visibility,
         stats: this.stats,
         createdAt: this.createdAt,
         metadata: {
@@ -364,6 +379,7 @@ memeSchema.statics.getTrending = function(limit = 10) {
     return this.find({
         isPublic: true,
         isActive: true,
+        visibility: { $in: ['public', 'gallery_only'] },
         createdAt: { $gte: sevenDaysAgo }
     })
     .sort({ 'stats.likesCount': -1, 'stats.views': -1 })
@@ -375,7 +391,8 @@ memeSchema.statics.getByCategory = function(category, limit = 20, skip = 0) {
     return this.find({
         category,
         isPublic: true,
-        isActive: true
+        isActive: true,
+        visibility: { $in: ['public', 'gallery_only'] }
     })
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -395,7 +412,8 @@ memeSchema.statics.searchMemes = function(query, options = {}) {
     
     let searchQuery = {
         isPublic: true,
-        isActive: true
+        isActive: true,
+        visibility: { $in: ['public', 'gallery_only'] }
     };
     
     // Text search
@@ -428,6 +446,8 @@ memeSchema.statics.getUserMemes = function(userId, includePrivate = false) {
     
     if (!includePrivate) {
         query.isPublic = true;
+        // For public viewing, show all memes except private and unlisted
+        query.visibility = { $in: ['public', 'gallery_only', 'followers_only', 'feed_only'] };
     }
     
     query.isActive = true;

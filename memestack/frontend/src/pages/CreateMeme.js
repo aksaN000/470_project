@@ -37,6 +37,7 @@ const CreateMeme = () => {
         category: 'funny',
         tags: '',
         isPublic: true,
+        visibility: 'public',
     });
 
     const [imageFile, setImageFile] = useState(null);
@@ -396,13 +397,36 @@ const CreateMeme = () => {
                                 <FormControl fullWidth margin="normal">
                                     <InputLabel>Visibility</InputLabel>
                                     <Select
-                                        name="isPublic"
-                                        value={formData.isPublic}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, isPublic: e.target.value }))}
+                                        name="visibility"
+                                        value={formData.visibility}
+                                        onChange={(e) => {
+                                            const visibility = e.target.value;
+                                            setFormData(prev => ({ 
+                                                ...prev, 
+                                                visibility,
+                                                isPublic: visibility !== 'private'
+                                            }));
+                                        }}
                                         label="Visibility"
                                     >
-                                        <MenuItem value={true}>Public</MenuItem>
-                                        <MenuItem value={false}>Private</MenuItem>
+                                        <MenuItem value="public">
+                                            🌍 Public - Visible everywhere (gallery, feed, search)
+                                        </MenuItem>
+                                        <MenuItem value="followers_only">
+                                            👥 Followers Only - Only visible to followers (feed + direct link)
+                                        </MenuItem>
+                                        <MenuItem value="gallery_only">
+                                            🖼️ Gallery Only - Only visible in public gallery, not in followers' feed
+                                        </MenuItem>
+                                        <MenuItem value="feed_only">
+                                            📱 Feed Only - Only visible in followers' feed, not in public gallery
+                                        </MenuItem>
+                                        <MenuItem value="unlisted">
+                                            🔗 Unlisted - Accessible via direct link only
+                                        </MenuItem>
+                                        <MenuItem value="private">
+                                            🔒 Private - Only visible to you
+                                        </MenuItem>
                                     </Select>
                                 </FormControl>
 

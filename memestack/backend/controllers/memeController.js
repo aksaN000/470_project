@@ -47,6 +47,7 @@ const getAllMemes = async (req, res) => {
             memes = await Meme.find({
                 isPublic: true,
                 isActive: true,
+                visibility: { $in: ['public', 'gallery_only'] },
                 ...(category !== 'all' && { category })
             })
             .sort({ [sortBy]: sortOrderNum })
@@ -58,6 +59,7 @@ const getAllMemes = async (req, res) => {
         const totalMemes = await Meme.countDocuments({
             isPublic: true,
             isActive: true,
+            visibility: { $in: ['public', 'gallery_only'] },
             ...(category !== 'all' && { category })
         });
 
@@ -245,6 +247,7 @@ const createMeme = async (req, res) => {
             category = 'funny',
             tags = [],
             isPublic = true,
+            visibility = 'public',
             imageUrl,
             thumbnailUrl = '',
             imageData = {},
@@ -284,6 +287,7 @@ const createMeme = async (req, res) => {
             category,
             tags: Array.isArray(tags) ? tags : [],
             isPublic,
+            visibility,
             imageUrl: finalImageUrl,
             thumbnailUrl: finalThumbnailUrl,
             imageData: finalImageData,
@@ -335,7 +339,8 @@ const updateMeme = async (req, res) => {
             description,
             category,
             tags,
-            isPublic
+            isPublic,
+            visibility
         } = req.body;
 
         const meme = await Meme.findById(id);
@@ -361,6 +366,7 @@ const updateMeme = async (req, res) => {
         if (category) meme.category = category;
         if (tags) meme.tags = Array.isArray(tags) ? tags : [];
         if (isPublic !== undefined) meme.isPublic = isPublic;
+        if (visibility) meme.visibility = visibility;
 
         await meme.save();
 

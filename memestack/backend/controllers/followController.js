@@ -314,7 +314,8 @@ const getFollowingFeed = async (req, res) => {
         const skip = (page - 1) * limit;
         const memes = await Meme.find({
             creator: { $in: followingIds },
-            isPublic: true
+            isPublic: true,
+            visibility: { $in: ['public', 'followers_only', 'feed_only'] }
         })
         .populate('creator', 'username avatar')
         .sort({ createdAt: -1 })
@@ -323,7 +324,8 @@ const getFollowingFeed = async (req, res) => {
 
         const totalMemes = await Meme.countDocuments({
             creator: { $in: followingIds },
-            isPublic: true
+            isPublic: true,
+            visibility: { $in: ['public', 'followers_only', 'feed_only'] }
         });
 
         res.status(200).json({
