@@ -16,6 +16,10 @@ import {
     Pagination,
     Alert,
     Button,
+    Paper,
+    Fade,
+    Zoom,
+    useTheme,
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -27,12 +31,15 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { followAPI, memeAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import FollowButton from '../components/common/FollowButton';
 
 const FollowingFeed = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const theme = useTheme();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const [memes, setMemes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -151,17 +158,90 @@ const FollowingFeed = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    📰 Following Feed
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                    See the latest memes from creators you follow
-                </Typography>
-            </Box>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            py: 4,
+        }}>
+            <Container maxWidth="lg">
+                <Fade in={true} timeout={1000}>
+                    <Box>
+                        {/* Enhanced Header */}
+                        <Zoom in={true} timeout={1200}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    mb: 4,
+                                    background: mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.05)'
+                                        : 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(20px)',
+                                    border: mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                    borderRadius: '24px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '4px',
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    },
+                                }}
+                            >
+                                <Box>
+                                    <Typography 
+                                        variant="h3" 
+                                        component="h1" 
+                                        sx={{
+                                            fontWeight: 800,
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                            backgroundClip: 'text',
+                                            WebkitBackgroundClip: 'text',
+                                            color: 'transparent',
+                                            mb: 2,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1
+                                        }}
+                                    >
+                                        📰 Following Feed
+                                    </Typography>
+                                    <Typography 
+                                        variant="h6" 
+                                        sx={{ 
+                                            color: theme.palette.text.secondary,
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        See the latest memes from creators you follow
+                                    </Typography>
+                                </Box>
+                            </Paper>
+                        </Zoom>
 
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '20px',
+                                p: 4,
+                            }}
+                        >
             {loading ? (
                 <LoadingSpinner message="Loading your feed..." />
             ) : error ? (
@@ -315,7 +395,11 @@ const FollowingFeed = () => {
                     )}
                 </>
             )}
-        </Container>
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
+        </Box>
     );
 };
 

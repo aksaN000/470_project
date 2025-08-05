@@ -28,6 +28,9 @@ import {
     Tab,
     Tabs,
     CircularProgress,
+    Fade,
+    Zoom,
+    useTheme,
     IconButton,
     Tooltip
 } from '@mui/material';
@@ -50,9 +53,12 @@ import {
 } from '../services/moderationAPI';
 import StatCard from '../components/common/StatCard';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 const ModerationDashboard = () => {
     const { user } = useAuth();
+    const theme = useTheme();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const [activeTab, setActiveTab] = useState(0);
     const [reports, setReports] = useState([]);
     const [dashboardStats, setDashboardStats] = useState(null);
@@ -197,7 +203,27 @@ const ModerationDashboard = () => {
     };
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'dark' 
+                ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+                : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            py: 4
+        }}>
+            <Fade in timeout={800}>
+                <Container maxWidth="xl">
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            background: mode === 'dark' 
+                                ? 'rgba(255, 255, 255, 0.08)'
+                                : 'rgba(255, 255, 255, 0.25)',
+                            backdropFilter: 'blur(20px)',
+                            borderRadius: 3,
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+                            p: { xs: 2, md: 4 }
+                        }}
+                    >
             <Typography variant="h4" gutterBottom>
                 Moderation Dashboard
             </Typography>
@@ -441,7 +467,10 @@ const ModerationDashboard = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+                    </Paper>
+                </Container>
+            </Fade>
+        </Box>
     );
 };
 

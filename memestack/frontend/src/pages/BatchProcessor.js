@@ -29,7 +29,12 @@ import {
     Switch,
     FormControlLabel,
     Slider,
-    Divider
+    Divider,
+    Container,
+    Paper,
+    Fade,
+    Zoom,
+    useTheme,
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
@@ -45,6 +50,7 @@ import {
     PlayArrow as StartIcon,
     Clear as ClearIcon
 } from '@mui/icons-material';
+import { useThemeMode } from '../contexts/ThemeContext';
 import {
     batchProcess,
     downloadBatchResults,
@@ -55,6 +61,8 @@ import {
 import { WATERMARK_POSITIONS } from '../utils/watermark';
 
 const BatchProcessor = () => {
+    const theme = useTheme();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const [files, setFiles] = useState([]);
     const [operation, setOperation] = useState('watermark');
     const [preset, setPreset] = useState('');
@@ -234,18 +242,117 @@ const BatchProcessor = () => {
     const successfulResults = results.filter(r => r.success);
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <BatchIcon />
-                Batch Image Processor
-            </Typography>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            py: 4,
+        }}>
+            <Container maxWidth="lg">
+                <Fade in={true} timeout={1000}>
+                    <Box>
+                        {/* Enhanced Header */}
+                        <Zoom in={true} timeout={1200}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    mb: 4,
+                                    background: mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.05)'
+                                        : 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(20px)',
+                                    border: mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                    borderRadius: '24px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '4px',
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    },
+                                }}
+                            >
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box>
+                                        <Typography 
+                                            variant="h3" 
+                                            component="h1" 
+                                            sx={{
+                                                fontWeight: 800,
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                mb: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1
+                                            }}
+                                        >
+                                            <BatchIcon />
+                                            ⚡ Batch Image Processor
+                                        </Typography>
+                                        <Typography 
+                                            variant="h6" 
+                                            sx={{ 
+                                                color: theme.palette.text.secondary,
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            Process multiple images with powerful batch operations
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        </Zoom>
 
-            {/* File Upload */}
-            <Card sx={{ mb: 3 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        1. Select Images
-                    </Typography>
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '20px',
+                                p: 4,
+                            }}
+                        >
+
+                    {/* File Upload */}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            background: mode === 'dark' 
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.15)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: 2,
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            p: 3,
+                            mb: 3
+                        }}
+                    >
+                        <Typography variant="h6" gutterBottom sx={{ 
+                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontWeight: 'bold'
+                        }}>
+                            1. Select Images
+                        </Typography>
                     
                     <Box sx={{ mb: 2 }}>
                         <Button
@@ -294,15 +401,31 @@ const BatchProcessor = () => {
                             </Box>
                         </Box>
                     )}
-                </CardContent>
-            </Card>
+                    </Paper>
 
-            {/* Operation Settings */}
-            <Card sx={{ mb: 3 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        2. Configure Operation
-                    </Typography>
+                    {/* Operation Settings */}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            background: mode === 'dark' 
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.15)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: 2,
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            p: 3,
+                            mb: 3
+                        }}
+                    >
+                        <Typography variant="h6" gutterBottom sx={{ 
+                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontWeight: 'bold'
+                        }}>
+                            2. Configure Operation
+                        </Typography>
 
                     {/* Presets */}
                     <Box sx={{ mb: 3 }}>
@@ -512,15 +635,31 @@ const BatchProcessor = () => {
                             </AccordionDetails>
                         </Accordion>
                     )}
-                </CardContent>
-            </Card>
+                    </Paper>
 
-            {/* Process Button */}
-            <Card sx={{ mb: 3 }}>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        3. Process Images
-                    </Typography>
+                    {/* Process Button */}
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            background: mode === 'dark' 
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.15)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: 2,
+                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            p: 3,
+                            mb: 3
+                        }}
+                    >
+                        <Typography variant="h6" gutterBottom sx={{ 
+                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontWeight: 'bold'
+                        }}>
+                            3. Process Images
+                        </Typography>
                     
                     <Button
                         variant="contained"
@@ -541,8 +680,7 @@ const BatchProcessor = () => {
                             </Typography>
                         </Box>
                     )}
-                </CardContent>
-            </Card>
+                    </Paper>
 
             {/* Errors */}
             {errors.length > 0 && (
@@ -556,24 +694,52 @@ const BatchProcessor = () => {
                 </Alert>
             )}
 
-            {/* Results */}
-            {results.length > 0 && (
-                <Card>
-                    <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="h6">
-                                Results ({successfulResults.length}/{results.length} successful)
-                            </Typography>
-                            {successfulResults.length > 0 && (
-                                <Button
-                                    variant="contained"
-                                    startIcon={<DownloadIcon />}
-                                    onClick={downloadResults}
-                                >
-                                    Download All
-                                </Button>
-                            )}
-                        </Box>
+                    {/* Results */}
+                    {results.length > 0 && (
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark' 
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.15)',
+                                backdropFilter: 'blur(10px)',
+                                borderRadius: 2,
+                                border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                                p: 3
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                <Typography variant="h6" sx={{ 
+                                    background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 'bold'
+                                }}>
+                                    Results ({successfulResults.length}/{results.length} successful)
+                                </Typography>
+                                {successfulResults.length > 0 && (
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<DownloadIcon />}
+                                        onClick={downloadResults}
+                                        sx={{
+                                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                            border: 0,
+                                            borderRadius: '25px',
+                                            color: 'white',
+                                            '&:hover': {
+                                                background: 'linear-gradient(45deg, #5855eb, #7c3aed)',
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)'
+                                            },
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        Download All
+                                    </Button>
+                                )}
+                            </Box>
 
                         <Grid container spacing={2}>
                             {results.map((result, index) => (
@@ -615,56 +781,59 @@ const BatchProcessor = () => {
                                 </Grid>
                             ))}
                         </Grid>
-                    </CardContent>
-                </Card>
-            )}
+                        </Paper>
+                    )}
 
-            {/* Preview Dialog */}
-            <Dialog
-                open={previewDialogOpen}
-                onClose={() => setPreviewDialogOpen(false)}
-                maxWidth="md"
-                fullWidth
-            >
-                {selectedPreview && (
-                    <>
-                        <DialogTitle>
-                            Preview: {selectedPreview.result.filename}
-                        </DialogTitle>
-                        <DialogContent>
-                            <Box
-                                component="img"
-                                src={selectedPreview.result.url}
-                                alt="Preview"
-                                sx={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    maxHeight: '70vh',
-                                    objectFit: 'contain'
-                                }}
-                            />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => setPreviewDialogOpen(false)}>
-                                Close
-                            </Button>
-                            <Button
-                                variant="contained"
-                                startIcon={<DownloadIcon />}
-                                onClick={() => {
-                                    const url = selectedPreview.result.url;
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = selectedPreview.result.filename;
-                                    a.click();
-                                }}
-                            >
-                                Download
-                            </Button>
-                        </DialogActions>
-                    </>
-                )}
-            </Dialog>
+                    {/* Preview Dialog */}
+                    <Dialog
+                        open={previewDialogOpen}
+                        onClose={() => setPreviewDialogOpen(false)}
+                        maxWidth="md"
+                        fullWidth
+                    >
+                        {selectedPreview && (
+                            <>
+                                <DialogTitle>
+                                    Preview: {selectedPreview.result.filename}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <Box
+                                        component="img"
+                                        src={selectedPreview.result.url}
+                                        alt="Preview"
+                                        sx={{
+                                            width: '100%',
+                                            height: 'auto',
+                                            maxHeight: '70vh',
+                                            objectFit: 'contain'
+                                        }}
+                                    />
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={() => setPreviewDialogOpen(false)}>
+                                        Close
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<DownloadIcon />}
+                                        onClick={() => {
+                                            const url = selectedPreview.result.url;
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = selectedPreview.result.filename;
+                                            a.click();
+                                        }}
+                                    >
+                                        Download
+                                    </Button>
+                                </DialogActions>
+                            </>
+                        )}
+                    </Dialog>
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
         </Box>
     );
 };

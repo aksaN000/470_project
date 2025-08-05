@@ -51,7 +51,7 @@ import MemeEditor from '../components/MemeEditor';
 const CreateMeme = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const { createMeme, loading } = useMemes();
     const fileInputRef = useRef(null);
 
@@ -289,13 +289,104 @@ const CreateMeme = () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                ➕ Create New Meme
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                Upload an image and add your creative touch to create an amazing meme!
-            </Typography>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            py: 4,
+        }}>
+            <Container maxWidth="lg">
+                <Fade in={true} timeout={1000}>
+                    <Box>
+                        {/* Enhanced Header */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 4,
+                                mb: 4,
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '24px',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                '&::before': {
+                                    content: '""',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '4px',
+                                    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                },
+                            }}
+                        >
+                            <Typography 
+                                variant="h3" 
+                                component="h1" 
+                                sx={{
+                                    fontWeight: 800,
+                                    background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    color: 'transparent',
+                                    mb: 2,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1
+                                }}
+                            >
+                                ➕ Create Your Meme
+                            </Typography>
+                            <Typography 
+                                variant="h6" 
+                                sx={{ 
+                                    color: theme.palette.text.secondary,
+                                    fontWeight: 500,
+                                }}
+                            >
+                                Bring your ideas to life with our powerful meme creation tools
+                            </Typography>
+                        </Paper>
+
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '20px',
+                                p: 4,
+                            }}
+                        >
+                        <Typography 
+                            variant="h4" 
+                            component="h1" 
+                            gutterBottom
+                            sx={{
+                                fontWeight: 'bold',
+                                background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                fontSize: { xs: '1.8rem', md: '2.5rem' }
+                            }}
+                        >
+                            ➕ Create New Meme
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem' }}>
+                            Upload an image and add your creative touch to create an amazing meme!
+                        </Typography>
 
             {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>
@@ -520,7 +611,11 @@ const CreateMeme = () => {
                     </Box>
                 </Box>
             </Box>
-        </Container>
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
+        </Box>
     );
 };
 

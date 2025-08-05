@@ -28,7 +28,11 @@ import {
     DialogContent,
     DialogActions,
     Badge,
-    AvatarGroup
+    AvatarGroup,
+    Paper,
+    Fade,
+    Zoom,
+    useTheme,
 } from '@mui/material';
 import {
     Handshake,
@@ -47,11 +51,14 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import api, { collaborationsAPI } from '../services/api';
 
 const Collaborations = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const theme = useTheme();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const [collaborations, setCollaborations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [tabValue, setTabValue] = useState(0);
@@ -337,41 +344,171 @@ const Collaborations = () => {
     );
 
     return (
-        <Container maxWidth="lg" sx={{ py: 3 }}>
-            {/* Header */}
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                <Box>
-                    <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        🤝 Collaborations & Remixes
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        Work together to create amazing memes and content!
-                    </Typography>
-                </Box>
-                {user && (
-                    <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => setCreateDialogOpen(true)}
-                        size="large"
-                    >
-                        Start Collaboration
-                    </Button>
-                )}
-            </Box>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            py: 4,
+        }}>
+            <Container maxWidth="lg">
+                <Fade in={true} timeout={1000}>
+                    <Box>
+                        {/* Enhanced Header */}
+                        <Zoom in={true} timeout={1200}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    mb: 4,
+                                    background: mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.05)'
+                                        : 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(20px)',
+                                    border: mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                    borderRadius: '24px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '4px',
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    },
+                                }}
+                            >
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box>
+                                        <Typography 
+                                            variant="h3" 
+                                            component="h1" 
+                                            sx={{
+                                                fontWeight: 800,
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                mb: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1
+                                            }}
+                                        >
+                                            🤝 Collaborations & Remixes
+                                        </Typography>
+                                        <Typography 
+                                            variant="h6" 
+                                            sx={{ 
+                                                color: theme.palette.text.secondary,
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            Work together to create amazing memes and content!
+                                        </Typography>
+                                    </Box>
+                                    {user && (
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<Add />}
+                                            onClick={() => setCreateDialogOpen(true)}
+                                            size="large"
+                                            sx={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                color: 'white',
+                                                borderRadius: '16px',
+                                                px: 3,
+                                                py: 1.5,
+                                                textTransform: 'none',
+                                                fontSize: '1rem',
+                                                fontWeight: 600,
+                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                '&:hover': {
+                                                    background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                },
+                                                '&:active': {
+                                                    transform: 'translateY(0)',
+                                                },
+                                                transition: 'all 0.2s ease-in-out',
+                                            }}
+                                        >
+                                            Start Collaboration
+                                        </Button>
+                                    )}
+                                </Box>
+                            </Paper>
+                        </Zoom>
 
-            {/* Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-                <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
-                    <Tab label="All Projects" icon={<Handshake />} iconPosition="start" />
-                    <Tab label="Trending" icon={<TrendingUp />} iconPosition="start" />
-                    {user && <Tab label="My Projects" icon={<Star />} iconPosition="start" />}
-                </Tabs>
-            </Box>
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '20px',
+                                p: 4,
+                            }}
+                        >
+                        {/* Tabs */}
+                        <Box sx={{ 
+                            borderBottom: 1, 
+                            borderColor: 'divider', 
+                            mb: 3,
+                            background: mode === 'dark' 
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.15)',
+                            borderRadius: 2,
+                            p: 1
+                        }}>
+                            <Tabs 
+                                value={tabValue} 
+                                onChange={(e, newValue) => setTabValue(newValue)}
+                                sx={{
+                                    '& .MuiTab-root': {
+                                        fontWeight: 600,
+                                        '&.Mui-selected': {
+                                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                            backgroundClip: 'text',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent'
+                                        }
+                                    }
+                                }}
+                            >
+                                <Tab label="All Projects" icon={<Handshake />} iconPosition="start" />
+                                <Tab label="Trending" icon={<TrendingUp />} iconPosition="start" />
+                                {user && <Tab label="My Projects" icon={<Star />} iconPosition="start" />}
+                            </Tabs>
+                        </Box>
 
-            {/* Filters */}
-            {tabValue === 0 && (
-                <Box display="flex" gap={2} mb={3} flexWrap="wrap">
+                        {/* Filters */}
+                        {tabValue === 0 && (
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    background: mode === 'dark' 
+                                        ? 'rgba(255, 255, 255, 0.05)'
+                                        : 'rgba(255, 255, 255, 0.15)',
+                                    backdropFilter: 'blur(10px)',
+                                    borderRadius: 2,
+                                    border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                                    p: 3,
+                                    mb: 3
+                                }}
+                            >
+                                <Box display="flex" gap={2} flexWrap="wrap">
                     <TextField
                         placeholder="Search collaborations..."
                         variant="outlined"
@@ -430,69 +567,88 @@ const Collaborations = () => {
                             ))}
                         </Select>
                     </FormControl>
-                </Box>
-            )}
+                                </Box>
+                            </Paper>
+                        )}
 
-            {/* Loading */}
-            {loading && <LinearProgress sx={{ mb: 3 }} />}
+                        {/* Loading */}
+                        {loading && <LinearProgress sx={{ mb: 3 }} />}
 
-            {/* Collaborations Grid */}
-            <Grid container spacing={3}>
-                {collaborations.map((collaboration) => (
-                    <Grid item xs={12} sm={6} md={4} key={collaboration._id}>
-                        <CollaborationCard collaboration={collaboration} />
-                    </Grid>
-                ))}
-            </Grid>
-
-            {/* Empty State */}
-            {!loading && collaborations.length === 0 && (
-                <Box textAlign="center" py={6}>
-                    <Handshake sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="h5" color="text.secondary" gutterBottom>
-                        No collaborations found
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                        {tabValue === 2 
-                            ? "You haven't started any collaborations yet."
-                            : "Be the first to start a collaborative project!"
-                        }
-                    </Typography>
-                    {user && (
-                        <Button
-                            variant="contained"
-                            startIcon={<Add />}
-                            onClick={() => setCreateDialogOpen(true)}
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark' 
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.15)',
+                                backdropFilter: 'blur(10px)',
+                                borderRadius: 2,
+                                border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                                p: 3
+                            }}
                         >
-                            Start Collaboration
-                        </Button>
-                    )}
-                </Box>
-            )}
+                            {/* Collaborations Grid */}
+                            <Grid container spacing={3}>
+                                {collaborations.map((collaboration) => (
+                                    <Grid item xs={12} sm={6} md={4} key={collaboration._id}>
+                                        <CollaborationCard collaboration={collaboration} />
+                                    </Grid>
+                                ))}
+                            </Grid>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <Box display="flex" justifyContent="center" mt={4}>
-                    <Button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                    >
-                        Previous
-                    </Button>
-                    <Typography sx={{ mx: 2, alignSelf: 'center' }}>
-                        {currentPage} of {totalPages}
-                    </Typography>
-                    <Button
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                    >
-                        Next
-                    </Button>
-                </Box>
-            )}
+                            {/* Empty State */}
+                            {!loading && collaborations.length === 0 && (
+                                <Box textAlign="center" py={6}>
+                                    <Handshake sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                                    <Typography variant="h5" color="text.secondary" gutterBottom>
+                                        No collaborations found
+                                    </Typography>
+                                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                                        {tabValue === 2 
+                                            ? "You haven't started any collaborations yet."
+                                            : "Be the first to start a collaborative project!"
+                                        }
+                                    </Typography>
+                                    {user && (
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<Add />}
+                                            onClick={() => setCreateDialogOpen(true)}
+                                        >
+                                            Start Collaboration
+                                        </Button>
+                                    )}
+                                </Box>
+                            )}
+                        </Paper>
 
-            <CreateCollaborationDialog />
-        </Container>
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <Box display="flex" justifyContent="center" mt={4}>
+                                <Button
+                                    disabled={currentPage === 1}
+                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                >
+                                    Previous
+                                </Button>
+                                <Typography sx={{ mx: 2, alignSelf: 'center' }}>
+                                    {currentPage} of {totalPages}
+                                </Typography>
+                                <Button
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(currentPage + 1)}
+                                >
+                                    Next
+                                </Button>
+                            </Box>
+                        )}
+
+                        <CreateCollaborationDialog />
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
+        </Box>
     );
 };
 

@@ -29,7 +29,11 @@ import {
     Switch,
     FormControlLabel,
     Tooltip,
-    Fab
+    Fab,
+    Paper,
+    Fade,
+    Zoom,
+    useTheme,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -44,10 +48,13 @@ import {
     FilterList as FilterListIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import { templatesAPI } from '../services/api';
 
 const TemplateManager = () => {
     const { user } = useAuth();
+    const theme = useTheme();
+    const { mode } = useThemeMode() || { mode: 'light' };
     const [templates, setTemplates] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -243,21 +250,108 @@ const TemplateManager = () => {
     };
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Header */}
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Meme Templates
-                </Typography>
-                <Fab
-                    color="primary"
-                    aria-label="add"
-                    onClick={() => setCreateDialogOpen(true)}
-                >
-                    <AddIcon />
-                </Fab>
-            </Box>
+        <Box sx={{ 
+            minHeight: '100vh',
+            background: mode === 'light' 
+                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            py: 4,
+        }}>
+            <Container maxWidth="xl">
+                <Fade in={true} timeout={1000}>
+                    <Box>
+                        {/* Enhanced Header */}
+                        <Zoom in={true} timeout={1200}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: 4,
+                                    mb: 4,
+                                    background: mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.05)'
+                                        : 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(20px)',
+                                    border: mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.1)'
+                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                    borderRadius: '24px',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    '&::before': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: '4px',
+                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    },
+                                }}
+                            >
+                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                    <Box>
+                                        <Typography 
+                                            variant="h3" 
+                                            component="h1" 
+                                            sx={{
+                                                fontWeight: 800,
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                mb: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1
+                                            }}
+                                        >
+                                            🎨 Meme Templates
+                                        </Typography>
+                                        <Typography 
+                                            variant="h6" 
+                                            sx={{ 
+                                                color: theme.palette.text.secondary,
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            Create and manage your meme templates collection
+                                        </Typography>
+                                    </Box>
+                                    <Fab
+                                        color="primary"
+                                        aria-label="add"
+                                        onClick={() => setCreateDialogOpen(true)}
+                                        sx={{
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                            },
+                                        }}
+                                    >
+                                        <AddIcon />
+                                    </Fab>
+                                </Box>
+                            </Paper>
+                        </Zoom>
 
+                        {/* Main Content Card */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                background: mode === 'dark'
+                                    ? 'rgba(255, 255, 255, 0.05)'
+                                    : 'rgba(255, 255, 255, 0.9)',
+                                backdropFilter: 'blur(20px)',
+                                border: mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.1)'
+                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                borderRadius: '20px',
+                                p: 4,
+                            }}
+                        >
             {/* Alerts */}
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
@@ -620,7 +714,11 @@ const TemplateManager = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+                        </Paper>
+                    </Box>
+                </Fade>
+            </Container>
+        </Box>
     );
 };
 
