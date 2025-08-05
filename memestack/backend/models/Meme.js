@@ -342,10 +342,12 @@ memeSchema.methods.getPublicData = function(userId = null) {
     
     // Add like status if user is provided
     if (userId) {
-        // Check if user has liked this meme directly
+        // Check if user has liked this meme directly with proper null checking
         publicData.isLiked = this.likes.some(like => 
-            like.user && like.user.toString() === userId.toString()
+            like && like.user && like.user.toString() === userId.toString()
         );
+    } else {
+        publicData.isLiked = false;
     }
     
     return publicData;

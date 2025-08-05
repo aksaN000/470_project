@@ -82,7 +82,7 @@ const FollowingFeed = () => {
         event.stopPropagation();
         
         try {
-            const response = await memeAPI.downloadMeme(meme._id);
+            const response = await memeAPI.downloadMeme(meme.id);
             
             const blob = new Blob([response.data]);
             const url = window.URL.createObjectURL(blob);
@@ -90,7 +90,7 @@ const FollowingFeed = () => {
             link.href = url;
             
             const contentDisposition = response.headers['content-disposition'];
-            let filename = `meme-${meme._id}-${meme.title.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+            let filename = `meme-${meme.id}-${meme.title.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
             
             if (contentDisposition) {
                 const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
@@ -121,7 +121,7 @@ const FollowingFeed = () => {
             // Update local state
             setMemes(prevMemes => 
                 prevMemes.map(meme => 
-                    meme._id === memeId 
+                    meme.id === memeId 
                         ? {
                             ...meme,
                             isLiked: !meme.isLiked,
@@ -198,7 +198,7 @@ const FollowingFeed = () => {
                     {/* Memes Grid */}
                     <Grid container spacing={3}>
                         {memes.map((meme) => (
-                            <Grid item xs={12} sm={6} md={4} key={meme._id}>
+                            <Grid item xs={12} sm={6} md={4} key={meme.id}>
                                 <Card
                                     sx={{
                                         height: '100%',
@@ -208,7 +208,7 @@ const FollowingFeed = () => {
                                             transform: 'translateY(-2px)',
                                         },
                                     }}
-                                    onClick={() => navigate(`/meme/${meme._id}`)}
+                                    onClick={() => navigate(`/meme/${meme.id}`)}
                                 >
                                     <CardMedia
                                         component="img"
@@ -279,7 +279,7 @@ const FollowingFeed = () => {
                                             <IconButton
                                                 size="small"
                                                 color={meme.isLiked ? 'error' : 'default'}
-                                                onClick={(e) => handleLike(meme._id, e)}
+                                                onClick={(e) => handleLike(meme.id, e)}
                                                 title="Like meme"
                                             >
                                                 {meme.isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}

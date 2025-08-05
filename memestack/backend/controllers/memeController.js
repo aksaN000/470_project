@@ -215,8 +215,7 @@ const getMemeById = async (req, res) => {
         res.json({
             success: true,
             data: {
-                meme: meme.getPublicData(req.user ? req.user._id : null),
-                isLiked: req.user ? meme.isLikedBy(req.user._id) : false
+                meme: meme.getPublicData(req.user ? req.user._id : null)
             },
             message: 'Meme fetched successfully'
         });
@@ -459,7 +458,9 @@ const toggleLikeMeme = async (req, res) => {
             });
         }
 
-        const isLiked = meme.isLikedBy(userId);
+        const isLiked = meme.likes.some(like => 
+            like && like.user && like.user.toString() === userId.toString()
+        );
 
         if (isLiked) {
             await meme.removeLike(userId);

@@ -114,6 +114,7 @@ const optionalAuth = async (req, res, next) => {
             
             if (user && user.isActive) {
                 req.user = {
+                    _id: user._id,  // Add _id for compatibility
                     userId: user._id,
                     username: user.username,
                     email: user.email,
