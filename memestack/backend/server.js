@@ -1,25 +1,4 @@
-// 🚀 MemeStack Backend     try {const createInitialData = async () => {
-    try {
-        // Create test data for development
-        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-            const { createTestData } = require('./utils/testData');
-            await createTestData();
-        }
-        
-        console.log('🚀 Server started successfully');
-    } catch (error) {
-        console.error('❌ Error during startup:', error.message);
-    }
-};   // Create test data for development
-        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-            const { createTestData } = require('./utils/testData');
-            await createTestData();
-        }
-        
-        console.log('🚀 Server started successfully');
-    } catch (error) {
-        console.error('❌ Error during startup:', error.message);
-    }r
+// 🚀 MemeStack Backend Server
 // This is the main entry point of our application
 
 // Import required packages
