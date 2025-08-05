@@ -181,6 +181,15 @@ const getMemeById = async (req, res) => {
     try {
         const { id } = req.params;
         
+        // Validate ObjectId format
+        const mongoose = require('mongoose');
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid meme ID format'
+            });
+        }
+        
         const meme = await Meme.findById(id);
         
         if (!meme || !meme.isActive) {

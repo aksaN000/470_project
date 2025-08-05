@@ -324,7 +324,7 @@ memeSchema.methods.incrementDownloads = function() {
 // Get public meme data (for API responses)
 memeSchema.methods.getPublicData = function(userId = null) {
     const publicData = {
-        id: this._id,
+        id: this._id.toString(),
         title: this.title,
         description: this.description,
         imageUrl: this.imageUrl,
