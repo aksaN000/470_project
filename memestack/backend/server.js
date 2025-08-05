@@ -23,7 +23,12 @@ const PORT = process.env.PORT || 5000;
 
 const createInitialData = async () => {
     try {
-        console.log('� Server started - no demo data creation');
+        // Create test data for development/testing
+        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+            const { createTestData } = require('./utils/testData');
+            await createTestData();
+        }
+        console.log('🚀 Server started successfully');
     } catch (error) {
         console.error('❌ Error during startup:', error.message);
     }

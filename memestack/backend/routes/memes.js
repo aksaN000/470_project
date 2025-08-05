@@ -67,7 +67,7 @@ router.get('/user/:userId', getUserMemes);
 // @route   GET /api/memes/:id
 // @params  :id
 // Note: Some features like viewing private memes require authentication
-router.get('/:id', getMemeById);
+router.get('/:id', optionalAuth, getMemeById);
 
 // @desc    Share meme (increment share count)
 // @route   POST /api/memes/:id/share

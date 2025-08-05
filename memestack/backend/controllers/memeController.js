@@ -206,7 +206,7 @@ const getMemeById = async (req, res) => {
         res.json({
             success: true,
             data: {
-                meme: meme.getPublicData(),
+                meme: meme.getPublicData(req.user ? req.user._id : null),
                 isLiked: req.user ? meme.isLikedBy(req.user._id) : false
             },
             message: 'Meme fetched successfully'
