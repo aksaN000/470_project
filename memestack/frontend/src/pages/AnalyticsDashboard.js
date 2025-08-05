@@ -40,6 +40,7 @@ import { useNavigate } from 'react-router-dom';
 import { analyticsAPI } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import StatCard from '../components/common/StatCard';
 
 const AnalyticsDashboard = () => {
     const navigate = useNavigate();
@@ -93,50 +94,6 @@ const AnalyticsDashboard = () => {
         return `${num > 0 ? '+' : ''}${num.toFixed(1)}%`;
     };
 
-    // Metric card component
-    const MetricCard = ({ title, value, icon, growth, color = 'primary' }) => (
-        <Card sx={{ height: '100%' }}>
-            <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Box
-                        sx={{
-                            p: 1,
-                            borderRadius: 2,
-                            backgroundColor: `${color}.light`,
-                            color: `${color}.contrastText`,
-                            mr: 2,
-                        }}
-                    >
-                        {icon}
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
-                            {formatNumber(value)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            {title}
-                        </Typography>
-                    </Box>
-                </Box>
-                {growth !== undefined && (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {growth >= 0 ? (
-                            <TrendingUpIcon color="success" sx={{ mr: 1 }} />
-                        ) : (
-                            <TrendingDownIcon color="error" sx={{ mr: 1 }} />
-                        )}
-                        <Typography
-                            variant="body2"
-                            color={growth >= 0 ? 'success.main' : 'error.main'}
-                        >
-                            {formatPercentage(growth)} from last period
-                        </Typography>
-                    </Box>
-                )}
-            </CardContent>
-        </Card>
-    );
-
     if (!user) {
         return (
             <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -189,37 +146,41 @@ const AnalyticsDashboard = () => {
             {/* Overview Metrics */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Total Memes"
                         value={overview.totalMemes}
                         icon={<AnalyticsIcon />}
                         growth={growth?.memesGrowth}
                         color="primary"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Total Likes"
                         value={overview.totalLikes}
                         icon={<LikesIcon />}
                         color="error"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Total Views"
                         value={overview.totalViews}
                         icon={<ViewsIcon />}
                         color="info"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Followers"
                         value={overview.followersCount}
                         icon={<FollowersIcon />}
                         growth={growth?.followersGrowth}
                         color="success"
+                        variant="detailed"
                     />
                 </Grid>
             </Grid>
@@ -227,35 +188,39 @@ const AnalyticsDashboard = () => {
             {/* Secondary Metrics */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Total Shares"
                         value={overview.totalShares}
                         icon={<SharesIcon />}
                         color="secondary"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Downloads"
                         value={overview.totalDownloads}
                         icon={<DownloadsIcon />}
                         color="warning"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Comments"
                         value={overview.totalComments}
                         icon={<CommentsIcon />}
                         color="info"
+                        variant="detailed"
                     />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
-                    <MetricCard
+                    <StatCard
                         title="Avg Engagement"
                         value={overview.avgEngagement}
                         icon={<TrendingUpIcon />}
                         color="success"
+                        variant="detailed"
                     />
                 </Grid>
             </Grid>

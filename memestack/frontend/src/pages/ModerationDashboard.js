@@ -48,6 +48,7 @@ import {
     suspendUser,
     banUser
 } from '../services/moderationAPI';
+import StatCard from '../components/common/StatCard';
 import { useAuth } from '../contexts/AuthContext';
 
 const ModerationDashboard = () => {
@@ -217,52 +218,36 @@ const ModerationDashboard = () => {
             {dashboardStats && (
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography color="textSecondary" gutterBottom>
-                                    Total Reports
-                                </Typography>
-                                <Typography variant="h4">
-                                    {dashboardStats.totalReports}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                        <StatCard
+                            title="Total Reports"
+                            value={dashboardStats.totalReports}
+                            color="primary"
+                            variant="compact"
+                        />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography color="textSecondary" gutterBottom>
-                                    Pending Reports
-                                </Typography>
-                                <Typography variant="h4" color="warning.main">
-                                    {dashboardStats.pendingReports}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                        <StatCard
+                            title="Pending Reports"
+                            value={dashboardStats.pendingReports}
+                            color="warning"
+                            variant="compact"
+                        />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography color="textSecondary" gutterBottom>
-                                    Resolved Today
-                                </Typography>
-                                <Typography variant="h4" color="success.main">
-                                    {dashboardStats.resolvedToday}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                        <StatCard
+                            title="Resolved Today"
+                            value={dashboardStats.resolvedToday}
+                            color="success"
+                            variant="compact"
+                        />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Card>
-                            <CardContent>
-                                <Typography color="textSecondary" gutterBottom>
-                                    Active Moderators
-                                </Typography>
-                                <Typography variant="h4">
-                                    {dashboardStats.activeModerators}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                        <StatCard
+                            title="Active Moderators"
+                            value={dashboardStats.activeModerators}
+                            color="info"
+                            variant="compact"
+                        />
                     </Grid>
                 </Grid>
             )}
