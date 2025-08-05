@@ -56,7 +56,13 @@ const FollowButton = ({
         return null;
     }
 
-    const handleFollowToggle = async () => {
+    const handleFollowToggle = async (event) => {
+        // Prevent event propagation to parent elements
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        
         try {
             setLoading(true);
             

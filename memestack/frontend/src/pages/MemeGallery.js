@@ -258,12 +258,14 @@ const MemeGallery = () => {
                                                 <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
                                                     by {meme.creator.username}
                                                 </Typography>
-                                                <FollowButton 
-                                                    userId={meme.creator._id} 
-                                                    username={meme.creator.username}
-                                                    variant="chip"
-                                                    size="small"
-                                                />
+                                                <Box onClick={(e) => e.stopPropagation()}>
+                                                    <FollowButton 
+                                                        userId={meme.creator._id} 
+                                                        username={meme.creator.username}
+                                                        variant="chip"
+                                                        size="small"
+                                                    />
+                                                </Box>
                                             </Box>
                                         )}
                                         
@@ -293,7 +295,7 @@ const MemeGallery = () => {
                                             {meme.description || 'No description available'}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ justifyContent: 'space-between' }}>
+                                    <CardActions sx={{ justifyContent: 'space-between' }} onClick={(e) => e.stopPropagation()}>
                                         <Box>
                                             <IconButton
                                                 size="small"
