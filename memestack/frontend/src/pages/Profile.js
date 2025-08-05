@@ -51,8 +51,15 @@ const Profile = () => {
                             variant="contained"
                             startIcon={<EditIcon />}
                             onClick={handleEditProfile}
+                            sx={{ mr: 1 }}
                         >
                             Edit Profile
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            onClick={() => navigate('/settings')}
+                        >
+                            Settings
                         </Button>
                     </Box>
 

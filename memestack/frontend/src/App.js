@@ -3,12 +3,12 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 
 // Context Providers
 import { AuthProvider } from './contexts/AuthContext';
 import { MemeProvider } from './contexts/MemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Components
 import Navbar from './components/layout/Navbar';
@@ -24,6 +24,7 @@ import MemeDetail from './pages/MemeDetail';
 import CreateMeme from './pages/CreateMeme';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import AccountSettings from './pages/AccountSettings';
 import FollowingFeed from './pages/FollowingFeed';
 import BrowseUsers from './pages/BrowseUsers';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
@@ -40,80 +41,12 @@ import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // ========================================
-// THEME CONFIGURATION
-// ========================================
-
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#6366f1', // Indigo
-      light: '#818cf8',
-      dark: '#4f46e5',
-    },
-    secondary: {
-      main: '#ec4899', // Pink
-      light: '#f472b6',
-      dark: '#db2777',
-    },
-    background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#1e293b',
-      secondary: '#64748b',
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2rem',
-    },
-    h3: {
-      fontWeight: 600,
-      fontSize: '1.5rem',
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 500,
-    },
-  },
-  shape: {
-    borderRadius: 12,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: '10px 20px',
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
-
-// ========================================
 // MAIN APP COMPONENT
 // ========================================
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <CssBaseline />
       <AuthProvider>
         <MemeProvider>
@@ -177,6 +110,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <EditProfile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/settings" 
+                    element={
+                      <ProtectedRoute>
+                        <AccountSettings />
                       </ProtectedRoute>
                     } 
                   />

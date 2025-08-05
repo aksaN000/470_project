@@ -32,6 +32,7 @@ import {
     Login as LoginIcon,
     PersonAdd as RegisterIcon,
     Logout as LogoutIcon,
+    Settings as SettingsIcon,
     EmojiEvents,
     Groups,
     Handshake
@@ -251,6 +252,17 @@ const Navbar = () => {
                             <ListItemIcon><PersonIcon /></ListItemIcon>
                             <ListItemText primary="Profile" />
                         </ListItem>
+                        <ListItem
+                            button
+                            onClick={() => {
+                                navigate('/settings');
+                                handleDrawerToggle();
+                            }}
+                            selected={isActive('/settings')}
+                        >
+                            <ListItemIcon><SettingsIcon /></ListItemIcon>
+                            <ListItemText primary="Settings" />
+                        </ListItem>
                         <ListItem button onClick={handleLogout}>
                             <ListItemIcon><LogoutIcon /></ListItemIcon>
                             <ListItemText primary="Logout" />
@@ -338,9 +350,9 @@ const Navbar = () => {
                                         <Avatar 
                                             sx={{ width: 32, height: 32 }}
                                             src={user?.profile?.avatar}
-                                            alt={user?.username}
+                                            alt={user?.profile?.displayName || user?.username}
                                         >
-                                            {user?.username?.charAt(0).toUpperCase()}
+                                            {(user?.profile?.displayName || user?.username)?.charAt(0).toUpperCase()}
                                         </Avatar>
                                     </IconButton>
                                     <Menu
@@ -361,6 +373,10 @@ const Navbar = () => {
                                         <MenuItem onClick={() => { navigate('/profile'); handleCloseMenu(); }}>
                                             <PersonIcon sx={{ mr: 2 }} />
                                             Profile
+                                        </MenuItem>
+                                        <MenuItem onClick={() => { navigate('/settings'); handleCloseMenu(); }}>
+                                            <SettingsIcon sx={{ mr: 2 }} />
+                                            Settings
                                         </MenuItem>
                                         <MenuItem onClick={handleLogout}>
                                             <LogoutIcon sx={{ mr: 2 }} />

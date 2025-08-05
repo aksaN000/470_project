@@ -255,7 +255,7 @@ const MemeGallery = () => {
                                                     {meme.creator.username?.charAt(0).toUpperCase()}
                                                 </Avatar>
                                                 <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
-                                                    by {meme.creator.username}
+                                                    by {meme.creator.profile?.displayName || meme.creator.username}
                                                 </Typography>
                                                 <Box onClick={(e) => e.stopPropagation()}>
                                                     <FollowButton 

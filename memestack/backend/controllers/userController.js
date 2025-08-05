@@ -32,7 +32,7 @@ const getUsers = async (req, res) => {
 
         // Get users
         const users = await User.find(query)
-            .select('username profile.bio profile.avatar stats createdAt')
+            .select('username profile.bio profile.avatar profile.displayName stats createdAt')
             .sort({ [sortBy]: sortOrderNum })
             .limit(parseInt(limit))
             .skip(skip);
@@ -47,6 +47,7 @@ const getUsers = async (req, res) => {
                 users: users.map(user => ({
                     id: user._id,
                     username: user.username,
+                    displayName: user.profile?.displayName || '',
                     bio: user.profile?.bio || '',
                     avatar: user.profile?.avatar || '',
                     stats: user.stats,
@@ -103,6 +104,7 @@ const getUserById = async (req, res) => {
                 user: {
                     id: user._id,
                     username: user.username,
+                    displayName: user.profile?.displayName || '',
                     bio: user.profile?.bio || '',
                     avatar: user.profile?.avatar || '',
                     stats: user.stats,

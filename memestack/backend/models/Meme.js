@@ -283,7 +283,7 @@ memeSchema.pre('save', function(next) {
 memeSchema.pre(/^find/, function(next) {
     this.populate({
         path: 'creator',
-        select: 'username profile.avatar stats.memesCreated'
+        select: 'username profile.avatar profile.displayName stats.memesCreated'
     });
     next();
 });

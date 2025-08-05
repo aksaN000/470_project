@@ -194,8 +194,14 @@ const BrowseUsers = () => {
                                         </Avatar>
                                         
                                         <Typography variant="h6" gutterBottom>
-                                            {user.username}
+                                            {user.displayName || user.username}
                                         </Typography>
+                                        
+                                        {user.displayName && (
+                                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                                                @{user.username}
+                                            </Typography>
+                                        )}
                                         
                                         {user.bio && (
                                             <Typography 

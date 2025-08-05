@@ -304,7 +304,7 @@ const createMeme = async (req, res) => {
         });
 
         // Populate creator info
-        await newMeme.populate('creator', 'username profile.avatar');
+        await newMeme.populate('creator', 'username profile.avatar profile.displayName');
 
         res.status(201).json({
             success: true,

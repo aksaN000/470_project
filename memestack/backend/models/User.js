@@ -89,6 +89,20 @@ const userSchema = new mongoose.Schema({
         notifications: {
             type: Boolean,
             default: true
+        },
+        emailNotifications: {
+            type: Boolean,
+            default: true
+        },
+        language: {
+            type: String,
+            enum: ['en', 'es', 'fr', 'de', 'it', 'pt'],
+            default: 'en'
+        },
+        dataUsage: {
+            type: String,
+            enum: ['low', 'standard', 'high'],
+            default: 'standard'
         }
     },
     

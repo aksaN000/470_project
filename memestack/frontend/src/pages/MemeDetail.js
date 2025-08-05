@@ -262,8 +262,13 @@ const MemeDetail = () => {
                                 </Avatar>
                                 <Box>
                                     <Typography variant="subtitle1" fontWeight="bold">
-                                        {meme.creator?.username}
+                                        {meme.creator?.profile?.displayName || meme.creator?.username}
                                     </Typography>
+                                    {meme.creator?.profile?.displayName && (
+                                        <Typography variant="body2" color="text.secondary">
+                                            @{meme.creator?.username}
+                                        </Typography>
+                                    )}
                                     <Typography variant="caption" color="text.secondary">
                                         {new Date(meme.createdAt).toLocaleDateString()}
                                     </Typography>

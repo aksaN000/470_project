@@ -207,7 +207,17 @@ const getMe = async (req, res) => {
 // @access  Private
 const updateProfile = async (req, res) => {
     try {
-        const { bio, theme, notifications, avatar, username, displayName } = req.body;
+        const { 
+            bio, 
+            theme, 
+            notifications, 
+            emailNotifications,
+            language,
+            dataUsage,
+            avatar, 
+            username, 
+            displayName 
+        } = req.body;
         
         // Find user
         const user = await User.findById(req.user.userId);
@@ -223,8 +233,13 @@ const updateProfile = async (req, res) => {
         if (bio !== undefined) user.profile.bio = bio;
         if (avatar !== undefined) user.profile.avatar = avatar;
         if (displayName !== undefined) user.profile.displayName = displayName;
+        
+        // Update preference fields
         if (theme !== undefined) user.preferences.theme = theme;
         if (notifications !== undefined) user.preferences.notifications = notifications;
+        if (emailNotifications !== undefined) user.preferences.emailNotifications = emailNotifications;
+        if (language !== undefined) user.preferences.language = language;
+        if (dataUsage !== undefined) user.preferences.dataUsage = dataUsage;
         
         // Update username if provided and different
         if (username !== undefined && username !== user.username) {
