@@ -121,4 +121,66 @@ router.post('/meme', protect, upload.single('meme'), async (req, res) => {
     }
 });
 
+// Profile picture upload endpoint
+router.post('/avatar', protect, upload.single('avatar'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No avatar file uploaded'
+            });
+        }
+
+        // Ensure avatars directory exists
+        const avatarsDir = path.join(__dirname, '../uploads/avatars');
+        try {
+            await fs.access(avatarsDir);
+        } catch {
+            await fs.mkdir(avatarsDir, { recursive: true });
+            console.log('📁 Created avatars directory:', avatarsDir);
+        }
+
+        // Generate unique filename for avatar
+        const fileExtension = path.extname(req.file.originalname);
+        const uniqueFileName = `${uuidv4()}${fileExtension}`;
+        const filePath = path.join(avatarsDir, uniqueFileName);
+
+        // Process and save the avatar (square crop, smaller size)
+        await sharp(req.file.buffer)
+            .resize(200, 200, { 
+                fit: 'cover',
+                position: 'center'
+            })
+            .jpeg({ quality: 90 })
+            .toFile(filePath);
+
+        // Generate accessible URL
+        const avatarUrl = `http://localhost:5000/uploads/avatars/${uniqueFileName}`;
+
+        console.log('✅ Avatar uploaded successfully:', avatarUrl);
+
+        const responseData = {
+            success: true,
+            message: 'Avatar uploaded successfully',
+            data: {
+                url: avatarUrl,
+                filename: uniqueFileName,
+                originalname: req.file.originalname,
+                size: req.file.size,
+                mimetype: req.file.mimetype
+            }
+        };
+
+        res.status(200).json(responseData);
+        
+    } catch (error) {
+        console.error('Avatar upload error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Avatar upload failed',
+            error: error.message
+        });
+    }
+});
+
 module.exports = router;

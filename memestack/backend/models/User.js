@@ -39,6 +39,11 @@ const userSchema = new mongoose.Schema({
     
     // User profile information
     profile: {
+        displayName: {
+            type: String,
+            maxlength: [50, 'Display name cannot exceed 50 characters'],
+            default: ''
+        },
         bio: {
             type: String,
             maxlength: [500, 'Bio cannot exceed 500 characters'],

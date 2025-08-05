@@ -316,6 +316,30 @@ export const uploadAPI = {
         }
     },
 
+    // Upload avatar/profile picture
+    uploadAvatar: async (file, onUploadProgress) => {
+        try {
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            const response = await API.post('/upload/avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                onUploadProgress: onUploadProgress ? (progressEvent) => {
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    onUploadProgress(percentCompleted);
+                } : undefined,
+            });
+
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to upload avatar' };
+        }
+    },
+
     // Get upload guidelines
     getGuidelines: async () => {
         try {

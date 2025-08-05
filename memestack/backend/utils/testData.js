@@ -67,6 +67,7 @@ async function createTestData() {
             category: 'funny',
             tags: ['cat', 'funny', 'animal'],
             isPublic: true,
+            visibility: 'public',
             metadata: {
                 format: 'jpg',
                 dimensions: { width: 500, height: 400 }
@@ -82,6 +83,7 @@ async function createTestData() {
             category: 'gaming',
             tags: ['gaming', 'victory', 'boss'],
             isPublic: true,
+            visibility: 'feed_only',
             metadata: {
                 format: 'jpg',
                 dimensions: { width: 500, height: 400 }
@@ -97,6 +99,7 @@ async function createTestData() {
             category: 'reaction',
             tags: ['reaction', 'monday', 'mood'],
             isPublic: true,
+            visibility: 'gallery_only',
             metadata: {
                 format: 'jpg',
                 dimensions: { width: 500, height: 400 }

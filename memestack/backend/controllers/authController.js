@@ -207,7 +207,7 @@ const getMe = async (req, res) => {
 // @access  Private
 const updateProfile = async (req, res) => {
     try {
-        const { bio, theme, notifications } = req.body;
+        const { bio, theme, notifications, avatar, username, displayName } = req.body;
         
         // Find user
         const user = await User.findById(req.user.userId);
@@ -221,8 +221,23 @@ const updateProfile = async (req, res) => {
         
         // Update profile fields
         if (bio !== undefined) user.profile.bio = bio;
+        if (avatar !== undefined) user.profile.avatar = avatar;
+        if (displayName !== undefined) user.profile.displayName = displayName;
         if (theme !== undefined) user.preferences.theme = theme;
         if (notifications !== undefined) user.preferences.notifications = notifications;
+        
+        // Update username if provided and different
+        if (username !== undefined && username !== user.username) {
+            // Check if username is already taken
+            const existingUser = await User.findOne({ username, _id: { $ne: user._id } });
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username is already taken'
+                });
+            }
+            user.username = username;
+        }
         
         // Save updated user
         await user.save();

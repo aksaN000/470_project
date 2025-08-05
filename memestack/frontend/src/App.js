@@ -23,6 +23,7 @@ import MemeGallery from './pages/MemeGallery';
 import MemeDetail from './pages/MemeDetail';
 import CreateMeme from './pages/CreateMeme';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import FollowingFeed from './pages/FollowingFeed';
 import BrowseUsers from './pages/BrowseUsers';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
@@ -168,6 +169,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/profile/edit" 
+                    element={
+                      <ProtectedRoute>
+                        <EditProfile />
                       </ProtectedRoute>
                     } 
                   />

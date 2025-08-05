@@ -317,7 +317,7 @@ const getFollowingFeed = async (req, res) => {
             isPublic: true,
             visibility: { $in: ['public', 'followers_only', 'feed_only'] }
         })
-        .populate('creator', 'username avatar')
+        .populate('creator', 'username profile.avatar profile.displayName')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit));
