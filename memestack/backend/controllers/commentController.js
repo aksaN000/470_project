@@ -37,6 +37,8 @@ const getComments = async (req, res) => {
             sortOrder: sortOrderValue
         });
         
+        console.log(`📋 Loading ${comments.length} comments for meme ${memeId}`);
+        
         // Get total count for pagination
         const totalComments = await Comment.countDocuments({
             meme: memeId,
@@ -53,12 +55,33 @@ const getComments = async (req, res) => {
                     isActive: true
                 });
                 
+                // Ensure we have proper method access by manually calling isLikedBy
+                // TEMP: Fixed issue with comment.isLikedBy method
+                let isLikedByUser = false;
+                if (comment.likes && comment.likes.length > 0) {
+                    console.log('🔍 Comment has likes:', comment._id, 'likes count:', comment.likes.length);
+                    console.log('🔍 Likes structure:', comment.likes.map(like => ({ 
+                        user: like?.user, 
+                        hasUser: !!like?.user,
+                        userString: like?.user?.toString ? like.user.toString() : 'no toString method'
+                    })));
+                }
+                try {
+                    isLikedByUser = req.user && comment.likes ? 
+                        comment.likes.some(like => like && like.user && like.user.toString() === req.user._id.toString()) : 
+                        false;
+                } catch (error) {
+                    console.error('❌ Error checking like status for comment:', comment._id, error.message);
+                    console.error('Comment likes:', comment.likes);
+                    isLikedByUser = false;
+                }
+                
                 return {
                     ...comment.getPublicData(),
                     replies: replies.map(reply => reply.getPublicData()),
                     hasMoreReplies: totalReplies > 3,
                     totalReplies,
-                    isLiked: req.user ? comment.isLikedBy()(req.user._id) : false
+                    isLiked: isLikedByUser
                 };
             })
         );
@@ -97,6 +120,8 @@ const addComment = async (req, res) => {
     try {
         const { memeId } = req.params;
         const { content, parentComment = null } = req.body;
+        
+        console.log('💬 Adding comment:', { memeId, content: content?.substring(0, 50), parentComment, userId: req.user._id });
         
         // Validation
         if (!content || content.trim().length === 0) {
@@ -315,7 +340,7 @@ const toggleLikeComment = async (req, res) => {
         }
         
         // Check if already liked
-        const isLiked = comment.isLikedBy()(userId);
+        const isLiked = comment.likes && comment.likes.some(like => like && like.user && like.user.toString() === userId.toString());
         
         if (isLiked) {
             await comment.removeLike(userId);
@@ -375,7 +400,7 @@ const getReplies = async (req, res) => {
         
         const repliesWithLikeStatus = replies.map(reply => ({
             ...reply.getPublicData(),
-            isLiked: req.user ? reply.isLikedBy()(req.user._id) : false
+            isLiked: req.user ? reply.likes && reply.likes.some(like => like && like.user && like.user.toString() === req.user._id.toString()) : false
         }));
         
         const pagination = {
@@ -510,7 +535,7 @@ const getUserComments = async (req, res) => {
         
         const commentsWithLikeStatus = comments.map(comment => ({
             ...comment.getPublicData(),
-            isLiked: req.user ? comment.isLikedBy()(req.user._id) : false
+            isLiked: req.user ? comment.likes && comment.likes.some(like => like && like.user && like.user.toString() === req.user._id.toString()) : false
         }));
         
         const pagination = {

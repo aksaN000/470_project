@@ -154,7 +154,7 @@ const CommentSection = ({ memeId }) => {
         }
 
         try {
-            const response = await commentsAPI.toggleLike(commentId);
+            const response = await commentsAPI.toggleLikeComment(commentId);
             if (response.success) {
                 // Update the comment in state
                 setComments(comments.map(comment => 

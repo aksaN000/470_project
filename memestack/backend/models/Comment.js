@@ -107,13 +107,11 @@ commentSchema.index({ 'stats.likesCount': -1 }); // Most liked comments
 // VIRTUAL FIELDS
 // ========================================
 
-// Check if user has liked this comment
-commentSchema.virtual('isLikedBy').get(function() {
-    return function(userId) {
-        if (!userId) return false;
-        return this.likes.some(like => like.user.toString() === userId.toString());
-    };
-});
+// Check if comment is liked by user
+commentSchema.methods.isLikedBy = function(userId) {
+    if (!userId) return false;
+    return this.likes.some(like => like && like.user && like.user.toString() === userId.toString());
+};
 
 // ========================================
 // MIDDLEWARE
@@ -141,7 +139,7 @@ commentSchema.pre(/^find/, function(next) {
 // Add like to comment
 commentSchema.methods.addLike = function(userId) {
     const alreadyLiked = this.likes.some(like => 
-        like.user.toString() === userId.toString()
+        like && like.user && like.user.toString() === userId.toString()
     );
     
     if (!alreadyLiked) {
@@ -155,7 +153,7 @@ commentSchema.methods.addLike = function(userId) {
 // Remove like from comment
 commentSchema.methods.removeLike = function(userId) {
     this.likes = this.likes.filter(like => 
-        like.user.toString() !== userId.toString()
+        !like || !like.user || like.user.toString() !== userId.toString()
     );
     this.stats.likesCount = this.likes.length;
     
@@ -170,6 +168,7 @@ commentSchema.methods.getPublicData = function() {
         meme: this.meme,
         author: this.author,
         parentComment: this.parentComment,
+        likes: this.likes,
         stats: this.stats,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
@@ -192,6 +191,7 @@ commentSchema.statics.getCommentsByMeme = function(memeId, options = {}) {
         isActive: true,
         parentComment: null // Only top-level comments
     })
+    .populate('author', 'username profile.displayName profile.avatar')
     .sort(sortObj)
     .limit(limit)
     .skip(skip);
@@ -205,6 +205,7 @@ commentSchema.statics.getReplies = function(commentId, options = {}) {
         parentComment: commentId,
         isActive: true
     })
+    .populate('author', 'username profile.displayName profile.avatar')
     .sort({ createdAt: 1 }) // Oldest first for replies
     .limit(limit)
     .skip(skip);
