@@ -322,8 +322,8 @@ memeSchema.methods.incrementDownloads = function() {
 };
 
 // Get public meme data (for API responses)
-memeSchema.methods.getPublicData = function() {
-    return {
+memeSchema.methods.getPublicData = function(userId = null) {
+    const publicData = {
         id: this._id,
         title: this.title,
         description: this.description,
@@ -339,6 +339,13 @@ memeSchema.methods.getPublicData = function() {
             dimensions: this.metadata.dimensions
         }
     };
+    
+    // Add like status if user is provided
+    if (userId) {
+        publicData.isLiked = this.isLikedBy(userId);
+    }
+    
+    return publicData;
 };
 
 // ========================================

@@ -329,7 +329,7 @@ const getFollowingFeed = async (req, res) => {
         res.status(200).json({
             success: true,
             data: {
-                memes,
+                memes: memes.map(meme => meme.getPublicData(currentUserId)),
                 pagination: {
                     currentPage: parseInt(page),
                     totalPages: Math.ceil(totalMemes / limit),

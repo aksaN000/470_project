@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 // Import middleware
-const { protect } = require('../middleware/auth');
+const { protect, optionalAuth } = require('../middleware/auth');
 
 // Import controller functions
 const {
@@ -42,12 +42,12 @@ const {
 // @desc    Get all public memes with pagination and filtering
 // @route   GET /api/memes
 // @params  ?page=1&limit=12&category=funny&sortBy=createdAt&sortOrder=desc&search=cats&tags=funny,cute
-router.get('/', getAllMemes);
+router.get('/', optionalAuth, getAllMemes);
 
 // @desc    Get trending memes (most liked in last 7 days)
 // @route   GET /api/memes/trending
 // @params  ?limit=10
-router.get('/trending', getTrendingMemes);
+router.get('/trending', optionalAuth, getTrendingMemes);
 
 // @desc    Get general statistics about memes
 // @route   GET /api/memes/stats

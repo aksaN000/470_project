@@ -125,8 +125,23 @@ const MemeGallery = () => {
         
         try {
             await memeAPI.toggleLike(memeId);
-            // Refresh memes to get updated data
-            fetchMemes(filters);
+            // Update local state
+            setMemes(prevMemes => 
+                prevMemes.map(meme => 
+                    meme.id === memeId 
+                        ? {
+                            ...meme,
+                            isLiked: !meme.isLiked,
+                            stats: {
+                                ...meme.stats,
+                                likesCount: meme.isLiked 
+                                    ? meme.stats.likesCount - 1 
+                                    : meme.stats.likesCount + 1
+                            }
+                        }
+                        : meme
+                )
+            );
         } catch (error) {
             console.error('Error toggling like:', error);
         }

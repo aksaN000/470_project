@@ -62,11 +62,14 @@ const getAllMemes = async (req, res) => {
         });
 
         const totalPages = Math.ceil(totalMemes / limit);
+        
+        // Get user ID if authenticated (for like status)
+        const userId = req.user ? req.user._id : null;
 
         res.json({
             success: true,
             data: {
-                memes: memes.map(meme => meme.getPublicData()),
+                memes: memes.map(meme => meme.getPublicData(userId)),
                 pagination: {
                     currentPage: parseInt(page),
                     totalPages,
@@ -103,11 +106,14 @@ const getTrendingMemes = async (req, res) => {
         const { limit = 10 } = req.query;
         
         const trendingMemes = await Meme.getTrending(parseInt(limit));
+        
+        // Get user ID if authenticated (for like status)
+        const userId = req.user ? req.user._id : null;
 
         res.json({
             success: true,
             data: {
-                memes: trendingMemes.map(meme => meme.getPublicData()),
+                memes: trendingMemes.map(meme => meme.getPublicData(userId)),
                 count: trendingMemes.length
             },
             message: 'Trending memes fetched successfully'

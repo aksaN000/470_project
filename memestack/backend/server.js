@@ -23,53 +23,9 @@ const PORT = process.env.PORT || 5000;
 
 const createInitialData = async () => {
     try {
-        const User = require('./models/User');
-        const bcrypt = require('bcryptjs');
-        
-        // Only create demo user in development environment
-        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
-            // Check if demo user already exists
-            const existingDemoUser = await User.findOne({ email: 'demo@memestack.com' });
-            if (existingDemoUser) {
-                console.log('👤 Demo user already exists');
-                return;
-            }
-            
-            // Create demo user for development/testing
-            const hashedPassword = await bcrypt.hash('demo123', 12);
-            const demoUser = new User({
-                username: 'demo_user',
-                email: 'demo@memestack.com',
-                password: hashedPassword,
-                profile: {
-                    displayName: 'Demo User',
-                    bio: 'Development demo account',
-                    avatar: ''
-                },
-                isVerified: true,
-                role: 'user',
-                stats: {
-                    memesCreated: 0,
-                    likesReceived: 0,
-                    totalViews: 0
-                }
-            });
-            
-            await demoUser.save();
-            console.log('✅ Demo user created for development');
-            console.log('📧 Email: demo@memestack.com');
-            console.log('🔑 Password: demo123');
-            
-            // Create additional demo data
-            const { createDemoData } = require('./utils/demoData');
-            await createDemoData();
-            
-        } else {
-            console.log('🏭 Production mode: No demo users created');
-        }
-        
+        console.log('� Server started - no demo data creation');
     } catch (error) {
-        console.error('❌ Error creating initial data:', error.message);
+        console.error('❌ Error during startup:', error.message);
     }
 };
 
