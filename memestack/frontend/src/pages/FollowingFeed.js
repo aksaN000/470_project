@@ -35,6 +35,7 @@ const FollowingFeed = () => {
     const { user } = useAuth();
     const [memes, setMemes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 0,
@@ -47,6 +48,7 @@ const FollowingFeed = () => {
     const fetchFollowingFeed = async (pageNum = 1) => {
         try {
             setLoading(true);
+            setError(null);
             const response = await followAPI.getFollowingFeed({
                 page: pageNum,
                 limit: 12
@@ -56,6 +58,7 @@ const FollowingFeed = () => {
             setPagination(response.data.pagination);
         } catch (error) {
             console.error('Error fetching following feed:', error);
+            setError(error.message || 'Failed to load feed');
             setMemes([]);
         } finally {
             setLoading(false);
@@ -161,6 +164,18 @@ const FollowingFeed = () => {
 
             {loading ? (
                 <LoadingSpinner message="Loading your feed..." />
+            ) : error ? (
+                <Box sx={{ textAlign: 'center', py: 8 }}>
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => fetchFollowingFeed(page)}
+                    >
+                        Try Again
+                    </Button>
+                </Box>
             ) : memes.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
                     <PersonAddIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />

@@ -78,9 +78,21 @@ const MemeDetail = () => {
             setLoading(true);
             setError('');
             
+            // Validate ID parameter
+            if (!id || id === 'undefined' || id === 'null') {
+                console.error('Invalid meme ID:', id);
+                setError('Invalid meme ID');
+                setLoading(false);
+                return;
+            }
+            
+            console.log('Fetching meme with ID:', id);
+            
             // Try to fetch real meme data from API
             try {
                 const response = await memeAPI.getMemeById(id);
+                console.log('API response:', response);
+                
                 if (response.success && response.data) {
                     // Handle both direct meme data and nested meme data
                     const memeData = response.data.meme || response.data;
