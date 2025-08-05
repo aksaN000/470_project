@@ -92,13 +92,20 @@ const MemeDetail = () => {
             try {
                 const response = await memeAPI.getMemeById(id);
                 console.log('API response:', response);
+                console.log('Response success:', response.success);
+                console.log('Response data:', response.data);
+                console.log('Response data meme:', response.data?.meme);
                 
                 if (response.success && response.data) {
                     // Handle both direct meme data and nested meme data
                     const memeData = response.data.meme || response.data;
+                    console.log('Meme data:', memeData);
                     setMeme(memeData);
                     setLiked(memeData.isLiked || false);
                     return;
+                } else {
+                    console.error('Response not successful or no data:', response);
+                    setError('Failed to load meme - invalid response');
                 }
             } catch (apiError) {
                 console.error('Failed to fetch meme:', apiError);
