@@ -43,7 +43,8 @@ const MemeGallery = () => {
         filters, 
         loading, 
         fetchMemes, 
-        setFilters 
+        setFilters,
+        toggleLike 
     } = useMemes();
 
     const [localFilters, setLocalFilters] = useState(filters);
@@ -124,24 +125,7 @@ const MemeGallery = () => {
         event.stopPropagation();
         
         try {
-            await memeAPI.toggleLike(memeId);
-            // Update local state
-            setMemes(prevMemes => 
-                prevMemes.map(meme => 
-                    meme.id === memeId 
-                        ? {
-                            ...meme,
-                            isLiked: !meme.isLiked,
-                            stats: {
-                                ...meme.stats,
-                                likesCount: meme.isLiked 
-                                    ? meme.stats.likesCount - 1 
-                                    : meme.stats.likesCount + 1
-                            }
-                        }
-                        : meme
-                )
-            );
+            await toggleLike(memeId);
         } catch (error) {
             console.error('Error toggling like:', error);
         }
