@@ -51,7 +51,9 @@ import {
     History as HistoryIcon,
     Group as GroupIcon,
     EmojiEvents as ChallengeIcon,
-    ArrowBack as BackIcon
+    ArrowBack as BackIcon,
+    Analytics as AnalyticsIcon,
+    Settings as AdvancedIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,6 +61,7 @@ import { useThemeMode } from '../contexts/ThemeContext';
 import { collaborationsAPI, memeAPI } from '../services/api';
 import useNotifications from '../hooks/useNotifications';
 import NotificationPanel from '../components/NotificationPanel';
+import AdvancedCollaborationFeatures from '../components/AdvancedCollaborationFeatures';
 
 const CollaborationDetail = () => {
     const { id } = useParams();
@@ -668,6 +671,15 @@ const CollaborationDetail = () => {
                                 <Tab label="Versions" />
                                 <Tab label="Contributors" />
                                 <Tab label="Comments" />
+                                <Tab 
+                                    icon={<AnalyticsIcon />} 
+                                    label="Advanced" 
+                                    sx={{ 
+                                        '& .MuiTab-iconWrapper': { 
+                                            mb: 0.5 
+                                        } 
+                                    }} 
+                                />
                             </Tabs>
                         </Box>
 
@@ -1204,6 +1216,15 @@ const CollaborationDetail = () => {
                                         </Box>
                                     )}
                                 </Box>
+                            )}
+
+                            {/* Advanced Features Tab */}
+                            {activeTab === 4 && (
+                                <AdvancedCollaborationFeatures 
+                                    collaborationId={id}
+                                    user={user}
+                                    onRefresh={loadCollaboration}
+                                />
                             )}
                         </Box>
                     </Paper>

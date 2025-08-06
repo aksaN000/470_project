@@ -1130,6 +1130,104 @@ export const collaborationsAPI = {
         } catch (error) {
             throw error.response?.data || { message: 'Failed to delete collaboration' };
         }
+    },
+
+    // ========================================
+    // ADVANCED COLLABORATION FEATURES
+    // ========================================
+
+    // Get collaboration templates
+    getTemplates: async (category = null) => {
+        try {
+            const response = await API.get('/collaborations/templates', {
+                params: category ? { category } : {}
+            });
+            return response.data.templates || [];
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch templates' };
+        }
+    },
+
+    // Create collaboration from template
+    createFromTemplate: async (data) => {
+        try {
+            const response = await API.post('/collaborations/from-template', data);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to create from template' };
+        }
+    },
+
+    // Get collaboration insights
+    getInsights: async (id) => {
+        try {
+            const response = await API.get(`/collaborations/${id}/insights`);
+            return response.data.insights || null;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get insights' };
+        }
+    },
+
+    // Get collaboration activity feed
+    getActivity: async (id, limit = 20) => {
+        try {
+            const response = await API.get(`/collaborations/${id}/activity`, {
+                params: { limit }
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get activity' };
+        }
+    },
+
+    // Get collaboration statistics
+    getStats: async (id) => {
+        try {
+            const response = await API.get(`/collaborations/${id}/stats`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get statistics' };
+        }
+    },
+
+    // Track user activity
+    trackActivity: async (id, action, details = {}) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/track-activity`, {
+                action,
+                details
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to track activity' };
+        }
+    },
+
+    // Merge fork back to parent
+    mergeFork: async (parentId, forkId, mergeOptions = {}) => {
+        try {
+            const response = await API.post(`/collaborations/${parentId}/merge-fork`, {
+                forkId,
+                mergeOptions
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to merge fork' };
+        }
+    },
+
+    // Bulk operations on collaborations
+    bulkOperations: async (operation, collaborationIds, data = {}) => {
+        try {
+            const response = await API.post('/collaborations/bulk-operations', {
+                operation,
+                collaborationIds,
+                data
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to perform bulk operation' };
+        }
     }
 };
 

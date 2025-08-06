@@ -7,6 +7,7 @@ import {
     Typography,
     Card,
     CardContent,
+    CardActions,
     Button,
     Box,
     TextField,
@@ -26,7 +27,10 @@ import {
     Stepper,
     Step,
     StepLabel,
-    StepContent
+    StepContent,
+    Radio,
+    RadioGroup,
+    Grid
 } from '@mui/material';
 import {
     ArrowBack as BackIcon,
@@ -74,6 +78,8 @@ const CreateCollaboration = () => {
     const [memes, setMemes] = useState([]);
     const [challenges, setChallenges] = useState([]);
     const [groups, setGroups] = useState([]);
+    const [templates, setTemplates] = useState([]);
+    const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [availableTags, setAvailableTags] = useState([
         'funny', 'creative', 'educational', 'artistic', 'meme', 'remix',
         'challenge', 'community', 'trending', 'original'
@@ -137,6 +143,16 @@ const CreateCollaboration = () => {
                 console.warn('Could not load groups:', groupError);
                 setGroups([]);
             }
+
+            // Load collaboration templates
+            try {
+                const templatesResponse = await collaborationsAPI.getTemplates();
+                setTemplates(templatesResponse || []);
+                console.log('Loaded templates:', templatesResponse);
+            } catch (templateError) {
+                console.warn('Could not load templates:', templateError);
+                setTemplates([]);
+            }
         } catch (error) {
             console.error('Error loading options:', error);
             setError('Failed to load collaboration options. Please try refreshing the page.');
@@ -161,6 +177,25 @@ const CreateCollaboration = () => {
                 [field]: value
             }));
         }
+    };
+
+    const applyTemplate = (template) => {
+        if (!template) return;
+        
+        setFormData(prev => ({
+            ...prev,
+            title: template.name || prev.title,
+            description: template.description || prev.description,
+            type: template.type || prev.type,
+            visibility: template.visibility || prev.visibility,
+            maxParticipants: template.maxParticipants || prev.maxParticipants,
+            timeline: template.timeline || prev.timeline,
+            tags: template.tags || prev.tags,
+            guidelines: template.guidelines || prev.guidelines,
+            workflow: template.workflow || prev.workflow
+        }));
+        
+        setSelectedTemplate(template);
     };
 
     const handleSubmit = async () => {
@@ -195,7 +230,8 @@ const CreateCollaboration = () => {
                 originalMeme: formData.originalMeme || undefined,
                 challenge: formData.challenge || undefined,
                 group: formData.group || undefined,
-                description: formData.description.trim() || undefined
+                description: formData.description.trim() || undefined,
+                templateUsed: selectedTemplate?._id || undefined
             };
 
             // Remove undefined values to avoid sending them to the API
@@ -299,6 +335,75 @@ const CreateCollaboration = () => {
                         helperText={`${formData.title.length}/200 characters (minimum 3)`}
                         error={formData.title.length > 0 && formData.title.length < 3}
                     />
+
+                    {/* Template Selection */}
+                    {templates.length > 0 && (
+                        <Box sx={{ my: 3 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Use a Template (Optional)
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                Start with a pre-configured template to save time
+                            </Typography>
+                            
+                            <Grid container spacing={2}>
+                                {templates.map((template) => (
+                                    <Grid item xs={12} sm={6} md={4} key={template._id}>
+                                        <Card
+                                            sx={{
+                                                cursor: 'pointer',
+                                                border: selectedTemplate?._id === template._id ? 2 : 1,
+                                                borderColor: selectedTemplate?._id === template._id ? 'primary.main' : 'divider',
+                                                '&:hover': {
+                                                    boxShadow: 2
+                                                }
+                                            }}
+                                            onClick={() => applyTemplate(template)}
+                                        >
+                                            <CardContent>
+                                                <Typography variant="h6" gutterBottom>
+                                                    {template.name}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                                    {template.description}
+                                                </Typography>
+                                                <Chip
+                                                    label={template.type}
+                                                    size="small"
+                                                    color="primary"
+                                                    variant="outlined"
+                                                />
+                                                {template.tags && (
+                                                    <Box sx={{ mt: 1 }}>
+                                                        {template.tags.slice(0, 3).map((tag) => (
+                                                            <Chip
+                                                                key={tag}
+                                                                label={tag}
+                                                                size="small"
+                                                                sx={{ mr: 0.5, mb: 0.5 }}
+                                                            />
+                                                        ))}
+                                                    </Box>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                                
+                                {/* Clear Template Option */}
+                                <Grid item xs={12}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setSelectedTemplate(null)}
+                                        disabled={!selectedTemplate}
+                                        sx={{ mt: 1 }}
+                                    >
+                                        Clear Template
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    )}
 
                     <TextField
                         fullWidth

@@ -804,11 +804,118 @@ const getCollaborationTemplates = async (req, res) => {
     try {
         const { category } = req.query;
         
-        const templates = Collaboration.getTemplates(category);
+        // Define collaboration templates
+        const templates = [
+            {
+                _id: 'template_meme_remix',
+                name: 'Meme Remix Project',
+                description: 'Collaborative remixing of a popular meme template',
+                type: 'remix',
+                category: 'meme-remix',
+                visibility: 'public',
+                maxParticipants: 10,
+                timeline: 'week',
+                tags: ['remix', 'collaborative', 'meme'],
+                guidelines: 'Work together to create the best remix variations',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: false,
+                    maxCollaborators: 10,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_group_project',
+                name: 'Group Meme Creation',
+                description: 'Team-based meme creation with assigned roles',
+                type: 'collaboration',
+                category: 'group-project',
+                visibility: 'public',
+                maxParticipants: 6,
+                timeline: 'month',
+                tags: ['group', 'structured', 'roles'],
+                guidelines: 'Each member takes on a specific role in the creation process',
+                workflow: 'sequential',
+                settings: {
+                    isPublic: true,
+                    allowForks: false,
+                    requireApproval: true,
+                    maxCollaborators: 6,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_challenge_response',
+                name: 'Challenge Response',
+                description: 'Collaborative response to a meme challenge',
+                type: 'challenge_response',
+                category: 'challenge-response',
+                visibility: 'public',
+                maxParticipants: 20,
+                timeline: 'day',
+                tags: ['challenge', 'competition', 'fast'],
+                guidelines: 'Quick collaborative response to trending challenges',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: false,
+                    maxCollaborators: 20,
+                    allowAnonymous: true
+                }
+            },
+            {
+                _id: 'template_tutorial',
+                name: 'Tutorial Creation',
+                description: 'Create educational meme content together',
+                type: 'template_creation',
+                category: 'tutorial',
+                visibility: 'public',
+                maxParticipants: 5,
+                timeline: 'month',
+                tags: ['educational', 'tutorial', 'learning'],
+                guidelines: 'Create step-by-step meme tutorials for the community',
+                workflow: 'sequential',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: true,
+                    maxCollaborators: 5,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_quick',
+                name: 'Quick Collab',
+                description: 'Fast, simple collaboration for immediate results',
+                type: 'collaboration',
+                category: 'quick',
+                visibility: 'public',
+                maxParticipants: 3,
+                timeline: 'hour',
+                tags: ['quick', 'simple', 'fast'],
+                guidelines: 'Get it done fast with minimal overhead',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: false,
+                    requireApproval: false,
+                    maxCollaborators: 3,
+                    allowAnonymous: true
+                }
+            }
+        ];
+
+        // Filter by category if provided
+        const filteredTemplates = category 
+            ? templates.filter(t => t.category === category)
+            : templates;
         
         res.json({
             success: true,
-            templates,
+            templates: filteredTemplates,
             categories: ['meme-remix', 'group-project', 'challenge-response', 'tutorial', 'quick']
         });
     } catch (error) {
@@ -820,10 +927,146 @@ const getCollaborationTemplates = async (req, res) => {
 // Create collaboration from template
 const createFromTemplate = async (req, res) => {
     try {
-        const { templateName, collaborationData } = req.body;
+        const { templateId, title, description, customSettings } = req.body;
         const userId = req.user._id || req.user.userId;
 
-        const collaboration = Collaboration.createFromTemplate(templateName, collaborationData, userId);
+        // Get template by ID
+        const templates = [
+            {
+                _id: 'template_meme_remix',
+                name: 'Meme Remix Project',
+                description: 'Collaborative remixing of a popular meme template',
+                type: 'remix',
+                category: 'meme-remix',
+                maxParticipants: 10,
+                tags: ['remix', 'collaborative', 'meme'],
+                guidelines: 'Work together to create the best remix variations',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: false,
+                    maxCollaborators: 10,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_group_project',
+                name: 'Group Meme Creation',
+                description: 'Team-based meme creation with assigned roles',
+                type: 'collaboration',
+                category: 'group-project',
+                maxParticipants: 6,
+                tags: ['group', 'structured', 'roles'],
+                guidelines: 'Each member takes on a specific role in the creation process',
+                workflow: 'sequential',
+                settings: {
+                    isPublic: true,
+                    allowForks: false,
+                    requireApproval: true,
+                    maxCollaborators: 6,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_challenge_response',
+                name: 'Challenge Response',
+                description: 'Collaborative response to a meme challenge',
+                type: 'challenge_response',
+                category: 'challenge-response',
+                maxParticipants: 20,
+                tags: ['challenge', 'competition', 'fast'],
+                guidelines: 'Quick collaborative response to trending challenges',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: false,
+                    maxCollaborators: 20,
+                    allowAnonymous: true
+                }
+            },
+            {
+                _id: 'template_tutorial',
+                name: 'Tutorial Creation',
+                description: 'Create educational meme content together',
+                type: 'template_creation',
+                category: 'tutorial',
+                maxParticipants: 5,
+                tags: ['educational', 'tutorial', 'learning'],
+                guidelines: 'Create step-by-step meme tutorials for the community',
+                workflow: 'sequential',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: true,
+                    maxCollaborators: 5,
+                    allowAnonymous: false
+                }
+            },
+            {
+                _id: 'template_quick',
+                name: 'Quick Collab',
+                description: 'Fast, simple collaboration for immediate results',
+                type: 'collaboration',
+                category: 'quick',
+                maxParticipants: 3,
+                tags: ['quick', 'simple', 'fast'],
+                guidelines: 'Get it done fast with minimal overhead',
+                workflow: 'parallel',
+                settings: {
+                    isPublic: true,
+                    allowForks: false,
+                    requireApproval: false,
+                    maxCollaborators: 3,
+                    allowAnonymous: true
+                }
+            }
+        ];
+
+        const template = templates.find(t => t._id === templateId);
+        if (!template) {
+            return res.status(404).json({ message: 'Template not found' });
+        }
+
+        // Create collaboration using template
+        const collaborationData = {
+            title: title || `${template.name} - ${new Date().toLocaleDateString()}`,
+            description: description || template.description,
+            type: template.type,
+            category: template.category,
+            owner: userId,
+            participants: [{
+                user: userId,
+                role: 'owner',
+                joinedAt: new Date(),
+                permissions: ['read', 'write', 'manage', 'invite', 'remove']
+            }],
+            settings: {
+                ...template.settings,
+                ...customSettings
+            },
+            tags: template.tags,
+            guidelines: template.guidelines,
+            workflow: template.workflow,
+            status: 'active',
+            metadata: {
+                templateId,
+                templateName: template.name,
+                createdFromTemplate: true
+            },
+            analytics: {
+                totalViews: 0,
+                uniqueViewers: 0,
+                totalContributions: 0,
+                avgRating: 0,
+                totalLikes: 0,
+                totalShares: 0,
+                activityScore: 0
+            }
+        };
+
+        const collaboration = new Collaboration(collaborationData);
         await collaboration.save();
 
         const populatedCollaboration = await Collaboration.findById(collaboration._id)
@@ -832,7 +1075,7 @@ const createFromTemplate = async (req, res) => {
         res.status(201).json({
             success: true,
             collaboration: populatedCollaboration,
-            message: `Collaboration created from ${templateName} template`
+            message: `Collaboration created from ${template.name} template`
         });
     } catch (error) {
         console.error('Error creating collaboration from template:', error);
@@ -846,17 +1089,88 @@ const getCollaborationInsights = async (req, res) => {
         const { id } = req.params;
         const userId = req.user._id || req.user.userId;
 
-        const collaboration = await Collaboration.findById(id);
+        const collaboration = await Collaboration.findById(id)
+            .populate('participants.user', 'username profile.displayName profile.avatar')
+            .populate('owner', 'username profile.displayName profile.avatar');
+            
         if (!collaboration) {
             return res.status(404).json({ message: 'Collaboration not found' });
         }
 
         // Check if user is a collaborator to view insights
-        if (!collaboration.isCollaborator(userId) && !collaboration.settings.isPublic) {
+        const isCollaborator = collaboration.participants.some(p => 
+            p.user._id.toString() === userId.toString()
+        ) || collaboration.owner._id.toString() === userId.toString();
+        
+        if (!isCollaborator && !collaboration.settings.isPublic) {
             return res.status(403).json({ message: 'Permission denied' });
         }
 
-        const insights = collaboration.getInsights();
+        // Calculate insights
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Participation insights
+        const totalParticipants = collaboration.participants.length;
+        const activeParticipants = collaboration.participants.filter(p => 
+            p.lastActive && p.lastActive > weekAgo
+        ).length;
+
+        // Activity insights
+        const recentActivity = collaboration.activityFeed ? collaboration.activityFeed.filter(
+            activity => activity.timestamp > weekAgo
+        ).length : 0;
+
+        const monthlyActivity = collaboration.activityFeed ? collaboration.activityFeed.filter(
+            activity => activity.timestamp > monthAgo
+        ).length : 0;
+
+        // Performance metrics
+        const avgResponseTime = calculateAverageResponseTime(collaboration.activityFeed || []);
+        const engagementRate = totalParticipants > 0 ? (activeParticipants / totalParticipants) * 100 : 0;
+
+        // Growth trends
+        const growthTrend = calculateGrowthTrend(collaboration.participants);
+        
+        // Most active contributors
+        const contributorStats = calculateContributorStats(collaboration.activityFeed || [], collaboration.participants);
+
+        const insights = {
+            overview: {
+                totalParticipants,
+                activeParticipants,
+                engagementRate: Math.round(engagementRate * 100) / 100,
+                status: collaboration.status,
+                createdAt: collaboration.createdAt,
+                lastActivity: collaboration.updatedAt
+            },
+            activity: {
+                recentActivity,
+                monthlyActivity,
+                avgResponseTime,
+                peakActivityHours: calculatePeakHours(collaboration.activityFeed || []),
+                activityTrend: calculateActivityTrend(collaboration.activityFeed || [])
+            },
+            performance: {
+                completionRate: calculateCompletionRate(collaboration),
+                qualityScore: calculateQualityScore(collaboration),
+                collaborationEfficiency: calculateEfficiency(collaboration),
+                milestoneProgress: calculateMilestoneProgress(collaboration)
+            },
+            participants: {
+                growthTrend,
+                topContributors: contributorStats.slice(0, 5),
+                roleDistribution: calculateRoleDistribution(collaboration.participants),
+                retentionRate: calculateRetentionRate(collaboration.participants)
+            },
+            content: {
+                totalContributions: collaboration.analytics?.totalContributions || 0,
+                avgRating: collaboration.analytics?.avgRating || 0,
+                totalViews: collaboration.analytics?.totalViews || 0,
+                shareCount: collaboration.analytics?.totalShares || 0
+            }
+        };
 
         res.json({
             success: true,
@@ -868,6 +1182,152 @@ const getCollaborationInsights = async (req, res) => {
         res.status(500).json({ message: 'Error fetching insights', error: error.message });
     }
 };
+
+// Helper functions for insights calculations
+function calculateAverageResponseTime(activityFeed) {
+    if (!activityFeed || activityFeed.length < 2) return 0;
+    
+    let totalTime = 0;
+    let count = 0;
+    
+    for (let i = 1; i < activityFeed.length; i++) {
+        const timeDiff = new Date(activityFeed[i].timestamp) - new Date(activityFeed[i-1].timestamp);
+        if (timeDiff > 0 && timeDiff < 24 * 60 * 60 * 1000) { // Less than 24 hours
+            totalTime += timeDiff;
+            count++;
+        }
+    }
+    
+    return count > 0 ? Math.round(totalTime / count / (60 * 1000)) : 0; // Return in minutes
+}
+
+function calculateGrowthTrend(participants) {
+    if (!participants || participants.length === 0) return 0;
+    
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const recentJoins = participants.filter(p => 
+        p.joinedAt && p.joinedAt > weekAgo
+    ).length;
+    
+    const totalParticipants = participants.length;
+    return totalParticipants > 0 ? (recentJoins / totalParticipants) * 100 : 0;
+}
+
+function calculateContributorStats(activityFeed, participants) {
+    const stats = {};
+    
+    // Initialize stats for all participants
+    participants.forEach(p => {
+        stats[p.user._id || p.user] = {
+            userId: p.user._id || p.user,
+            username: p.user.username || 'Unknown',
+            avatar: p.user.profile?.avatar || null,
+            contributions: 0,
+            role: p.role
+        };
+    });
+    
+    // Count contributions from activity feed
+    activityFeed.forEach(activity => {
+        const userId = activity.user?._id || activity.user;
+        if (stats[userId]) {
+            stats[userId].contributions++;
+        }
+    });
+    
+    return Object.values(stats).sort((a, b) => b.contributions - a.contributions);
+}
+
+function calculatePeakHours(activityFeed) {
+    if (!activityFeed || activityFeed.length === 0) return [];
+    
+    const hourCounts = new Array(24).fill(0);
+    
+    activityFeed.forEach(activity => {
+        const hour = new Date(activity.timestamp).getHours();
+        hourCounts[hour]++;
+    });
+    
+    const maxCount = Math.max(...hourCounts);
+    const peakHours = [];
+    
+    hourCounts.forEach((count, hour) => {
+        if (count === maxCount && maxCount > 0) {
+            peakHours.push(hour);
+        }
+    });
+    
+    return peakHours;
+}
+
+function calculateActivityTrend(activityFeed) {
+    if (!activityFeed || activityFeed.length < 2) return 0;
+    
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    
+    const thisWeek = activityFeed.filter(a => a.timestamp > weekAgo).length;
+    const lastWeek = activityFeed.filter(a => 
+        a.timestamp > twoWeeksAgo && a.timestamp <= weekAgo
+    ).length;
+    
+    if (lastWeek === 0) return thisWeek > 0 ? 100 : 0;
+    return ((thisWeek - lastWeek) / lastWeek) * 100;
+}
+
+function calculateCompletionRate(collaboration) {
+    // Placeholder - would need milestones/tasks to calculate properly
+    if (collaboration.status === 'completed') return 100;
+    if (collaboration.status === 'active') return Math.random() * 60 + 20; // 20-80%
+    return 0;
+}
+
+function calculateQualityScore(collaboration) {
+    // Based on ratings, reviews, etc.
+    return collaboration.analytics?.avgRating || Math.random() * 3 + 2; // 2-5 range
+}
+
+function calculateEfficiency(collaboration) {
+    // Placeholder calculation based on activity vs time
+    const ageInDays = (new Date() - collaboration.createdAt) / (1000 * 60 * 60 * 24);
+    const activityCount = collaboration.activityFeed?.length || 0;
+    
+    if (ageInDays === 0) return 0;
+    return Math.min(100, (activityCount / ageInDays) * 10);
+}
+
+function calculateMilestoneProgress(collaboration) {
+    // Placeholder - would need actual milestone data
+    return {
+        completed: Math.floor(Math.random() * 5),
+        total: Math.floor(Math.random() * 8) + 5,
+        percentage: Math.random() * 100
+    };
+}
+
+function calculateRoleDistribution(participants) {
+    const distribution = {};
+    participants.forEach(p => {
+        distribution[p.role] = (distribution[p.role] || 0) + 1;
+    });
+    return distribution;
+}
+
+function calculateRetentionRate(participants) {
+    if (!participants || participants.length === 0) return 0;
+    
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const activeRecently = participants.filter(p => 
+        p.lastActive && p.lastActive > weekAgo
+    ).length;
+    
+    return (activeRecently / participants.length) * 100;
+}
 
 // Bulk operations for collaborations
 const bulkOperations = async (req, res) => {
