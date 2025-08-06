@@ -56,7 +56,7 @@ const Groups = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [tabValue, setTabValue] = useState(0);
@@ -199,9 +199,9 @@ const Groups = () => {
                             sx={{ 
                                 width: 48, 
                                 height: 48,
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                border: group.verified ? '3px solid #1976d2' : '2px solid rgba(99, 102, 241, 0.2)',
-                                boxShadow: '0 4px 16px rgba(99, 102, 241, 0.3)',
+                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
+                                border: group.verified ? '3px solid #1976d2' : `2px solid ${currentThemeColors?.primary || '#6366f1'}30`,
+                                boxShadow: `0 4px 16px ${currentThemeColors?.primary || '#6366f1'}50`,
                             }}
                         >
                             <GroupsIcon />
@@ -232,12 +232,12 @@ const Groups = () => {
                                     size="small"
                                     sx={{
                                         background: getPrivacyColor(group.privacy) === 'success' 
-                                            ? 'linear-gradient(135deg, #10b981, #059669)'
+                                            ? `linear-gradient(135deg, ${currentThemeColors?.primary || '#10b981'}, ${currentThemeColors?.secondary || '#059669'})`
                                             : getPrivacyColor(group.privacy) === 'error'
-                                            ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+                                            ? `linear-gradient(135deg, ${currentThemeColors?.accent || '#ef4444'}, #dc2626)`
                                             : getPrivacyColor(group.privacy) === 'warning'
-                                            ? 'linear-gradient(135deg, #f59e0b, #d97706)'
-                                            : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                            ? `linear-gradient(135deg, ${currentThemeColors?.tertiary || '#f59e0b'}, #d97706)`
+                                            : `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         color: 'white',
                                         fontWeight: 600,
                                         '& .MuiChip-icon': { color: 'white' },
@@ -272,7 +272,7 @@ const Groups = () => {
                             sx={{ 
                                 width: 24, 
                                 height: 24,
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             }}
                         >
                             {group.creator?.username?.[0]?.toUpperCase()}
@@ -310,8 +310,8 @@ const Groups = () => {
                                     '& .MuiAvatar-root': { 
                                         width: 28, 
                                         height: 28,
-                                        border: '2px solid rgba(99, 102, 241, 0.2)',
-                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        border: `2px solid ${currentThemeColors?.primary || '#6366f1'}30`,
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                     } 
                                 }}
                             >
@@ -350,7 +350,7 @@ const Groups = () => {
                                 label={group.userRole} 
                                 size="small" 
                                 sx={{
-                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                     color: 'white',
                                     fontWeight: 600,
                                     textTransform: 'capitalize',
@@ -396,9 +396,7 @@ const Groups = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -428,7 +426,7 @@ const Groups = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -439,7 +437,7 @@ const Groups = () => {
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                                 backgroundClip: 'text',
                                                 WebkitBackgroundClip: 'text',
                                                 color: 'transparent',
@@ -461,7 +459,7 @@ const Groups = () => {
                                     {user && (
                                         <Button
                                             variant="contained"
-                                            startIcon={<Add />}
+                                            startIcon={<Add sx={{ color: 'inherit' }} />}
                                             onClick={() => setCreateDialogOpen(true)}
                                             size="large"
                                             sx={{
@@ -469,12 +467,12 @@ const Groups = () => {
                                                 px: 3,
                                                 fontWeight: 600,
                                                 borderRadius: '12px',
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                 textTransform: 'none',
-                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                 '&:hover': {
-                                                    background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                    boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                     transform: 'translateY(-2px)',
                                                 },
                                             }}
@@ -513,16 +511,16 @@ const Groups = () => {
                                         py: 2,
                                     },
                                     '& .Mui-selected': {
-                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         backgroundClip: 'text',
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent !important',
                                     },
                                 }}
                             >
-                                <Tab label="All Groups" icon={<GroupsIcon />} iconPosition="start" />
-                                <Tab label="Trending" icon={<TrendingUp />} iconPosition="start" />
-                                {user && <Tab label="My Groups" icon={<Star />} iconPosition="start" />}
+                                <Tab label="All Groups" icon={<GroupsIcon sx={{ color: currentThemeColors?.primary || 'primary.main' }} />} iconPosition="start" />
+                                <Tab label="Trending" icon={<TrendingUp sx={{ color: currentThemeColors?.secondary || 'secondary.main' }} />} iconPosition="start" />
+                                {user && <Tab label="My Groups" icon={<Star sx={{ color: currentThemeColors?.primary || 'primary.main' }} />} iconPosition="start" />}
                             </Tabs>
                         </Paper>
 
@@ -642,9 +640,9 @@ const Groups = () => {
                             >
                                 <LinearProgress 
                                     sx={{
-                                        background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         '& .MuiLinearProgress-bar': {
-                                            background: 'linear-gradient(90deg, #ec4899, #f97316)',
+                                            background: `linear-gradient(90deg, ${currentThemeColors?.accent || '#ec4899'}, ${currentThemeColors?.tertiary || '#f97316'})`,
                                         },
                                     }}
                                 />
@@ -690,19 +688,19 @@ const Groups = () => {
                                 {user && (
                                     <Button
                                         variant="contained"
-                                        startIcon={<Add />}
+                                        startIcon={<Add sx={{ color: 'inherit' }} />}
                                         onClick={() => setCreateDialogOpen(true)}
                                         sx={{
                                             py: 1.5,
                                             px: 3,
                                             fontWeight: 600,
                                             borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                             textTransform: 'none',
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                             '&:hover': {
-                                                background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                 transform: 'translateY(-2px)',
                                             },
                                         }}

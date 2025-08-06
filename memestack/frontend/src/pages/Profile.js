@@ -30,7 +30,7 @@ import { useThemeMode } from '../contexts/ThemeContext';
 const Profile = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const { user } = useAuth();
 
     const handleEditProfile = () => {
@@ -49,9 +49,7 @@ const Profile = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
         }}>
             <Container maxWidth="md" sx={{ py: 4 }}>
                 <Fade in={true} timeout={1000}>
@@ -75,7 +73,7 @@ const Profile = () => {
                                 left: 0,
                                 right: 0,
                                 height: '4px',
-                                background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                             },
                         }}
                     >
@@ -87,7 +85,7 @@ const Profile = () => {
                                     component="h1"
                                     sx={{
                                         fontWeight: 800,
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                         backgroundClip: 'text',
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent',
@@ -98,19 +96,19 @@ const Profile = () => {
                                 <Box sx={{ display: 'flex', gap: 2 }}>
                                     <Button
                                         variant="contained"
-                                        startIcon={<EditIcon />}
+                                        startIcon={<EditIcon sx={{ color: 'inherit' }} />}
                                         onClick={handleEditProfile}
                                         sx={{
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                             borderRadius: '12px',
                                             px: 3,
                                             py: 1.5,
                                             fontWeight: 600,
                                             textTransform: 'none',
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                             '&:hover': {
-                                                background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                             },
                                         }}
                                     >
@@ -118,7 +116,7 @@ const Profile = () => {
                                     </Button>
                                     <Button
                                         variant="outlined"
-                                        startIcon={<SettingsIcon />}
+                                        startIcon={<SettingsIcon sx={{ color: 'inherit' }} />}
                                         onClick={() => navigate('/settings')}
                                         sx={{
                                             borderColor: theme.palette.primary.main,
@@ -149,9 +147,9 @@ const Profile = () => {
                                             mx: 'auto', 
                                             mb: 3,
                                             fontSize: '3rem',
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                            border: '4px solid rgba(99, 102, 241, 0.2)',
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
+                                            border: `4px solid ${currentThemeColors?.primary || '#6366f1'}30`,
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                         }}
                                         src={user?.profile?.avatar}
                                     >
@@ -212,7 +210,7 @@ const Profile = () => {
                                             icon={<CalendarIcon />}
                                             label={`Joined ${formatJoinDate(user?.profile?.joinDate || user?.createdAt)}`} 
                                             sx={{
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                 color: 'white',
                                                 fontWeight: 600,
                                                 '& .MuiChip-label': {
@@ -296,7 +294,7 @@ const Profile = () => {
                                                         variant="h4" 
                                                         sx={{ 
                                                             fontWeight: 800,
-                                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                             backgroundClip: 'text',
                                                             WebkitBackgroundClip: 'text',
                                                             color: 'transparent',

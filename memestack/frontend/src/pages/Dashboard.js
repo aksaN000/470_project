@@ -44,7 +44,7 @@ import ActionCard from '../components/common/ActionCard';
 const Dashboard = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const { user } = useAuth();
     const [animationStep, setAnimationStep] = useState(0);
 
@@ -58,25 +58,25 @@ const Dashboard = () => {
     // Enhanced stats data
     const userStats = [
         {
-            icon: <MemoryIcon sx={{ fontSize: 28 }} />,
+            icon: <MemoryIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
             title: 'Total Memes',
             value: user?.stats?.totalMemes || '12',
             change: '+3 this week',
         },
         {
-            icon: <FavoriteIcon sx={{ fontSize: 28 }} />,
+            icon: <FavoriteIcon sx={{ fontSize: 40, color: '#ef4444' }} />,
             title: 'Total Likes',
             value: user?.stats?.totalLikes || '1.2k',
             change: '+127 this week',
         },
         {
-            icon: <VisibilityIcon sx={{ fontSize: 28 }} />,
+            icon: <VisibilityIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
             title: 'Total Views',
             value: user?.stats?.totalViews || '15.7k',
             change: '+2.1k this week',
         },
         {
-            icon: <ShareIcon sx={{ fontSize: 28 }} />,
+            icon: <ShareIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
             title: 'Shares',
             value: user?.stats?.totalShares || '89',
             change: '+12 this week',
@@ -88,21 +88,21 @@ const Dashboard = () => {
         {
             title: 'Create New Meme',
             description: 'Use our AI-powered editor to create viral content',
-            icon: <AddIcon sx={{ fontSize: 40 }} />,
+            icon: <AddIcon sx={{ fontSize: 60, color: '#10b981' }} />,
             action: () => navigate('/create'),
             badge: 'Popular'
         },
         {
             title: 'Browse Templates',
             description: 'Explore thousands of trending meme templates',
-            icon: <GalleryIcon sx={{ fontSize: 40 }} />,
+            icon: <GalleryIcon sx={{ fontSize: 60, color: '#f59e0b' }} />,
             action: () => navigate('/templates'),
             badge: 'New'
         },
         {
             title: 'View Analytics',
             description: 'Track your meme performance and engagement',
-            icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+            icon: <AnalyticsIcon sx={{ fontSize: 60, color: '#8b5cf6' }} />,
             action: () => navigate('/analytics'),
             badge: 'Pro'
         },
@@ -111,9 +111,7 @@ const Dashboard = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
         }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 {/* Enhanced Header Section */}
@@ -138,7 +136,7 @@ const Dashboard = () => {
                                     left: 0,
                                     right: 0,
                                     height: '4px',
-                                    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                 },
                             }}
                         >
@@ -148,7 +146,7 @@ const Dashboard = () => {
                                     sx={{
                                         width: 80,
                                         height: 80,
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
                                         fontSize: '2rem',
                                         fontWeight: 700,
                                         border: '4px solid rgba(255, 255, 255, 0.2)',
@@ -165,7 +163,7 @@ const Dashboard = () => {
                                         sx={{ 
                                             fontWeight: 800,
                                             mb: 1,
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
                                             backgroundClip: 'text',
                                             WebkitBackgroundClip: 'text',
                                             color: 'transparent',
@@ -182,21 +180,26 @@ const Dashboard = () => {
                                     </Typography>
                                     <Stack direction="row" spacing={1} justifyContent={{ xs: 'center', sm: 'flex-start' }}>
                                         <Chip
-                                            icon={<TrendingIcon />}
+                                            icon={<TrendingIcon sx={{ color: 'white' }} />}
                                             label="Trending Creator"
                                             size="small"
                                             sx={{
-                                                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.warning || '#f59e0b'} 0%, ${currentThemeColors?.error || '#ef4444'} 100%)`,
                                                 color: 'white',
                                                 fontWeight: 600,
+                                                '& .MuiChip-icon': { color: 'white' },
                                             }}
                                         />
                                         <Chip
-                                            icon={<AchievementIcon />}
+                                            icon={<AchievementIcon sx={{ color: 'primary.main' }} />}
                                             label={`Level ${user?.level || 5}`}
                                             size="small"
                                             variant="outlined"
-                                            sx={{ borderColor: theme.palette.primary.main, color: theme.palette.primary.main }}
+                                            sx={{ 
+                                                borderColor: theme.palette.primary.main, 
+                                                color: theme.palette.primary.main,
+                                                '& .MuiChip-icon': { color: theme.palette.primary.main },
+                                            }}
                                         />
                                     </Stack>
                                 </Box>
@@ -205,19 +208,17 @@ const Dashboard = () => {
                                     <IconButton
                                         onClick={() => navigate('/settings')}
                                         sx={{
-                                            background: 'rgba(99, 102, 241, 0.1)',
-                                            '&:hover': { background: 'rgba(99, 102, 241, 0.2)' }
+                                            '&:hover': { background: 'rgba(99, 102, 241, 0.1)' }
                                         }}
                                     >
-                                        <SettingsIcon sx={{ color: theme.palette.primary.main }} />
+                                        <SettingsIcon sx={{ color: '#6366f1', fontSize: 28 }} />
                                     </IconButton>
                                     <IconButton
                                         sx={{
-                                            background: 'rgba(236, 72, 153, 0.1)',
-                                            '&:hover': { background: 'rgba(236, 72, 153, 0.2)' }
+                                            '&:hover': { background: 'rgba(236, 72, 153, 0.1)' }
                                         }}
                                     >
-                                        <NotificationIcon sx={{ color: theme.palette.secondary.main }} />
+                                        <NotificationIcon sx={{ color: '#ec4899', fontSize: 28 }} />
                                     </IconButton>
                                 </Stack>
                             </Stack>
@@ -261,16 +262,7 @@ const Dashboard = () => {
                                 >
                                     <CardContent sx={{ p: 3, position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                            <Box
-                                                sx={{
-                                                    p: 1.5,
-                                                    borderRadius: '12px',
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                                    color: 'white',
-                                                    mr: 2,
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                                                }}
-                                            >
+                                            <Box sx={{ mr: 2 }}>
                                                 {stat.icon}
                                             </Box>
                                             <Typography 
@@ -367,7 +359,7 @@ const Dashboard = () => {
                                                     label={action.badge}
                                                     size="small"
                                                     sx={{
-                                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                         color: 'white',
                                                         fontWeight: 600,
                                                         border: 'none',
@@ -378,20 +370,7 @@ const Dashboard = () => {
                                                 />
                                             </Box>
                                             
-                                            <Box
-                                                sx={{
-                                                    width: '80px',
-                                                    height: '80px',
-                                                    borderRadius: '20px',
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    mb: 3,
-                                                    color: 'white',
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                                                }}
-                                            >
+                                            <Box sx={{ mb: 3, textAlign: 'center' }}>
                                                 {action.icon}
                                             </Box>
                                             
@@ -421,15 +400,15 @@ const Dashboard = () => {
                                                 variant="contained"
                                                 sx={{
                                                     mt: 2,
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                     color: 'white',
                                                     fontWeight: 600,
                                                     borderRadius: '12px',
                                                     textTransform: 'none',
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                    boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                     '&:hover': {
-                                                        background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                        boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primaryHover || '#5b5bf6'}, ${currentThemeColors?.secondaryHover || '#7c3aed'})`,
+                                                        boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                     },
                                                 }}
                                             >

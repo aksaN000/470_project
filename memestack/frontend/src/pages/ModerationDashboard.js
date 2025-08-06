@@ -205,9 +205,7 @@ const ModerationDashboard = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'dark' 
-                ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
-                : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4
         }}>
             <Fade in timeout={800}>

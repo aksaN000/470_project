@@ -46,6 +46,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useMemes } from '../contexts/MemeContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { healthAPI } from '../services/api';
 
@@ -58,6 +59,7 @@ const Home = () => {
         loading, 
         fetchTrendingMemes 
     } = useMemes();
+    const { mode, currentThemeColors } = useThemeMode();
 
     const [animationStep, setAnimationStep] = useState(0);
     const [heroVisible, setHeroVisible] = useState(false);
@@ -79,21 +81,21 @@ const Home = () => {
     // Enhanced features data with more comprehensive descriptions
     const coreFeatures = [
         {
-            icon: <CreateIcon sx={{ fontSize: 48 }} />,
+            icon: <CreateIcon sx={{ fontSize: 48, color: '#10b981' }} />,
             title: 'AI-Powered Meme Creation',
             description: 'Create stunning memes with our intelligent editor, featuring smart templates, auto-captioning, and style suggestions.',
             gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             stats: '50K+ Templates'
         },
         {
-            icon: <GalleryIcon sx={{ fontSize: 48 }} />,
+            icon: <GalleryIcon sx={{ fontSize: 48, color: '#f59e0b' }} />,
             title: 'Infinite Discovery',
             description: 'Explore millions of memes with advanced filtering, personalized recommendations, and real-time trending content.',
             gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
             stats: '2M+ Memes'
         },
         {
-            icon: <CommunityIcon sx={{ fontSize: 48 }} />,
+            icon: <CommunityIcon sx={{ fontSize: 48, color: '#6366f1' }} />,
             title: 'Vibrant Community',
             description: 'Connect with fellow creators, join challenges, collaborate on projects, and build your meme empire together.',
             gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -103,32 +105,32 @@ const Home = () => {
 
     const advancedFeatures = [
         {
-            icon: <GroupsIcon sx={{ fontSize: 40 }} />,
+            icon: <GroupsIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
             title: 'Team Collaboration',
             description: 'Work together on meme projects with real-time editing and version control.',
         },
         {
-            icon: <ChallengeIcon sx={{ fontSize: 40 }} />,
+            icon: <ChallengeIcon sx={{ fontSize: 40, color: '#f59e0b' }} />,
             title: 'Meme Challenges',
             description: 'Participate in daily challenges and win exclusive rewards and recognition.',
         },
         {
-            icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+            icon: <AnalyticsIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
             title: 'Advanced Analytics',
             description: 'Track your meme performance with detailed insights and engagement metrics.',
         },
         {
-            icon: <CloudIcon sx={{ fontSize: 40 }} />,
+            icon: <CloudIcon sx={{ fontSize: 40, color: '#06b6d4' }} />,
             title: 'Cloud Storage',
             description: 'Never lose your creations with unlimited cloud storage and backup.',
         },
         {
-            icon: <MobileIcon sx={{ fontSize: 40 }} />,
+            icon: <MobileIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
             title: 'Mobile First',
             description: 'Create and share memes on the go with our responsive mobile experience.',
         },
         {
-            icon: <APIIcon sx={{ fontSize: 40 }} />,
+            icon: <APIIcon sx={{ fontSize: 40, color: '#10b981' }} />,
             title: 'Developer API',
             description: 'Integrate MemeStack into your applications with our comprehensive API.',
         },
@@ -136,8 +138,8 @@ const Home = () => {
 
     // Platform statistics
     const stats = [
-        { label: 'Active Users', value: '500K+', icon: <CommunityIcon />, color: '#6366f1' },
-        { label: 'Memes Created', value: '2M+', icon: <CreateIcon />, color: '#ec4899' },
+        { label: 'Active Users', value: '500K+', icon: <CommunityIcon />, color: currentThemeColors?.primary || '#6366f1' },
+        { label: 'Memes Created', value: '2M+', icon: <CreateIcon />, color: currentThemeColors?.secondary || '#ec4899' },
         { label: 'Daily Views', value: '10M+', icon: <ViewIcon />, color: '#10b981' },
         { label: 'Countries', value: '150+', icon: <StarIcon />, color: '#f59e0b' },
     ];
@@ -190,15 +192,53 @@ const Home = () => {
                                         sx={{
                                             fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
                                             fontWeight: 800,
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #10b981 100%)',
-                                            backgroundClip: 'text',
-                                            WebkitBackgroundClip: 'text',
-                                            color: 'transparent',
                                             mb: 2,
                                             lineHeight: 1.1,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: { xs: 1, sm: 2 },
+                                            justifyContent: { xs: 'center', sm: 'flex-start' },
                                         }}
                                     >
-                                        🎭 MemeStack
+                                        {/* Theater Masks Emoji - Separate for Natural Colors */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                fontSize: { xs: '3rem', sm: '4rem', md: '5rem' },
+                                                filter: 'hue-rotate(15deg) saturate(1.2) brightness(1.1)',
+                                                '&:hover': {
+                                                    transform: 'scale(1.1) rotate(5deg)',
+                                                    transition: 'transform 0.3s ease',
+                                                },
+                                            }}
+                                        >
+                                            🎭
+                                        </Box>
+                                        
+                                        {/* MemeStack Text with Gradient */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 50%, #10b981 100%)`,
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                backgroundSize: '200% 200%',
+                                                animation: 'logoGradient 3s ease infinite',
+                                                '@keyframes logoGradient': {
+                                                    '0%': { backgroundPosition: '0% 50%' },
+                                                    '50%': { backgroundPosition: '100% 50%' },
+                                                    '100%': { backgroundPosition: '0% 50%' },
+                                                },
+                                                // Fallback for browsers that don't support background-clip
+                                                '@supports not (-webkit-background-clip: text)': {
+                                                    background: 'none',
+                                                    color: currentThemeColors?.primary || '#6366f1',
+                                                },
+                                            }}
+                                        >
+                                            MemeStack
+                                        </Box>
                                     </Typography>
                                     
                                     <Typography
@@ -240,14 +280,14 @@ const Home = () => {
                                                     startIcon={<CreateIcon />}
                                                     onClick={() => navigate('/create')}
                                                     sx={{
-                                                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
                                                         fontWeight: 600,
                                                         px: 4,
                                                         py: 2,
                                                         borderRadius: '16px',
                                                         textTransform: 'none',
                                                         fontSize: '1.1rem',
-                                                        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                        boxShadow: `0 8px 32px ${currentThemeColors?.primary || 'rgba(99, 102, 241, 0.3)'}`,
                                                         '&:hover': {
                                                             transform: 'translateY(-2px)',
                                                             boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
@@ -290,7 +330,7 @@ const Home = () => {
                                                     size="large"
                                                     onClick={() => navigate('/register')}
                                                     sx={{
-                                                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
                                                         fontWeight: 600,
                                                         px: 4,
                                                         py: 2,
@@ -460,7 +500,14 @@ const Home = () => {
                                                 zIndex: animationStep === 1 ? 3 : 1,
                                             }}
                                         >
-                                            🎭
+                                            <Box 
+                                                sx={{ 
+                                                    filter: 'hue-rotate(10deg) saturate(1.3) brightness(1.2)',
+                                                    fontSize: '3rem'
+                                                }}
+                                            >
+                                                🎭
+                                            </Box>
                                         </Box>
                                         <Box
                                             className="preview-card"
@@ -492,7 +539,7 @@ const Home = () => {
                             sx={{
                                 fontSize: { xs: '2.5rem', md: '3.5rem' },
                                 fontWeight: 800,
-                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
                                 backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 color: 'transparent',
@@ -522,13 +569,13 @@ const Home = () => {
                                 <Card
                                     sx={{
                                         height: '100%',
-                                        background: theme.palette.mode === 'dark' 
+                                        background: currentThemeColors?.surface || (theme.palette.mode === 'dark' 
                                             ? 'rgba(255, 255, 255, 0.05)' 
-                                            : 'rgba(255, 255, 255, 0.9)',
+                                            : 'rgba(255, 255, 255, 0.9)'),
                                         backdropFilter: 'blur(20px)',
-                                        border: theme.palette.mode === 'dark'
-                                            ? '1px solid rgba(255, 255, 255, 0.1)'
-                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                        border: `1px solid ${currentThemeColors?.primary || (theme.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.1)'
+                                            : 'rgba(99, 102, 241, 0.1)')}`,
                                         borderRadius: '24px',
                                         overflow: 'visible',
                                         position: 'relative',
@@ -536,40 +583,25 @@ const Home = () => {
                                         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                         '&:hover': {
                                             transform: 'translateY(-12px)',
-                                            background: theme.palette.mode === 'dark'
+                                            background: currentThemeColors?.surfaceHover || (theme.palette.mode === 'dark'
                                                 ? 'rgba(255, 255, 255, 0.08)'
-                                                : 'rgba(255, 255, 255, 1)',
-                                            boxShadow: theme.palette.mode === 'dark'
-                                                ? '0 25px 60px rgba(99, 102, 241, 0.3)'
-                                                : '0 25px 60px rgba(99, 102, 241, 0.2)',
-                                            borderColor: theme.palette.mode === 'dark'
-                                                ? 'rgba(99, 102, 241, 0.4)'
-                                                : 'rgba(99, 102, 241, 0.3)',
+                                                : 'rgba(255, 255, 255, 1)'),
+                                            boxShadow: `0 25px 60px ${currentThemeColors?.primary || 'rgba(99, 102, 241, 0.3)'}`,
+                                            borderColor: currentThemeColors?.primary || 'rgba(99, 102, 241, 0.4)',
                                         },
                                     }}
                                 >
                                     <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-                                        <Box
-                                            sx={{
-                                                width: '80px',
-                                                height: '80px',
-                                                borderRadius: '20px',
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                mb: 3,
-                                                color: 'white',
-                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                                                '& svg': {
-                                                    fontSize: '2.5rem'
-                                                }
-                                            }}
-                                        >
-                                            {feature.icon}
-                                        </Box>
-                                        
-                                        <Typography 
+                        <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+                            {React.cloneElement(feature.icon, {
+                                sx: {
+                                    fontSize: 60,
+                                    color: index === 0 ? '#10b981' : // Green for Create
+                                           index === 1 ? '#6366f1' : // Blue for Gallery  
+                                           '#ec4899' // Pink for Community
+                                }
+                            })}
+                        </Box>                                        <Typography 
                                             variant="h5" 
                                             component="h3" 
                                             sx={{ 
@@ -596,7 +628,7 @@ const Home = () => {
                                         <Chip
                                             label={feature.stats}
                                             sx={{
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                 color: 'white',
                                                 fontWeight: 600,
                                                 border: 'none',
@@ -678,21 +710,18 @@ const Home = () => {
                                         }}
                                     >
                                         <CardContent sx={{ p: 3 }}>
-                                            <Box
-                                                sx={{
-                                                    width: '60px',
-                                                    height: '60px',
-                                                    borderRadius: '12px',
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    mb: 2,
-                                                    color: 'white',
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                                                }}
-                                            >
-                                                {feature.icon}
+                                            <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-start' }}>
+                                                {React.cloneElement(feature.icon, {
+                                                    sx: {
+                                                        fontSize: 40,
+                                                        color: index === 0 ? '#8b5cf6' : // Purple for Groups
+                                               index === 1 ? '#f59e0b' : // Yellow for Challenges  
+                                               index === 2 ? '#6366f1' : // Blue for Analytics
+                                               index === 3 ? '#10b981' : // Green for Cloud
+                                               index === 4 ? '#ec4899' : // Pink for Mobile
+                                               '#f97316' // Orange for API
+                                                    }
+                                                })}
                                             </Box>
                                             
                                             <Typography 
@@ -744,14 +773,44 @@ const Home = () => {
                             sx={{
                                 fontSize: { xs: '2rem', md: '2.5rem' },
                                 fontWeight: 700,
-                                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                color: 'transparent',
                                 mb: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
                             }}
                         >
-                            🔥 Trending Now
+                            {/* Fire Emoji - Separate for Natural Colors */}
+                            <Box
+                                component="span"
+                                sx={{
+                                    fontSize: 'inherit',
+                                    filter: 'hue-rotate(5deg) saturate(1.2) brightness(1.1)',
+                                    '&:hover': {
+                                        transform: 'scale(1.15) rotate(5deg)',
+                                        transition: 'transform 0.3s ease',
+                                    },
+                                }}
+                            >
+                                🔥
+                            </Box>
+                            
+                            {/* Trending Now Text with Gradient */}
+                            <Box
+                                component="span"
+                                sx={{
+                                    background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    color: 'transparent',
+                                    // Fallback for browsers that don't support background-clip
+                                    '@supports not (-webkit-background-clip: text)': {
+                                        background: 'none',
+                                        color: '#f59e0b',
+                                    },
+                                }}
+                            >
+                                Trending Now
+                            </Box>
                         </Typography>
                         <Typography variant="h6" color="text.secondary">
                             Discover what's going viral in the meme world
@@ -946,184 +1005,6 @@ const Home = () => {
                     </Grid>
                 )}
             </Container>
-
-            {/* Enhanced Call to Action Section */}
-            <Box
-                sx={{
-                    position: 'relative',
-                    background: `
-                        linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(236, 72, 153, 0.9) 100%),
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="none"><path d="M0,0 Q250,50 500,0 T1000,0 L1000,100 L0,100 Z" fill="rgba(255,255,255,0.1)"/></svg>')
-                    `,
-                    backgroundSize: 'cover',
-                    color: 'white',
-                    py: { xs: 8, md: 12 },
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: `
-                            radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                            radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)
-                        `,
-                        animation: 'pulse 4s ease-in-out infinite',
-                        '@keyframes pulse': {
-                            '0%, 100%': { opacity: 0.5 },
-                            '50%': { opacity: 1 },
-                        },
-                    },
-                }}
-            >
-                <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
-                    <Fade in={true} timeout={1000}>
-                        <Box>
-                            <Typography 
-                                variant="h2" 
-                                component="h2" 
-                                sx={{
-                                    fontSize: { xs: '2.5rem', md: '3.5rem' },
-                                    fontWeight: 800,
-                                    mb: 2,
-                                    textShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-                                }}
-                            >
-                                Ready to Go Viral? 🚀
-                            </Typography>
-                            
-                            <Typography 
-                                variant="h5" 
-                                sx={{ 
-                                    opacity: 0.95, 
-                                    mb: 6,
-                                    fontSize: { xs: '1.3rem', md: '1.5rem' },
-                                    fontWeight: 500,
-                                    maxWidth: '600px',
-                                    mx: 'auto',
-                                    lineHeight: 1.6,
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-                                }}
-                            >
-                                Join over 500,000 creators who are already making the internet laugh. 
-                                Start your meme journey today!
-                            </Typography>
-
-                            {!isAuthenticated && (
-                                <Stack 
-                                    direction={{ xs: 'column', sm: 'row' }} 
-                                    spacing={3} 
-                                    justifyContent="center"
-                                    sx={{ mb: 4 }}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        size="large"
-                                        onClick={() => navigate('/register')}
-                                        sx={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                            color: '#6366f1',
-                                            fontWeight: 700,
-                                            px: 5,
-                                            py: 2,
-                                            fontSize: '1.2rem',
-                                            borderRadius: '16px',
-                                            textTransform: 'none',
-                                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-                                            backdropFilter: 'blur(10px)',
-                                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                                            '&:hover': {
-                                                backgroundColor: 'rgba(255, 255, 255, 1)',
-                                                transform: 'translateY(-4px)',
-                                                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.3)',
-                                            },
-                                            transition: 'all 0.3s ease',
-                                        }}
-                                    >
-                                        Join MemeStack Free
-                                    </Button>
-                                    
-                                    <Button
-                                        variant="outlined"
-                                        size="large"
-                                        startIcon={<PlayIcon />}
-                                        onClick={() => navigate('/gallery')}
-                                        sx={{
-                                            borderColor: 'rgba(255, 255, 255, 0.8)',
-                                            color: 'white',
-                                            fontWeight: 600,
-                                            px: 4,
-                                            py: 2,
-                                            fontSize: '1.1rem',
-                                            borderRadius: '16px',
-                                            textTransform: 'none',
-                                            borderWidth: '2px',
-                                            backdropFilter: 'blur(10px)',
-                                            '&:hover': {
-                                                borderColor: 'white',
-                                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                                transform: 'translateY(-2px)',
-                                                borderWidth: '2px',
-                                            },
-                                            transition: 'all 0.3s ease',
-                                        }}
-                                    >
-                                        Watch Demo
-                                    </Button>
-                                </Stack>
-                            )}
-
-                            {/* Social Proof */}
-                            <Box sx={{ mt: 6 }}>
-                                <Typography variant="body2" sx={{ opacity: 0.8, mb: 3 }}>
-                                    Trusted by creators worldwide
-                                </Typography>
-                                <Stack 
-                                    direction="row" 
-                                    spacing={4} 
-                                    justifyContent="center"
-                                    sx={{ 
-                                        flexWrap: 'wrap',
-                                        '& > *': { 
-                                            minWidth: 'fit-content',
-                                        }
-                                    }}
-                                >
-                                    {stats.slice(0, 4).map((stat, index) => (
-                                        <Box key={index} sx={{ textAlign: 'center' }}>
-                                            <Typography 
-                                                variant="h4" 
-                                                sx={{ 
-                                                    fontWeight: 800,
-                                                    mb: 0.5,
-                                                    color: 'white',
-                                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                                                }}
-                                            >
-                                                {stat.value}
-                                            </Typography>
-                                            <Typography 
-                                                variant="caption" 
-                                                sx={{ 
-                                                    opacity: 0.9,
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: 1,
-                                                    fontWeight: 600,
-                                                }}
-                                            >
-                                                {stat.label}
-                                            </Typography>
-                                        </Box>
-                                    ))}
-                                </Stack>
-                            </Box>
-                        </Box>
-                    </Fade>
-                </Container>
-            </Box>
         </Box>
     );
 };

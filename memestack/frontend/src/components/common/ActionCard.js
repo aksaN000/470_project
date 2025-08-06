@@ -37,14 +37,18 @@ const ActionCard = ({
             {...cardProps}
         >
             <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                {icon && React.cloneElement(icon, {
-                    sx: { 
-                        fontSize: 60, 
-                        color: `${color}.main`, 
-                        mb: 2,
-                        ...icon.props.sx 
-                    }
-                })}
+                {icon && (
+                    <Box sx={{ mb: 2 }}>
+                        {React.cloneElement(icon, {
+                            sx: { 
+                                fontSize: 60,
+                                // Preserve original icon color if it exists, otherwise use semantic default
+                                color: icon.props.sx?.color || 'inherit',
+                                ...icon.props.sx 
+                            }
+                        })}
+                    </Box>
+                )}
                 <Typography variant="h6" gutterBottom>
                     {title}
                 </Typography>

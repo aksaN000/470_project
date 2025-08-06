@@ -43,7 +43,7 @@ import FollowButton from '../components/common/FollowButton';
 const MemeGallery = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const { 
         memes, 
         pagination, 
@@ -146,9 +146,7 @@ const MemeGallery = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
         }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 {/* Enhanced Header */}
@@ -175,7 +173,7 @@ const MemeGallery = () => {
                                 left: 0,
                                 right: 0,
                                 height: '4px',
-                                background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                             },
                         }}
                     >
@@ -184,7 +182,7 @@ const MemeGallery = () => {
                             component="h1" 
                             sx={{
                                 fontWeight: 800,
-                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                 backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 color: 'transparent',
@@ -290,15 +288,15 @@ const MemeGallery = () => {
                                     onClick={handleSearch}
                                     startIcon={<SearchIcon />}
                                     sx={{
-                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         borderRadius: '12px',
                                         py: 1.5,
                                         fontWeight: 600,
                                         textTransform: 'none',
-                                        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                        boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                         '&:hover': {
-                                            background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                            boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                            boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                         },
                                     }}
                                 >
@@ -386,7 +384,7 @@ const MemeGallery = () => {
                                                                 width: 24, 
                                                                 height: 24, 
                                                                 mr: 1,
-                                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                             }}
                                                         >
                                                             {meme.creator.username?.charAt(0).toUpperCase()}
@@ -419,7 +417,7 @@ const MemeGallery = () => {
                                                         label={meme.category} 
                                                         size="small" 
                                                         sx={{
-                                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                             color: 'white',
                                                             fontWeight: 600,
                                                             '& .MuiChip-label': {
@@ -531,7 +529,7 @@ const MemeGallery = () => {
                                                     fontWeight: 600,
                                                 },
                                                 '& .Mui-selected': {
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6) !important',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'}) !important`,
                                                     color: 'white',
                                                 }
                                             }}

@@ -21,7 +21,6 @@ import {
     Select,
     Avatar,
     LinearProgress,
-    IconButton,
     Tooltip,
     Dialog,
     DialogTitle,
@@ -54,7 +53,7 @@ const Challenges = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const [challenges, setChallenges] = useState([]);
     const [loading, setLoading] = useState(true);
     const [tabValue, setTabValue] = useState(0);
@@ -211,10 +210,10 @@ const Challenges = () => {
                                 label={challenge.status.toUpperCase()} 
                                 sx={{
                                     background: getStatusColor(challenge.status) === 'success' 
-                                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                                        ? `linear-gradient(135deg, ${currentThemeColors?.success || '#10b981'}, ${currentThemeColors?.successDark || '#059669'})`
                                         : getStatusColor(challenge.status) === 'warning'
-                                        ? 'linear-gradient(135deg, #f59e0b, #d97706)'
-                                        : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        ? `linear-gradient(135deg, ${currentThemeColors?.warning || '#f59e0b'}, ${currentThemeColors?.warningDark || '#d97706'})`
+                                        : `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                     color: 'white',
                                     fontWeight: 600,
                                     fontSize: '0.75rem',
@@ -262,7 +261,7 @@ const Challenges = () => {
                             sx={{ 
                                 width: 32, 
                                 height: 32,
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             }}
                         >
                             {challenge.creator?.username?.[0]?.toUpperCase()}
@@ -359,9 +358,7 @@ const Challenges = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -391,7 +388,7 @@ const Challenges = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -402,14 +399,44 @@ const Challenges = () => {
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-                                                backgroundClip: 'text',
-                                                WebkitBackgroundClip: 'text',
-                                                color: 'transparent',
                                                 mb: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
                                             }}
                                         >
-                                            🏆 Meme Challenges
+                                            {/* Trophy Emoji - Separate for Natural Colors */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    fontSize: 'inherit',
+                                                    filter: 'hue-rotate(5deg) saturate(1.1) brightness(1.05)',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.1) rotate(5deg)',
+                                                        transition: 'transform 0.3s ease',
+                                                    },
+                                                }}
+                                            >
+                                                🏆
+                                            </Box>
+                                            
+                                            {/* Meme Challenges Text with Gradient */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
+                                                    backgroundClip: 'text',
+                                                    WebkitBackgroundClip: 'text',
+                                                    color: 'transparent',
+                                                    // Fallback for browsers that don't support background-clip
+                                                    '@supports not (-webkit-background-clip: text)': {
+                                                        background: 'none',
+                                                        color: currentThemeColors?.primary || '#6366f1',
+                                                    },
+                                                }}
+                                            >
+                                                Meme Challenges
+                                            </Box>
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
@@ -424,7 +451,7 @@ const Challenges = () => {
                                     {user && (
                                         <Button
                                             variant="contained"
-                                            startIcon={<Add />}
+                                            startIcon={<Add sx={{ color: 'inherit' }} />}
                                             onClick={() => setCreateDialogOpen(true)}
                                             size="large"
                                             sx={{
@@ -432,12 +459,12 @@ const Challenges = () => {
                                                 px: 3,
                                                 fontWeight: 600,
                                                 borderRadius: '12px',
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                 textTransform: 'none',
-                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                 '&:hover': {
-                                                    background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                    boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                     transform: 'translateY(-2px)',
                                                 },
                                             }}
@@ -459,8 +486,8 @@ const Challenges = () => {
                                     : 'rgba(255, 255, 255, 0.9)',
                                 backdropFilter: 'blur(20px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? 'rgba(255, 255, 255, 0.1)'
+                                    : `${currentThemeColors?.primary || '#6366f1'}20`,
                                 borderRadius: '20px',
                                 overflow: 'hidden',
                             }}
@@ -476,16 +503,16 @@ const Challenges = () => {
                                         py: 2,
                                     },
                                     '& .Mui-selected': {
-                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         backgroundClip: 'text',
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent !important',
                                     },
                                 }}
                             >
-                                <Tab label="All Challenges" icon={<EmojiEvents />} iconPosition="start" />
-                                <Tab label="Trending" icon={<TrendingUp />} iconPosition="start" />
-                                {user && <Tab label="My Challenges" icon={<Star />} iconPosition="start" />}
+                                <Tab label="All Challenges" icon={<EmojiEvents sx={{ color: currentThemeColors?.primary || 'primary.main' }} />} iconPosition="start" />
+                                <Tab label="Trending" icon={<TrendingUp sx={{ color: currentThemeColors?.secondary || 'secondary.main' }} />} iconPosition="start" />
+                                {user && <Tab label="My Challenges" icon={<Star sx={{ color: currentThemeColors?.primary || 'primary.main' }} />} iconPosition="start" />}
                             </Tabs>
                         </Paper>
 
@@ -605,9 +632,9 @@ const Challenges = () => {
                             >
                                 <LinearProgress 
                                     sx={{
-                                        background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                         '& .MuiLinearProgress-bar': {
-                                            background: 'linear-gradient(90deg, #ec4899, #f97316)',
+                                            background: `linear-gradient(90deg, ${currentThemeColors?.accent || '#ec4899'}, ${currentThemeColors?.highlight || '#f97316'})`,
                                         },
                                     }}
                                 />
@@ -653,19 +680,19 @@ const Challenges = () => {
                                 {user && (
                                     <Button
                                         variant="contained"
-                                        startIcon={<Add />}
+                                        startIcon={<Add sx={{ color: 'inherit' }} />}
                                         onClick={() => setCreateDialogOpen(true)}
                                         sx={{
                                             py: 1.5,
                                             px: 3,
                                             fontWeight: 600,
                                             borderRadius: '12px',
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                             textTransform: 'none',
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                             '&:hover': {
-                                                background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primaryHover || '#5b5bf6'}, ${currentThemeColors?.secondaryHover || '#7c3aed'})`,
+                                                boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                 transform: 'translateY(-2px)',
                                             },
                                         }}

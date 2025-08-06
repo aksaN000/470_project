@@ -62,7 +62,7 @@ import { WATERMARK_POSITIONS } from '../utils/watermark';
 
 const BatchProcessor = () => {
     const theme = useTheme();
-    const { mode } = useThemeMode() || { mode: 'light' };
+    const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const [files, setFiles] = useState([]);
     const [operation, setOperation] = useState('watermark');
     const [preset, setPreset] = useState('');
@@ -244,9 +244,7 @@ const BatchProcessor = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -276,7 +274,7 @@ const BatchProcessor = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -287,18 +285,46 @@ const BatchProcessor = () => {
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-                                                backgroundClip: 'text',
-                                                WebkitBackgroundClip: 'text',
-                                                color: 'transparent',
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: 1
+                                                gap: 1.5
                                             }}
                                         >
                                             <BatchIcon />
-                                            ⚡ Batch Image Processor
+                                            
+                                            {/* Lightning Bolt Emoji - Separate for Natural Colors */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    fontSize: 'inherit',
+                                                    filter: 'hue-rotate(0deg) saturate(1.2) brightness(1.1)',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.15) rotate(-5deg)',
+                                                        transition: 'transform 0.3s ease',
+                                                    },
+                                                }}
+                                            >
+                                                ⚡
+                                            </Box>
+                                            
+                                            {/* Batch Image Processor Text with Gradient */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                                    backgroundClip: 'text',
+                                                    WebkitBackgroundClip: 'text',
+                                                    color: 'transparent',
+                                                    // Fallback for browsers that don't support background-clip
+                                                    '@supports not (-webkit-background-clip: text)': {
+                                                        background: 'none',
+                                                        color: currentThemeColors?.primary || '#6366f1',
+                                                    },
+                                                }}
+                                            >
+                                                Batch Image Processor
+                                            </Box>
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
@@ -345,7 +371,7 @@ const BatchProcessor = () => {
                         }}
                     >
                         <Typography variant="h6" gutterBottom sx={{ 
-                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -418,7 +444,7 @@ const BatchProcessor = () => {
                         }}
                     >
                         <Typography variant="h6" gutterBottom sx={{ 
-                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -652,7 +678,7 @@ const BatchProcessor = () => {
                         }}
                     >
                         <Typography variant="h6" gutterBottom sx={{ 
-                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                            background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -710,7 +736,7 @@ const BatchProcessor = () => {
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                 <Typography variant="h6" sx={{ 
-                                    background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                    background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                     backgroundClip: 'text',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
@@ -724,12 +750,12 @@ const BatchProcessor = () => {
                                         startIcon={<DownloadIcon />}
                                         onClick={downloadResults}
                                         sx={{
-                                            background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                            background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                             border: 0,
                                             borderRadius: '25px',
                                             color: 'white',
                                             '&:hover': {
-                                                background: 'linear-gradient(45deg, #5855eb, #7c3aed)',
+                                                background: `linear-gradient(45deg, ${currentThemeColors?.primaryHover || '#5855eb'}, ${currentThemeColors?.secondaryHover || '#7c3aed'})`,
                                                 transform: 'translateY(-2px)',
                                                 boxShadow: '0 8px 25px rgba(139, 92, 246, 0.3)'
                                             },

@@ -15,9 +15,89 @@ export const useThemeMode = () => {
     return context;
 };
 
+// Color scheme definitions
+const colorSchemes = {
+    default: {
+        name: 'Default Blue',
+        light: {
+            primary: '#6366f1',
+            secondary: '#ec4899',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            surface: 'rgba(255, 255, 255, 0.25)',
+        },
+        dark: {
+            primary: '#8b5cf6',
+            secondary: '#f472b6',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            surface: 'rgba(255, 255, 255, 0.08)',
+        }
+    },
+    ocean: {
+        name: 'Ocean Breeze',
+        light: {
+            primary: '#0ea5e9',
+            secondary: '#06b6d4',
+            background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+            surface: 'rgba(255, 255, 255, 0.25)',
+        },
+        dark: {
+            primary: '#38bdf8',
+            secondary: '#22d3ee',
+            background: 'linear-gradient(135deg, #0c4a6e 0%, #164e63 100%)',
+            surface: 'rgba(255, 255, 255, 0.08)',
+        }
+    },
+    sunset: {
+        name: 'Sunset Vibes',
+        light: {
+            primary: '#f97316',
+            secondary: '#ef4444',
+            background: 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
+            surface: 'rgba(255, 255, 255, 0.25)',
+        },
+        dark: {
+            primary: '#fb923c',
+            secondary: '#f87171',
+            background: 'linear-gradient(135deg, #9a3412 0%, #991b1b 100%)',
+            surface: 'rgba(255, 255, 255, 0.08)',
+        }
+    },
+    forest: {
+        name: 'Forest Green',
+        light: {
+            primary: '#059669',
+            secondary: '#10b981',
+            background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+            surface: 'rgba(255, 255, 255, 0.25)',
+        },
+        dark: {
+            primary: '#34d399',
+            secondary: '#6ee7b7',
+            background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)',
+            surface: 'rgba(255, 255, 255, 0.08)',
+        }
+    },
+    purple: {
+        name: 'Purple Dream',
+        light: {
+            primary: '#7c3aed',
+            secondary: '#a855f7',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+            surface: 'rgba(255, 255, 255, 0.25)',
+        },
+        dark: {
+            primary: '#a78bfa',
+            secondary: '#c084fc',
+            background: 'linear-gradient(135deg, #581c87 0%, #6b21a8 100%)',
+            surface: 'rgba(255, 255, 255, 0.08)',
+        }
+    }
+};
+
 export const ThemeProvider = ({ children }) => {
     const { user } = useAuth();
     const [mode, setMode] = useState('light');
+    const [colorScheme, setColorScheme] = useState('default');
 
     // Initialize theme from user preferences or localStorage
     useEffect(() => {
@@ -33,12 +113,22 @@ export const ThemeProvider = ({ children }) => {
                 setMode(prefersDark ? 'dark' : 'light');
             }
         }
+
+        // Load saved color scheme
+        const savedColorScheme = localStorage.getItem('colorScheme');
+        if (savedColorScheme && colorSchemes[savedColorScheme]) {
+            setColorScheme(savedColorScheme);
+        }
     }, [user]);
 
     // Save theme to localStorage when it changes
     useEffect(() => {
         localStorage.setItem('theme', mode);
     }, [mode]);
+
+    useEffect(() => {
+        localStorage.setItem('colorScheme', colorScheme);
+    }, [colorScheme]);
 
     const toggleTheme = () => {
         setMode(prevMode => prevMode === 'light' ? 'dark' : 'light');
@@ -48,36 +138,65 @@ export const ThemeProvider = ({ children }) => {
         setMode(newMode);
     };
 
+    const setThemeColorScheme = (scheme) => {
+        if (colorSchemes[scheme]) {
+            setColorScheme(scheme);
+        }
+    };
+
+    // Get current color scheme colors
+    const currentScheme = colorSchemes[colorScheme][mode];
+
+    // Helper function to lighten/darken colors
+    const adjustColor = (color, amount) => {
+        const clamp = (val) => Math.min(Math.max(val, 0), 255);
+        const hex = color.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        const newR = clamp(r + amount);
+        const newG = clamp(g + amount);
+        const newB = clamp(b + amount);
+        
+        return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+    };
+
     // Create Material-UI theme
     const theme = createTheme({
         palette: {
             mode,
             primary: {
-                main: mode === 'light' ? '#6366f1' : '#8b5cf6',
-                light: mode === 'light' ? '#818cf8' : '#a78bfa',
-                dark: mode === 'light' ? '#4f46e5' : '#7c3aed',
+                main: currentScheme.primary,
+                light: adjustColor(currentScheme.primary, mode === 'light' ? 40 : 60),
+                dark: adjustColor(currentScheme.primary, mode === 'light' ? -40 : -60),
                 contrastText: '#ffffff',
             },
             secondary: {
-                main: mode === 'light' ? '#ec4899' : '#f472b6',
-                light: mode === 'light' ? '#f472b6' : '#f9a8d4',
-                dark: mode === 'light' ? '#db2777' : '#ec4899',
+                main: currentScheme.secondary,
+                light: adjustColor(currentScheme.secondary, mode === 'light' ? 40 : 60),
+                dark: adjustColor(currentScheme.secondary, mode === 'light' ? -40 : -60),
                 contrastText: '#ffffff',
             },
             background: {
                 default: mode === 'light' ? '#f8fafc' : '#0f172a',
-                paper: mode === 'light' ? '#ffffff' : '#1e293b',
+                paper: currentScheme.surface || (mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)'),
             },
             text: {
                 primary: mode === 'light' ? '#1e293b' : '#f1f5f9',
                 secondary: mode === 'light' ? '#64748b' : '#94a3b8',
             },
-            divider: mode === 'light' ? '#e2e8f0' : '#334155',
+            divider: mode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
             action: {
                 hover: mode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.08)',
                 selected: mode === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.12)',
                 disabled: mode === 'light' ? 'rgba(0, 0, 0, 0.26)' : 'rgba(255, 255, 255, 0.3)',
                 disabledBackground: mode === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)',
+            },
+            // Custom properties for glassmorphism
+            glass: {
+                background: currentScheme.surface,
+                border: mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
             },
         },
         typography: {
@@ -162,6 +281,12 @@ export const ThemeProvider = ({ children }) => {
                                 : '0 4px 8px rgba(0, 0, 0, 0.3)',
                         },
                     },
+                    contained: {
+                        background: `linear-gradient(135deg, ${currentScheme.primary} 0%, ${currentScheme.secondary} 100%)`,
+                        '&:hover': {
+                            background: `linear-gradient(135deg, ${adjustColor(currentScheme.primary, -20)} 0%, ${adjustColor(currentScheme.secondary, -20)} 100%)`,
+                        },
+                    },
                 },
             },
             MuiCard: {
@@ -186,11 +311,11 @@ export const ThemeProvider = ({ children }) => {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: mode === 'light' ? '#6366f1' : '#1e293b',
+                        background: `linear-gradient(135deg, ${currentScheme.primary} 0%, ${currentScheme.secondary} 50%, ${adjustColor(currentScheme.primary, 30)} 100%)`,
                         boxShadow: mode === 'light' 
                             ? '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)'
                             : '0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3)',
-                        borderBottom: mode === 'dark' ? '1px solid #334155' : 'none',
+                        borderBottom: mode === 'dark' ? `1px solid ${currentScheme.primary}50` : 'none',
                     },
                 },
             },
@@ -224,7 +349,7 @@ export const ThemeProvider = ({ children }) => {
                                 borderColor: mode === 'light' ? '#9ca3af' : '#6b7280',
                             },
                             '&.Mui-focused fieldset': {
-                                borderColor: mode === 'light' ? '#6366f1' : '#8b5cf6',
+                                borderColor: currentScheme.primary,
                             },
                         },
                     },
@@ -232,16 +357,22 @@ export const ThemeProvider = ({ children }) => {
             },
             MuiChip: {
                 styleOverrides: {
-                    root: {
-                        backgroundColor: mode === 'light' ? '#f1f5f9' : '#334155',
-                        color: mode === 'light' ? '#475569' : '#e2e8f0',
-                        '&.MuiChip-colorPrimary': {
-                            backgroundColor: mode === 'light' ? '#ddd6fe' : '#4c1d95',
-                            color: mode === 'light' ? '#5b21b6' : '#c4b5fd',
-                        },
-                        '&.MuiChip-colorSecondary': {
-                            backgroundColor: mode === 'light' ? '#fce7f3' : '#831843',
-                            color: mode === 'light' ? '#be185d' : '#f9a8d4',
+                    colorPrimary: {
+                        backgroundColor: currentScheme.primary,
+                        color: '#ffffff',
+                    },
+                    colorSecondary: {
+                        backgroundColor: currentScheme.secondary,
+                        color: '#ffffff',
+                    },
+                },
+            },
+            MuiFab: {
+                styleOverrides: {
+                    primary: {
+                        background: `linear-gradient(135deg, ${currentScheme.primary} 0%, ${currentScheme.secondary} 100%)`,
+                        '&:hover': {
+                            background: `linear-gradient(135deg, ${adjustColor(currentScheme.primary, -20)} 0%, ${adjustColor(currentScheme.secondary, -20)} 100%)`,
                         },
                     },
                 },
@@ -263,9 +394,17 @@ export const ThemeProvider = ({ children }) => {
     const value = {
         mode,
         theme,
+        colorScheme,
+        colorSchemes,
+        currentScheme,
+        currentThemeColors: currentScheme, // For backward compatibility
         toggleTheme,
         setTheme,
+        setThemeColorScheme,
     };
+
+    // Debug log to check the value
+    console.log('ThemeContext value:', { currentScheme, currentThemeColors: currentScheme });
 
     return (
         <ThemeContext.Provider value={value}>

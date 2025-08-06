@@ -22,10 +22,10 @@ import {
     ListItemAvatar,
     ListItemText,
     Alert,
+    useTheme,
     Paper,
     Fade,
     Zoom,
-    useTheme,
 } from '@mui/material';
 import {
     TrendingUp as TrendingUpIcon,
@@ -51,7 +51,7 @@ const AnalyticsDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode() || { mode: 'light' };
+    const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const [analytics, setAnalytics] = useState(null);
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState(30);
@@ -130,9 +130,7 @@ const AnalyticsDashboard = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -162,7 +160,7 @@ const AnalyticsDashboard = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.primary || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -172,7 +170,7 @@ const AnalyticsDashboard = () => {
                                         component="h1" 
                                         sx={{
                                             fontWeight: 800,
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
                                             backgroundClip: 'text',
                                             WebkitBackgroundClip: 'text',
                                             color: 'transparent',

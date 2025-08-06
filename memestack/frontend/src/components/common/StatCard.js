@@ -67,12 +67,20 @@ const StatCard = ({
                                     sx={{
                                         p: 1,
                                         borderRadius: 2,
-                                        backgroundColor: `${color}.light`,
-                                        color: `${color}.contrastText`,
+                                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
                                         mr: 2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                     }}
                                 >
-                                    {icon}
+                                    {React.cloneElement(icon, {
+                                        sx: { 
+                                            // Preserve original icon color
+                                            color: icon.props.sx?.color || 'inherit',
+                                            ...icon.props.sx 
+                                        }
+                                    })}
                                 </Box>
                             )}
                             <Box sx={{ flexGrow: 1 }}>
@@ -113,7 +121,12 @@ const StatCard = ({
                         {icon && (
                             <Box sx={{ mb: 2 }}>
                                 {React.cloneElement(icon, {
-                                    sx: { fontSize: 40, color: `${color}.main`, ...icon.props.sx }
+                                    sx: { 
+                                        fontSize: 40, 
+                                        // Preserve original icon color if it exists, otherwise inherit
+                                        color: icon.props.sx?.color || 'inherit',
+                                        ...icon.props.sx 
+                                    }
                                 })}
                             </Box>
                         )}

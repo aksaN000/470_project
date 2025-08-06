@@ -41,7 +41,7 @@ const BrowseUsers = () => {
     const navigate = useNavigate();
     const { user: currentUser } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({
@@ -98,9 +98,7 @@ const BrowseUsers = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -130,7 +128,7 @@ const BrowseUsers = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -139,7 +137,7 @@ const BrowseUsers = () => {
                                     component="h1" 
                                     sx={{
                                         fontWeight: 800,
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                         backgroundClip: 'text',
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent',
@@ -318,8 +316,8 @@ const BrowseUsers = () => {
                                                     ? '0 20px 40px rgba(99, 102, 241, 0.3)'
                                                     : '0 20px 40px rgba(99, 102, 241, 0.2)',
                                                 border: mode === 'dark'
-                                                    ? '1px solid rgba(99, 102, 241, 0.3)'
-                                                    : '1px solid rgba(99, 102, 241, 0.2)',
+                                                    ? `1px solid ${currentThemeColors?.primary || '#6366f1'}50`
+                                                    : `1px solid ${currentThemeColors?.primary || '#6366f1'}30`,
                                             },
                                         }}
                                         onClick={() => navigate(`/user/${user.id}`)}
@@ -333,12 +331,12 @@ const BrowseUsers = () => {
                                                     mx: 'auto', 
                                                     mb: 3,
                                                     fontSize: '2rem',
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                     border: '3px solid',
                                                     borderColor: mode === 'dark' 
                                                         ? 'rgba(255, 255, 255, 0.1)' 
-                                                        : 'rgba(99, 102, 241, 0.2)',
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                        : `${currentThemeColors?.primary || '#6366f1'}40`,
+                                                    boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                 }}
                                             >
                                                 {user.username?.charAt(0).toUpperCase()}
@@ -391,7 +389,7 @@ const BrowseUsers = () => {
                                                     label={user.stats?.memesCreated || 0} 
                                                     size="small" 
                                                     sx={{
-                                                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                         color: 'white',
                                                         fontWeight: 600,
                                                         '& .MuiChip-icon': { color: 'white' },
@@ -480,7 +478,7 @@ const BrowseUsers = () => {
                                             fontWeight: 600,
                                         },
                                         '& .Mui-selected': {
-                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6) !important',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'}) !important`,
                                             color: 'white',
                                         },
                                     }}

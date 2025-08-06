@@ -51,7 +51,7 @@ import MemeEditor from '../components/MemeEditor';
 const CreateMeme = () => {
     const navigate = useNavigate();
     const theme = useTheme();
-    const { mode } = useThemeMode() || { mode: 'light' };
+    const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const { createMeme, loading } = useMemes();
     const fileInputRef = useRef(null);
 
@@ -80,17 +80,17 @@ const CreateMeme = () => {
         {
             label: 'Choose Source',
             description: 'Upload an image or select a template',
-            icon: <UploadIcon />,
+            icon: <UploadIcon sx={{ fontSize: 28, color: currentThemeColors?.primary || 'primary.main' }} />,
         },
         {
             label: 'Edit & Design',
             description: 'Add text, effects, and customize your meme',
-            icon: <PaletteIcon />,
+            icon: <PaletteIcon sx={{ fontSize: 28, color: '#ec4899' }} />,
         },
         {
             label: 'Details & Publish',
             description: 'Add title, description, and publish settings',
-            icon: <PublishIcon />,
+            icon: <PublishIcon sx={{ fontSize: 28, color: currentThemeColors?.primary || 'primary.main' }} />,
         },
     ];
 
@@ -291,9 +291,7 @@ const CreateMeme = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -322,7 +320,7 @@ const CreateMeme = () => {
                                     left: 0,
                                     right: 0,
                                     height: '4px',
-                                    background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                    background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                 },
                             }}
                         >
@@ -331,7 +329,7 @@ const CreateMeme = () => {
                                 component="h1" 
                                 sx={{
                                     fontWeight: 800,
-                                    background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     backgroundClip: 'text',
                                     WebkitBackgroundClip: 'text',
                                     color: 'transparent',
@@ -375,7 +373,7 @@ const CreateMeme = () => {
                             gutterBottom
                             sx={{
                                 fontWeight: 'bold',
-                                background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
+                                background: `linear-gradient(45deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                 backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
@@ -469,7 +467,7 @@ const CreateMeme = () => {
                                         variant="outlined"
                                         component="label"
                                         htmlFor="file-input"
-                                        startIcon={<UploadIcon />}
+                                        startIcon={<UploadIcon sx={{ color: 'inherit' }} />}
                                         fullWidth
                                         disabled={isUploading}
                                     >

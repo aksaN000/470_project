@@ -54,7 +54,7 @@ import { templatesAPI } from '../services/api';
 const TemplateManager = () => {
     const { user } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode() || { mode: 'light' };
+    const { mode, currentThemeColors } = useThemeMode() || { mode: 'light', currentThemeColors: null };
     const [templates, setTemplates] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -252,9 +252,7 @@ const TemplateManager = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="xl">
@@ -284,7 +282,7 @@ const TemplateManager = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -295,17 +293,44 @@ const TemplateManager = () => {
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-                                                backgroundClip: 'text',
-                                                WebkitBackgroundClip: 'text',
-                                                color: 'transparent',
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: 1
+                                                gap: 1.5
                                             }}
                                         >
-                                            🎨 Meme Templates
+                                            {/* Artist Palette Emoji - Separate for Natural Colors */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    fontSize: 'inherit',
+                                                    filter: 'hue-rotate(0deg) saturate(1.1) brightness(1.05)',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.1) rotate(-10deg)',
+                                                        transition: 'transform 0.3s ease',
+                                                    },
+                                                }}
+                                            >
+                                                🎨
+                                            </Box>
+                                            
+                                            {/* Meme Templates Text with Gradient */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
+                                                    backgroundClip: 'text',
+                                                    WebkitBackgroundClip: 'text',
+                                                    color: 'transparent',
+                                                    // Fallback for browsers that don't support background-clip
+                                                    '@supports not (-webkit-background-clip: text)': {
+                                                        background: 'none',
+                                                        color: currentThemeColors?.primary || '#6366f1',
+                                                    },
+                                                }}
+                                            >
+                                                Meme Templates
+                                            </Box>
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
@@ -322,12 +347,12 @@ const TemplateManager = () => {
                                         aria-label="add"
                                         onClick={() => setCreateDialogOpen(true)}
                                         sx={{
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                             '&:hover': {
-                                                background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primaryHover || '#5b21b6'} 0%, ${currentThemeColors?.secondaryHover || '#7c3aed'} 100%)`,
                                                 transform: 'translateY(-2px)',
-                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                             },
                                         }}
                                     >

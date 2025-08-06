@@ -42,7 +42,7 @@ const EditProfile = () => {
     const { user, updateProfile } = useAuth();
     const fileInputRef = useRef(null);
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
 
     const [formData, setFormData] = useState({
         username: user?.username || '',
@@ -153,9 +153,7 @@ const EditProfile = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="md">
@@ -185,7 +183,7 @@ const EditProfile = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -194,7 +192,7 @@ const EditProfile = () => {
                                     component="h1" 
                                     sx={{
                                         fontWeight: 800,
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                         backgroundClip: 'text',
                                         WebkitBackgroundClip: 'text',
                                         color: 'transparent',
@@ -291,12 +289,12 @@ const EditProfile = () => {
                                                     width: 150, 
                                                     height: 150,
                                                     fontSize: '4rem',
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                     border: '4px solid',
                                                     borderColor: mode === 'dark' 
                                                         ? 'rgba(255, 255, 255, 0.1)' 
-                                                        : 'rgba(99, 102, 241, 0.2)',
-                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                        : `${currentThemeColors?.primary || '#6366f1'}30`,
+                                                    boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                 }}
                                             >
                                                 {!previewAvatar && formData.username?.charAt(0).toUpperCase()}
@@ -333,17 +331,17 @@ const EditProfile = () => {
                                                     position: 'absolute',
                                                     bottom: 8,
                                                     right: 8,
-                                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                     color: 'white',
                                                     width: 56,
                                                     height: 56,
-                                                    boxShadow: '0 4px 16px rgba(99, 102, 241, 0.4)',
+                                                    boxShadow: `0 4px 16px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                     '&:hover': { 
-                                                        background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
                                                         transform: 'scale(1.1)',
                                                     },
                                                     '&:disabled': {
-                                                        background: 'rgba(99, 102, 241, 0.5)',
+                                                        background: `${currentThemeColors?.primary || '#6366f1'}80`,
                                                         color: 'white',
                                                     },
                                                 }}
@@ -567,12 +565,12 @@ const EditProfile = () => {
                                                     onChange={handleInputChange}
                                                     sx={{
                                                         '& .MuiSwitch-thumb': {
-                                                            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                         },
                                                         '& .MuiSwitch-track': {
                                                             backgroundColor: mode === 'dark' 
                                                                 ? 'rgba(255, 255, 255, 0.2)' 
-                                                                : 'rgba(99, 102, 241, 0.2)',
+                                                                : `${currentThemeColors?.primary || '#6366f1'}30`,
                                                         },
                                                     }}
                                                 />
@@ -624,16 +622,16 @@ const EditProfile = () => {
                                                 px: 4,
                                                 fontWeight: 600,
                                                 borderRadius: '12px',
-                                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                                 textTransform: 'none',
-                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                                 '&:hover': {
-                                                    background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                    boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                                     transform: 'translateY(-2px)',
                                                 },
                                                 '&:disabled': {
-                                                    background: 'rgba(99, 102, 241, 0.5)',
+                                                    background: `${currentThemeColors?.primary || '#6366f1'}80`,
                                                     color: 'white',
                                                 },
                                             }}

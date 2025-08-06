@@ -58,7 +58,7 @@ import { foldersAPI } from '../services/api';
 const FolderManager = () => {
     const { user } = useAuth();
     const theme = useTheme();
-    const { mode } = useThemeMode() || { mode: 'light' };
+    const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -207,9 +207,7 @@ const FolderManager = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             py: 4,
         }}>
             <Container maxWidth="lg">
@@ -239,7 +237,7 @@ const FolderManager = () => {
                                         left: 0,
                                         right: 0,
                                         height: '4px',
-                                        background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                        background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                     },
                                 }}
                             >
@@ -250,7 +248,7 @@ const FolderManager = () => {
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                                                 backgroundClip: 'text',
                                                 WebkitBackgroundClip: 'text',
                                                 color: 'transparent',
@@ -278,7 +276,7 @@ const FolderManager = () => {
                                         onClick={handleCreateFolder}
                                         size="large"
                                         sx={{
-                                            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
                                             color: 'white',
                                             borderRadius: '16px',
                                             px: 3,
@@ -286,10 +284,10 @@ const FolderManager = () => {
                                             textTransform: 'none',
                                             fontSize: '1rem',
                                             fontWeight: 600,
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                             border: '1px solid rgba(255, 255, 255, 0.1)',
                                             '&:hover': {
-                                                background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b21b6'} 0%, ${currentThemeColors?.secondary || '#7c3aed'} 100%)`,
                                                 transform: 'translateY(-2px)',
                                                 boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
                                             },

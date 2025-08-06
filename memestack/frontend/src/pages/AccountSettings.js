@@ -204,7 +204,7 @@ const AccountSettings = () => {
                 <Card sx={{ mb: 3 }}>
                     <CardContent>
                         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <PaletteIcon /> Appearance
+                            <PaletteIcon sx={{ color: '#ec4899' }} /> Appearance
                         </Typography>
 
                         <List>

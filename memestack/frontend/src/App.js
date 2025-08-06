@@ -35,6 +35,7 @@ import BatchProcessor from './pages/BatchProcessor';
 import Challenges from './pages/Challenges';
 import Groups from './pages/Groups';
 import Collaborations from './pages/Collaborations';
+import ThemeDemo from './pages/ThemeDemo';
 import NotFound from './pages/NotFound';
 
 // Protected Route Component
@@ -79,6 +80,7 @@ function App() {
                   <Route path="/gallery" element={<MemeGallery />} />
                   <Route path="/meme/:id" element={<MemeDetail />} />
                   <Route path="/browse-users" element={<BrowseUsers />} />
+                  <Route path="/theme-demo" element={<ThemeDemo />} />
 
                   {/* Protected Routes */}
                   <Route 

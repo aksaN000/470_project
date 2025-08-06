@@ -32,7 +32,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
-    const { mode } = useThemeMode();
+    const { mode, currentThemeColors } = useThemeMode();
     const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
 
     // Form state
@@ -125,9 +125,7 @@ const Login = () => {
     return (
         <Box sx={{ 
             minHeight: '100vh',
-            background: mode === 'light' 
-                ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
-                : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            backgroundColor: mode === 'light' ? '#f8fafc' : '#0f172a',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -156,7 +154,7 @@ const Login = () => {
                                 left: 0,
                                 right: 0,
                                 height: '4px',
-                                background: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)',
+                                background: `linear-gradient(90deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 50%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
                             },
                         }}
                     >
@@ -168,14 +166,45 @@ const Login = () => {
                                     component="h1" 
                                     sx={{
                                         fontWeight: 800,
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #ec4899 100%)',
-                                        backgroundClip: 'text',
-                                        WebkitBackgroundClip: 'text',
-                                        color: 'transparent',
                                         mb: 2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: 1.5,
                                     }}
                                 >
-                                    🎭 Welcome Back
+                                    {/* Theater Masks Emoji - Separate for Natural Colors */}
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            fontSize: 'inherit',
+                                            filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                            '&:hover': {
+                                                transform: 'scale(1.1) rotate(5deg)',
+                                                transition: 'transform 0.3s ease',
+                                            },
+                                        }}
+                                    >
+                                        🎭
+                                    </Box>
+                                    
+                                    {/* Welcome Back Text with Gradient */}
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                            backgroundClip: 'text',
+                                            WebkitBackgroundClip: 'text',
+                                            color: 'transparent',
+                                            // Fallback for browsers that don't support background-clip
+                                            '@supports not (-webkit-background-clip: text)': {
+                                                background: 'none',
+                                                color: currentThemeColors?.primary || '#6366f1',
+                                            },
+                                        }}
+                                    >
+                                        Welcome Back
+                                    </Box>
                                 </Typography>
                                 
                                 <Typography 
@@ -333,16 +362,16 @@ const Login = () => {
                                     fontWeight: 600,
                                     fontSize: '1.1rem',
                                     borderRadius: '12px',
-                                    background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                                     textTransform: 'none',
-                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                    boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
                                     '&:hover': {
-                                        background: 'linear-gradient(135deg, #5b5bf6, #7c3aed)',
-                                        boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                        boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
                                         transform: 'translateY(-2px)',
                                     },
                                     '&:disabled': {
-                                        background: 'rgba(99, 102, 241, 0.5)',
+                                        background: `${currentThemeColors?.primary || '#6366f1'}80`,
                                         color: 'white',
                                     },
                                 }}
