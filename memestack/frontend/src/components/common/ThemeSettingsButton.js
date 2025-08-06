@@ -50,15 +50,19 @@ const ThemeSettingsButton = () => {
             <Tooltip title="Theme Settings">
                 <IconButton
                     onClick={handleClick}
-                    sx={{
-                        color: 'inherit',
+                    sx={(theme) => ({
+                        color: theme.palette.mode === 'light' ? '#374151' : '#fafafa',
+                        background: theme.palette.mode === 'light' ? '#f3f4f6' : '#222',
+                        border: `1px solid ${theme.palette.mode === 'light' ? '#d1d5db' : '#444'}`,
+                        boxShadow: 'none',
                         '&:hover': {
+                            background: theme.palette.mode === 'light' ? '#e5e7eb' : '#333',
                             transform: 'rotate(90deg)',
                             transition: 'transform 0.3s ease',
                         }
-                    }}
+                    })}
                 >
-                    <SettingsIcon sx={{ color: 'inherit' }} />
+                    <SettingsIcon sx={(theme) => ({ color: theme.palette.mode === 'light' ? '#374151' : '#fafafa' })} />
                 </IconButton>
             </Tooltip>
 
@@ -72,15 +76,15 @@ const ThemeSettingsButton = () => {
                         minWidth: 200,
                         borderRadius: 2,
                         backdropFilter: 'blur(20px)',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        background: (theme) => theme.palette.mode === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(30,30,30,0.95)',
+                        border: (theme) => `1px solid ${theme.palette.mode === 'light' ? '#e5e7eb' : '#444'}`,
                     }
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
                 <Box sx={{ p: 2, pb: 1 }}>
-                    <Typography variant="subtitle2" color="text.secondary">
+                    <Typography variant="subtitle2" color="text.primary">
                         Theme Settings
                     </Typography>
                 </Box>
@@ -92,7 +96,7 @@ const ThemeSettingsButton = () => {
                         <PaletteIcon fontSize="small" sx={{ color: '#ec4899' }} />
                     </ListItemIcon>
                     <ListItemText 
-                        primary="Color Scheme"
+                        primary={<span style={{ color: '#374151' }}>Color Scheme</span>}
                         secondary={currentSchemeName}
                     />
                 </MenuItem>
@@ -115,7 +119,7 @@ const ThemeSettingsButton = () => {
                                 ) : (
                                     <LightModeIcon fontSize="small" sx={{ color: currentScheme?.primary || 'primary.main' }} />
                                 )}
-                                <Typography variant="body2">
+                                <Typography variant="body2" sx={{ color: theme => theme.palette.mode === 'light' ? '#374151' : '#fafafa' }}>
                                     {mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
                                 </Typography>
                             </Box>
