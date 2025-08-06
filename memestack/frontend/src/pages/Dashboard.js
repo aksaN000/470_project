@@ -156,20 +156,52 @@ const Dashboard = () => {
                                     {user?.username?.[0]?.toUpperCase() || 'U'}
                                 </Avatar>
                                 
-                                <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+                                <Box sx={{ flex: 1, textAlign: 'center' }}>
                                     <Typography 
                                         variant="h3" 
                                         component="h1" 
                                         sx={{ 
                                             fontWeight: 800,
                                             mb: 1,
-                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
-                                            backgroundClip: 'text',
-                                            WebkitBackgroundClip: 'text',
-                                            color: 'transparent',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 1.5,
+                                            flexWrap: 'wrap',
                                         }}
                                     >
-                                        Welcome back, {user?.username}! 👋
+                                        {/* Welcome Text with Gradient */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#ec4899'} 100%)`,
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                // Fallback for browsers that don't support background-clip
+                                                '@supports not (-webkit-background-clip: text)': {
+                                                    background: 'none',
+                                                    color: currentThemeColors?.primary || '#6366f1',
+                                                },
+                                            }}
+                                        >
+                                            Welcome back, {user?.username}!
+                                        </Box>
+                                        
+                                        {/* Waving Hand Emoji - Separate for Natural Colors */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                fontSize: 'inherit',
+                                                filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                                '&:hover': {
+                                                    transform: 'scale(1.1) rotate(15deg)',
+                                                    transition: 'transform 0.3s ease',
+                                                },
+                                            }}
+                                        >
+                                            👋
+                                        </Box>
                                     </Typography>
                                     <Typography 
                                         variant="h6" 

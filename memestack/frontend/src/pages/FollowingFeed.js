@@ -194,23 +194,51 @@ const FollowingFeed = () => {
                                     },
                                 }}
                             >
-                                <Box>
+                                <Box sx={{ textAlign: 'center' }}>
                                     <Typography 
                                         variant="h3" 
                                         component="h1" 
                                         sx={{
                                             fontWeight: 800,
-                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
-                                            backgroundClip: 'text',
-                                            WebkitBackgroundClip: 'text',
-                                            color: 'transparent',
                                             mb: 2,
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: 1
+                                            justifyContent: 'center',
+                                            gap: 1.5
                                         }}
                                     >
-                                        📰 Following Feed
+                                        {/* Newspaper Emoji - Separate for Natural Colors */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                fontSize: 'inherit',
+                                                filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                                '&:hover': {
+                                                    transform: 'scale(1.1) rotate(-2deg)',
+                                                    transition: 'transform 0.3s ease',
+                                                },
+                                            }}
+                                        >
+                                            📰
+                                        </Box>
+                                        
+                                        {/* Following Feed Text with Gradient */}
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                color: 'transparent',
+                                                // Fallback for browsers that don't support background-clip
+                                                '@supports not (-webkit-background-clip: text)': {
+                                                    background: 'none',
+                                                    color: currentThemeColors?.primary || '#6366f1',
+                                                },
+                                            }}
+                                        >
+                                            Following Feed
+                                        </Box>
                                     </Typography>
                                     <Typography 
                                         variant="h6" 

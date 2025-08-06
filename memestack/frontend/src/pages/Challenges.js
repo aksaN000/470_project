@@ -392,8 +392,8 @@ const Challenges = () => {
                                     },
                                 }}
                             >
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <Box>
+                                <Box sx={{ position: 'relative', textAlign: 'center', width: '100%' }}>
+                                    <Box sx={{ textAlign: 'center' }}>
                                         <Typography 
                                             variant="h3" 
                                             component="h1" 
@@ -402,6 +402,7 @@ const Challenges = () => {
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
+                                                justifyContent: 'center',
                                                 gap: 2,
                                             }}
                                         >
@@ -448,29 +449,33 @@ const Challenges = () => {
                                             Compete in meme contests and show your creativity!
                                         </Typography>
                                     </Box>
+                                    
+                                    {/* Absolutely positioned button */}
                                     {user && (
-                                        <Button
-                                            variant="contained"
-                                            startIcon={<Add sx={{ color: 'inherit' }} />}
-                                            onClick={() => setCreateDialogOpen(true)}
-                                            size="large"
-                                            sx={{
-                                                py: 1.5,
-                                                px: 3,
-                                                fontWeight: 600,
-                                                borderRadius: '12px',
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
-                                                textTransform: 'none',
-                                                boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
-                                                '&:hover': {
-                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
-                                                    boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
-                                                    transform: 'translateY(-2px)',
-                                                },
-                                            }}
-                                        >
-                                            Create Challenge
-                                        </Button>
+                                        <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<Add sx={{ color: 'inherit' }} />}
+                                                onClick={() => setCreateDialogOpen(true)}
+                                                size="large"
+                                                sx={{
+                                                    py: 1.5,
+                                                    px: 3,
+                                                    fontWeight: 600,
+                                                    borderRadius: '12px',
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
+                                                    textTransform: 'none',
+                                                    boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
+                                                    '&:hover': {
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b5bf6'}, ${currentThemeColors?.secondary || '#7c3aed'})`,
+                                                        boxShadow: `0 12px 40px ${currentThemeColors?.primary || '#6366f1'}60`,
+                                                        transform: 'translateY(-2px)',
+                                                    },
+                                                }}
+                                            >
+                                                Create Challenge
+                                            </Button>
+                                        </Box>
                                     )}
                                 </Box>
                             </Paper>

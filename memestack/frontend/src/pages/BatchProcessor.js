@@ -278,8 +278,8 @@ const BatchProcessor = () => {
                                     },
                                 }}
                             >
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <Box>
+                                <Box sx={{ textAlign: 'center', width: '100%' }}>
+                                    <Box sx={{ textAlign: 'center' }}>
                                         <Typography 
                                             variant="h3" 
                                             component="h1" 
@@ -288,6 +288,7 @@ const BatchProcessor = () => {
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
+                                                justifyContent: 'center',
                                                 gap: 1.5
                                             }}
                                         >

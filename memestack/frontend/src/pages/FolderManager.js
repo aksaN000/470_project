@@ -241,24 +241,52 @@ const FolderManager = () => {
                                     },
                                 }}
                             >
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                    <Box>
+                                <Box sx={{ position: 'relative', textAlign: 'center', width: '100%' }}>
+                                    <Box sx={{ textAlign: 'center' }}>
                                         <Typography 
                                             variant="h3" 
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
-                                                backgroundClip: 'text',
-                                                WebkitBackgroundClip: 'text',
-                                                color: 'transparent',
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: 1
+                                                justifyContent: 'center',
+                                                gap: 1.5
                                             }}
                                         >
-                                            📁 Folder Manager
+                                            {/* Folder Emoji - Separate for Natural Colors */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    fontSize: 'inherit',
+                                                    filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.1) rotate(-2deg)',
+                                                        transition: 'transform 0.3s ease',
+                                                    },
+                                                }}
+                                            >
+                                                📁
+                                            </Box>
+                                            
+                                            {/* Folder Manager Text with Gradient */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                                    backgroundClip: 'text',
+                                                    WebkitBackgroundClip: 'text',
+                                                    color: 'transparent',
+                                                    // Fallback for browsers that don't support background-clip
+                                                    '@supports not (-webkit-background-clip: text)': {
+                                                        background: 'none',
+                                                        color: currentThemeColors?.primary || '#6366f1',
+                                                    },
+                                                }}
+                                            >
+                                                Folder Manager
+                                            </Box>
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
@@ -270,35 +298,39 @@ const FolderManager = () => {
                                             Organize your memes into custom folders and collections
                                         </Typography>
                                     </Box>
-                                    <Button
-                                        variant="contained"
-                                        startIcon={<AddIcon />}
-                                        onClick={handleCreateFolder}
-                                        size="large"
-                                        sx={{
-                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
-                                            color: 'white',
-                                            borderRadius: '16px',
-                                            px: 3,
-                                            py: 1.5,
-                                            textTransform: 'none',
-                                            fontSize: '1rem',
-                                            fontWeight: 600,
-                                            boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
-                                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                                            '&:hover': {
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b21b6'} 0%, ${currentThemeColors?.secondary || '#7c3aed'} 100%)`,
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
-                                            },
-                                            '&:active': {
-                                                transform: 'translateY(0)',
-                                            },
-                                            transition: 'all 0.2s ease-in-out',
-                                        }}
-                                    >
-                                        Create Folder
-                                    </Button>
+                                    
+                                    {/* Absolutely positioned button */}
+                                    <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                                        <Button
+                                            variant="contained"
+                                            startIcon={<AddIcon />}
+                                            onClick={handleCreateFolder}
+                                            size="large"
+                                            sx={{
+                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
+                                                color: 'white',
+                                                borderRadius: '16px',
+                                                px: 3,
+                                                py: 1.5,
+                                                textTransform: 'none',
+                                                fontSize: '1rem',
+                                                fontWeight: 600,
+                                                boxShadow: `0 8px 32px ${currentThemeColors?.primary || '#6366f1'}50`,
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                '&:hover': {
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#5b21b6'} 0%, ${currentThemeColors?.secondary || '#7c3aed'} 100%)`,
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                },
+                                                '&:active': {
+                                                    transform: 'translateY(0)',
+                                                },
+                                                transition: 'all 0.2s ease-in-out',
+                                            }}
+                                        >
+                                            Create Folder
+                                        </Button>
+                                    </Box>
                                 </Box>
                             </Paper>
                         </Zoom>

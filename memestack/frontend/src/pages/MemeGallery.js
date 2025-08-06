@@ -156,6 +156,7 @@ const MemeGallery = () => {
                         sx={{
                             p: 4,
                             mb: 4,
+                            textAlign: 'center',
                             background: mode === 'dark'
                                 ? 'rgba(255, 255, 255, 0.05)'
                                 : 'rgba(255, 255, 255, 0.9)',
@@ -182,14 +183,45 @@ const MemeGallery = () => {
                             component="h1" 
                             sx={{
                                 fontWeight: 800,
-                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                color: 'transparent',
                                 mb: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 1.5,
                             }}
                         >
-                            🖼️ Meme Gallery
+                            {/* Framed Picture Emoji - Separate for Natural Colors */}
+                            <Box
+                                component="span"
+                                sx={{
+                                    fontSize: 'inherit',
+                                    filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                    '&:hover': {
+                                        transform: 'scale(1.1) rotate(-3deg)',
+                                        transition: 'transform 0.3s ease',
+                                    },
+                                }}
+                            >
+                                🖼️
+                            </Box>
+                            
+                            {/* Meme Gallery Text with Gradient */}
+                            <Box
+                                component="span"
+                                sx={{
+                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    color: 'transparent',
+                                    // Fallback for browsers that don't support background-clip
+                                    '@supports not (-webkit-background-clip: text)': {
+                                        background: 'none',
+                                        color: currentThemeColors?.primary || '#6366f1',
+                                    },
+                                }}
+                            >
+                                Meme Gallery
+                            </Box>
                         </Typography>
                         <Typography 
                             variant="h6" 

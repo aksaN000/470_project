@@ -79,21 +79,54 @@ const Profile = () => {
                     >
                         <CardContent sx={{ p: 4 }}>
                             {/* Enhanced Header with Edit Button */}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 4, position: 'relative' }}>
                                 <Typography 
                                     variant="h3" 
                                     component="h1"
                                     sx={{
                                         fontWeight: 800,
-                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
-                                        backgroundClip: 'text',
-                                        WebkitBackgroundClip: 'text',
-                                        color: 'transparent',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: 1.5,
                                     }}
                                 >
-                                    👤 My Profile
+                                    {/* Person Emoji - Separate for Natural Colors */}
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            fontSize: 'inherit',
+                                            filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                            '&:hover': {
+                                                transform: 'scale(1.1) rotate(2deg)',
+                                                transition: 'transform 0.3s ease',
+                                            },
+                                        }}
+                                    >
+                                        👤
+                                    </Box>
+                                    
+                                    {/* My Profile Text with Gradient */}
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                            backgroundClip: 'text',
+                                            WebkitBackgroundClip: 'text',
+                                            color: 'transparent',
+                                            // Fallback for browsers that don't support background-clip
+                                            '@supports not (-webkit-background-clip: text)': {
+                                                background: 'none',
+                                                color: currentThemeColors?.primary || '#6366f1',
+                                            },
+                                        }}
+                                    >
+                                        My Profile
+                                    </Box>
                                 </Typography>
-                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                
+                                {/* Edit Button - Positioned absolutely to top right */}
+                                <Box sx={{ position: 'absolute', top: 0, right: 0, display: 'flex', gap: 2 }}>
                                     <Button
                                         variant="contained"
                                         startIcon={<EditIcon sx={{ color: 'inherit' }} />}

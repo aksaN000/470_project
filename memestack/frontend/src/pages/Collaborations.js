@@ -380,24 +380,53 @@ const Collaborations = () => {
                                     },
                                 }}
                             >
-                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Box sx={{ position: 'relative', textAlign: 'center' }}>
+                                    {/* Centered Content */}
                                     <Box>
                                         <Typography 
                                             variant="h3" 
                                             component="h1" 
                                             sx={{
                                                 fontWeight: 800,
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
-                                                backgroundClip: 'text',
-                                                WebkitBackgroundClip: 'text',
-                                                color: 'transparent',
                                                 mb: 2,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: 1
+                                                justifyContent: 'center',
+                                                gap: 1.5
                                             }}
                                         >
-                                            🤝 Collaborations & Remixes
+                                            {/* Handshake Emoji - Separate for Natural Colors */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    fontSize: 'inherit',
+                                                    filter: 'hue-rotate(0deg) saturate(1.0) brightness(1.0)',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.1) rotate(5deg)',
+                                                        transition: 'transform 0.3s ease',
+                                                    },
+                                                }}
+                                            >
+                                                🤝
+                                            </Box>
+                                            
+                                            {/* Collaborations & Remixes Text with Gradient */}
+                                            <Box
+                                                component="span"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.accent || '#ec4899'} 100%)`,
+                                                    backgroundClip: 'text',
+                                                    WebkitBackgroundClip: 'text',
+                                                    color: 'transparent',
+                                                    // Fallback for browsers that don't support background-clip
+                                                    '@supports not (-webkit-background-clip: text)': {
+                                                        background: 'none',
+                                                        color: currentThemeColors?.primary || '#6366f1',
+                                                    },
+                                                }}
+                                            >
+                                                Collaborations & Remixes
+                                            </Box>
                                         </Typography>
                                         <Typography 
                                             variant="h6" 
@@ -409,36 +438,40 @@ const Collaborations = () => {
                                             Work together to create amazing memes and content!
                                         </Typography>
                                     </Box>
+                                    
+                                    {/* Absolutely positioned button */}
                                     {user && (
-                                        <Button
-                                            variant="contained"
-                                            startIcon={<Add sx={{ color: 'inherit' }} />}
-                                            onClick={() => setCreateDialogOpen(true)}
-                                            size="large"
-                                            sx={{
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
-                                                color: 'white',
-                                                borderRadius: '16px',
-                                                px: 3,
-                                                py: 1.5,
-                                                textTransform: 'none',
-                                                fontSize: '1rem',
-                                                fontWeight: 600,
-                                                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                '&:hover': {
-                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primaryHover || '#5b21b6'} 0%, ${currentThemeColors?.secondaryHover || '#7c3aed'} 100%)`,
-                                                    transform: 'translateY(-2px)',
-                                                    boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
-                                                },
-                                                '&:active': {
-                                                    transform: 'translateY(0)',
-                                                },
-                                                transition: 'all 0.2s ease-in-out',
-                                            }}
-                                        >
-                                            Start Collaboration
-                                        </Button>
+                                        <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<Add sx={{ color: 'inherit' }} />}
+                                                onClick={() => setCreateDialogOpen(true)}
+                                                size="large"
+                                                sx={{
+                                                    background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'} 0%, ${currentThemeColors?.secondary || '#8b5cf6'} 100%)`,
+                                                    color: 'white',
+                                                    borderRadius: '16px',
+                                                    px: 3,
+                                                    py: 1.5,
+                                                    textTransform: 'none',
+                                                    fontSize: '1rem',
+                                                    fontWeight: 600,
+                                                    boxShadow: '0 8px 32px rgba(99, 102, 241, 0.3)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                    '&:hover': {
+                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primaryHover || '#5b21b6'} 0%, ${currentThemeColors?.secondaryHover || '#7c3aed'} 100%)`,
+                                                        transform: 'translateY(-2px)',
+                                                        boxShadow: '0 12px 40px rgba(99, 102, 241, 0.4)',
+                                                    },
+                                                    '&:active': {
+                                                        transform: 'translateY(0)',
+                                                    },
+                                                    transition: 'all 0.2s ease-in-out',
+                                                }}
+                                            >
+                                                Start Collaboration
+                                            </Button>
+                                        </Box>
                                     )}
                                 </Box>
                             </Paper>
