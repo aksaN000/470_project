@@ -220,6 +220,34 @@ const memeSchema = new mongoose.Schema({
                 italic: Boolean
             }
         }]
+    },
+    
+    // Template information (when meme is created from a template)
+    templateInfo: {
+        templateId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'MemeTemplate',
+            default: null
+        },
+        templateTitle: {
+            type: String,
+            default: ''
+        },
+        templateCreator: {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+                default: null
+            },
+            username: {
+                type: String,
+                default: ''
+            }
+        },
+        usedAt: {
+            type: Date,
+            default: null
+        }
     }
     
 }, {
@@ -352,7 +380,14 @@ memeSchema.methods.getPublicData = function(userId = null) {
         metadata: {
             format: this.metadata.format,
             dimensions: this.metadata.dimensions
-        }
+        },
+        // Include template information if meme was created from a template
+        templateInfo: this.templateInfo && this.templateInfo.templateId ? {
+            templateId: this.templateInfo.templateId,
+            templateTitle: this.templateInfo.templateTitle,
+            templateCreator: this.templateInfo.templateCreator,
+            usedAt: this.templateInfo.usedAt
+        } : null
     };
     
     // Add like status if user is provided

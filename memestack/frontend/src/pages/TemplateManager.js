@@ -51,6 +51,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { templatesAPI } from '../services/api';
 
+// Utility function to get full image URL
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    // If it's already a full URL (starts with http), return as is
+    if (imageUrl.startsWith('http')) return imageUrl;
+    // If it's a local path (starts with /uploads), prepend backend URL
+    if (imageUrl.startsWith('/uploads')) {
+        const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        // Remove /api from base URL if present, since uploads are served from root
+        const serverURL = baseURL.replace('/api', '');
+        return `${serverURL}${imageUrl}`;
+    }
+    // For any other format, return as is
+    return imageUrl;
+};
+
 const TemplateManager = () => {
     const { user } = useAuth();
     const theme = useTheme();
@@ -534,7 +550,7 @@ const TemplateManager = () => {
                                     <CardMedia
                                         component="img"
                                         height="200"
-                                        image={template.imageUrl}
+                                        image={getImageUrl(template.imageUrl)}
                                         alt={template.name}
                                         sx={{ objectFit: 'cover' }}
                                     />

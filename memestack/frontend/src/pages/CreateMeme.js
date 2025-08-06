@@ -1,7 +1,7 @@
 // ➕ Enhanced Create Meme Page Component
 // Modern meme creation interface with AI-powered tools
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Container,
     Typography,
@@ -29,6 +29,7 @@ import {
     Slide,
     Avatar,
     Divider,
+    CircularProgress,
 } from '@mui/material';
 import {
     CloudUpload as UploadIcon,
@@ -42,14 +43,15 @@ import {
     CameraAlt as CameraIcon,
     Palette as PaletteIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
 import { useThemeMode } from '../contexts/ThemeContext';
-import { uploadAPI } from '../services/api';
+import { uploadAPI, templatesAPI } from '../services/api';
 import MemeEditor from '../components/MemeEditor';
 
 const CreateMeme = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const theme = useTheme();
     const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const { createMeme, loading } = useMemes();
@@ -75,6 +77,74 @@ const CreateMeme = () => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState('');
+    const [loadingTemplate, setLoadingTemplate] = useState(false);
+
+    // Handle template parameter from URL
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const templateId = searchParams.get('template');
+        
+        if (templateId) {
+            loadTemplate(templateId);
+        }
+    }, [location.search]);
+
+    const loadTemplate = async (templateId) => {
+        try {
+            setLoadingTemplate(true);
+            setError('');
+            
+            console.log('🔍 Loading template with ID:', templateId);
+            const response = await templatesAPI.getTemplateById(templateId);
+            const template = response.template;
+            
+            console.log('📄 Template loaded:', template);
+            
+            // Set the template as selected
+            setSelectedTemplate(template);
+            
+            // Set the image URL for the editor
+            const imageUrl = getImageUrl(template.imageUrl);
+            console.log('🖼️ Template image URL:', imageUrl);
+            
+            if (!imageUrl) {
+                throw new Error('Template does not have a valid image URL');
+            }
+            
+            setPreviewUrl(imageUrl);
+            setUploadedImageUrl(imageUrl);
+            
+            // Pre-fill form data with template information
+            setFormData(prev => ({
+                ...prev,
+                title: template.title ? `Based on: ${template.title}` : prev.title,
+                category: template.category || prev.category
+            }));
+            
+            console.log('✅ Template loaded successfully');
+            
+            // Stay on the create form page - don't auto-advance to editor
+            // Users can click "Edit Meme" button when they're ready
+            
+        } catch (error) {
+            console.error('💥 Error loading template:', error);
+            setError('Failed to load template. Please try again.');
+        } finally {
+            setLoadingTemplate(false);
+        }
+    };
+
+    // Utility function to get full image URL (same as in Templates.js)
+    const getImageUrl = (imageUrl) => {
+        if (!imageUrl) return '';
+        if (imageUrl.startsWith('http')) return imageUrl;
+        if (imageUrl.startsWith('/uploads')) {
+            const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+            const serverURL = baseURL.replace('/api', '');
+            return `${serverURL}${imageUrl}`;
+        }
+        return imageUrl;
+    };
 
     const steps = [
         {
@@ -133,7 +203,8 @@ const CreateMeme = () => {
     };
 
     const handleUploadAndEdit = async () => {
-        if (!imageFile) {
+        // Check if we have either an uploaded file or a template image
+        if (!imageFile && !selectedTemplate) {
             setError('Please select an image first');
             return;
         }
@@ -143,17 +214,28 @@ const CreateMeme = () => {
         setError('');
 
         try {
-            console.log('📤 Uploading image for editing:', imageFile.name);
-            const uploadResponse = await uploadAPI.uploadMeme(imageFile, (progress) => {
-                setUploadProgress(progress);
-            });
+            let finalImageUrl;
+            
+            if (selectedTemplate && !imageFile) {
+                // If using template without custom upload, use template image directly
+                finalImageUrl = uploadedImageUrl;
+                console.log('✅ Using template image directly for editing');
+            } else {
+                // Upload custom image file
+                console.log('📤 Uploading image for editing:', imageFile.name);
+                const uploadResponse = await uploadAPI.uploadMeme(imageFile, (progress) => {
+                    setUploadProgress(progress);
+                });
 
-            if (!uploadResponse.success) {
-                throw new Error(uploadResponse.message || 'Failed to upload image');
+                if (!uploadResponse.success) {
+                    throw new Error(uploadResponse.message || 'Failed to upload image');
+                }
+
+                finalImageUrl = uploadResponse.data.url;
+                console.log('✅ Image uploaded, opening editor');
             }
-
-            console.log('✅ Image uploaded, opening editor');
-            setUploadedImageUrl(uploadResponse.data.url);
+            
+            setUploadedImageUrl(finalImageUrl);
             setShowEditor(true);
         } catch (error) {
             console.error('💥 Error uploading image:', error);
@@ -186,6 +268,16 @@ const CreateMeme = () => {
                 ...formData,
                 imageUrl: uploadResponse.data.url,
                 tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                // Include template information if meme was created from template
+                templateInfo: selectedTemplate ? {
+                    templateId: selectedTemplate._id,
+                    templateTitle: selectedTemplate.title,
+                    templateCreator: {
+                        userId: selectedTemplate.createdBy?._id || selectedTemplate.createdBy,
+                        username: selectedTemplate.createdBy?.username || 'Unknown'
+                    },
+                    usedAt: new Date()
+                } : null
             };
 
             console.log('🎨 Creating meme with edited image:', memeData);
@@ -214,6 +306,8 @@ const CreateMeme = () => {
         console.log('🎯 Form submission started');
         console.log('📝 Form data:', formData);
         console.log('📁 Image file:', imageFile);
+        console.log('🎨 Selected template:', selectedTemplate);
+        console.log('🖼️ Current uploadedImageUrl:', uploadedImageUrl);
         
         if (!formData.title) {
             console.log('❌ Title validation failed');
@@ -221,9 +315,17 @@ const CreateMeme = () => {
             return;
         }
 
-        if (!imageFile) {
-            console.log('❌ Image validation failed');
-            setError('Please select an image');
+        // Check if we have either an uploaded file or a template image
+        if (!imageFile && !selectedTemplate) {
+            console.log('❌ Image validation failed - no file or template');
+            setError('Please select an image or use a template');
+            return;
+        }
+
+        // Additional validation for template usage
+        if (selectedTemplate && !uploadedImageUrl) {
+            console.log('❌ Template validation failed - no image URL set');
+            setError('Template image not loaded properly. Please try again.');
             return;
         }
 
@@ -234,27 +336,51 @@ const CreateMeme = () => {
         console.log('🚀 Starting upload process...');
 
         try {
-            // Step 1: Upload the image first
-            console.log('📤 Uploading image:', imageFile.name);
-            const uploadResponse = await uploadAPI.uploadMeme(imageFile, (progress) => {
-                console.log('📊 Upload progress:', progress + '%');
-                setUploadProgress(progress);
-            });
+            let finalImageUrl;
+            
+            if (selectedTemplate && !imageFile) {
+                // If using template without custom upload, use template image directly
+                finalImageUrl = uploadedImageUrl;
+                console.log('✅ Using template image directly for meme creation');
+            } else {
+                // Step 1: Upload the custom image file
+                console.log('📤 Uploading image:', imageFile.name);
+                const uploadResponse = await uploadAPI.uploadMeme(imageFile, (progress) => {
+                    console.log('📊 Upload progress:', progress + '%');
+                    setUploadProgress(progress);
+                });
 
-            console.log('✅ Upload response received:', uploadResponse);
+                console.log('✅ Upload response received:', uploadResponse);
 
-            if (!uploadResponse.success) {
-                throw new Error(uploadResponse.message || 'Failed to upload image');
+                if (!uploadResponse.success) {
+                    throw new Error(uploadResponse.message || 'Failed to upload image');
+                }
+
+                finalImageUrl = uploadResponse.data.url;
+                console.log('Image uploaded successfully:', uploadResponse);
             }
 
-            console.log('Image uploaded successfully:', uploadResponse);
-
-            // Step 2: Create the meme with the uploaded image URL
+            // Step 2: Create the meme with the final image URL
             const memeData = {
                 ...formData,
-                imageUrl: uploadResponse.data.url, // Use the uploaded image URL
+                imageUrl: finalImageUrl, // Use the final image URL (template or uploaded)
                 tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                // Include template information if meme was created from template
+                templateInfo: selectedTemplate ? {
+                    templateId: selectedTemplate._id,
+                    templateTitle: selectedTemplate.title,
+                    templateCreator: {
+                        userId: selectedTemplate.createdBy?._id || selectedTemplate.createdBy,
+                        username: selectedTemplate.createdBy?.username || 'Unknown'
+                    },
+                    usedAt: new Date()
+                } : null
             };
+
+            // Ensure we have a valid imageUrl for the backend
+            if (!memeData.imageUrl) {
+                throw new Error('No image URL available for meme creation');
+            }
 
             console.log('🎨 Creating meme with data:', memeData);
             const result = await createMeme(memeData);
@@ -506,8 +632,39 @@ const CreateMeme = () => {
                         >
                             <CardContent>
                                 <Typography variant="h6" gutterBottom>
-                                    Upload Image
+                                    {selectedTemplate ? 'Template Loaded' : 'Upload Image'}
                                 </Typography>
+                                
+                                {/* Template Loading Indicator */}
+                                {loadingTemplate && (
+                                    <Box sx={{ textAlign: 'center', py: 3 }}>
+                                        <CircularProgress size={48} sx={{ mb: 2 }} />
+                                        <Typography variant="h6" gutterBottom>
+                                            Loading Template...
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Please wait while we prepare your template
+                                        </Typography>
+                                    </Box>
+                                )}
+                                
+                                {/* Template Info Display */}
+                                {selectedTemplate && !loadingTemplate && (
+                                    <Box sx={{ mb: 2, p: 2, borderRadius: 2, backgroundColor: 'success.light' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                            <TemplateIcon color="success" />
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                                Template: {selectedTemplate.title}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                            {selectedTemplate.description || 'Template loaded successfully!'}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            📝 Fill out the meme details below, then click "Edit Meme" to add text and effects.
+                                        </Typography>
+                                    </Box>
+                                )}
                                 
                                 <Paper
                                     sx={{
@@ -522,20 +679,21 @@ const CreateMeme = () => {
                                         borderRadius: '16px',
                                         p: 4,
                                         textAlign: 'center',
-                                        cursor: 'pointer',
+                                        cursor: selectedTemplate ? 'default' : 'pointer',
                                         mb: 2,
                                         transition: 'all 0.3s ease',
+                                        opacity: loadingTemplate ? 0.5 : 1,
                                         '&:hover': {
-                                            background: theme.palette.mode === 'dark'
+                                            background: !selectedTemplate && theme.palette.mode === 'dark'
                                                 ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%)',
-                                            border: theme.palette.mode === 'dark'
+                                                : !selectedTemplate && 'linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%)',
+                                            border: !selectedTemplate && (theme.palette.mode === 'dark'
                                                 ? '2px dashed rgba(255, 255, 255, 0.5)'
-                                                : '2px dashed rgba(0, 0, 0, 0.4)',
-                                            transform: 'translateY(-2px)',
+                                                : '2px dashed rgba(0, 0, 0, 0.4)'),
+                                            transform: !selectedTemplate && 'translateY(-2px)',
                                         },
                                     }}
-                                    onClick={() => document.getElementById('file-input').click()}
+                                    onClick={!selectedTemplate && !loadingTemplate ? () => document.getElementById('file-input').click() : undefined}
                                 >
                                     {previewUrl ? (
                                         <img
@@ -591,9 +749,9 @@ const CreateMeme = () => {
                                         fullWidth
                                         disabled={isUploading}
                                     >
-                                        Choose File
+                                        {selectedTemplate ? 'Replace Image' : 'Choose File'}
                                     </Button>
-                                    {previewUrl && (
+                                    {(previewUrl || selectedTemplate) && (
                                         <Button
                                             variant="contained"
                                             onClick={handleUploadAndEdit}

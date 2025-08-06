@@ -57,6 +57,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { templatesAPI } from '../services/api';
 
+// Utility function to get full image URL
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    // If it's already a full URL (starts with http), return as is
+    if (imageUrl.startsWith('http')) return imageUrl;
+    // If it's a local path (starts with /uploads), prepend backend URL
+    if (imageUrl.startsWith('/uploads')) {
+        const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        // Remove /api from base URL if present, since uploads are served from root
+        const serverURL = baseURL.replace('/api', '');
+        return `${serverURL}${imageUrl}`;
+    }
+    // For any other format, return as is
+    return imageUrl;
+};
+
 const Templates = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -95,6 +111,35 @@ const Templates = () => {
         fetchTemplates();
     }, [tabValue, searchTerm, categoryFilter, sortBy, currentPage]);
 
+    useEffect(() => {
+        if (user) {
+            loadUserFavorites();
+        }
+    }, [user]);
+
+    // Listen for when user returns from creating a template
+    useEffect(() => {
+        const handleFocus = () => {
+            // Refresh templates when window gets focus (user navigates back)
+            if (tabValue === 2) { // My templates tab
+                fetchTemplates();
+            }
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, [tabValue]);
+
+    const loadUserFavorites = async () => {
+        try {
+            const response = await templatesAPI.getFavoriteTemplates();
+            const favoriteIds = new Set(response.templates.map(template => template._id));
+            setFavorites(favoriteIds);
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+        }
+    };
+
     const fetchTemplates = async () => {
         try {
             setLoading(true);
@@ -111,7 +156,7 @@ const Templates = () => {
             } else if (tabValue === 1) {
                 // Trending
                 const response = await templatesAPI.getTrending();
-                setTemplates(response.data);
+                setTemplates(response.templates);
                 setLoading(false);
                 return;
             } else if (tabValue === 2) {
@@ -122,7 +167,7 @@ const Templates = () => {
                     return;
                 }
                 const response = await templatesAPI.getUserTemplates();
-                setTemplates(response.data);
+                setTemplates(response.templates);
                 setLoading(false);
                 return;
             } else if (tabValue === 3) {
@@ -133,14 +178,14 @@ const Templates = () => {
                     return;
                 }
                 const response = await templatesAPI.getFavoriteTemplates();
-                setTemplates(response.data);
+                setTemplates(response.templates);
                 setLoading(false);
                 return;
             }
 
             const response = await templatesAPI.getTemplates(paramsObj);
-            setTemplates(response.data.templates);
-            setTotalPages(response.data.totalPages);
+            setTemplates(response.templates);
+            setTotalPages(response.pagination.totalPages);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching templates:', error);
@@ -166,8 +211,68 @@ const Templates = () => {
         }
     };
 
-    const handleUseTemplate = (template) => {
-        navigate(`/create-meme?template=${template._id}`);
+    const handleUseTemplate = async (template) => {
+        try {
+            // Track template usage
+            await templatesAPI.trackTemplateUsage(template._id);
+            
+            // Navigate to create page
+            navigate(`/create?template=${template._id}`);
+        } catch (error) {
+            console.error('Error tracking template usage:', error);
+            // Still navigate even if tracking fails
+            navigate(`/create?template=${template._id}`);
+        }
+    };
+
+    const handleDownloadTemplate = async (template, event) => {
+        event.stopPropagation(); // Prevent card click
+        try {
+            // Use the proper download API endpoint
+            await templatesAPI.downloadTemplate(template._id);
+            
+            // Create download link for the image
+            const imageUrl = getImageUrl(template.imageUrl);
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `${template.name}.${template.imageUrl.split('.').pop()}`;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading template:', error);
+            // Fallback: open image in new tab
+            const imageUrl = getImageUrl(template.imageUrl);
+            window.open(imageUrl, '_blank');
+        }
+    };
+
+    const handleRateTemplate = async (template, newRating, event) => {
+        event.stopPropagation(); // Prevent card click
+        if (!user) {
+            // Could show login prompt here
+            return;
+        }
+        
+        try {
+            await templatesAPI.rateTemplate(template._id, newRating);
+            
+            // Update the template in the list
+            setTemplates(prevTemplates => 
+                prevTemplates.map(t => 
+                    t._id === template._id 
+                        ? {
+                            ...t,
+                            averageRating: newRating, // Simplified - in reality would recalculate average
+                            ratingCount: (t.ratingCount || 0) + 1
+                          }
+                        : t
+                )
+            );
+        } catch (error) {
+            console.error('Error rating template:', error);
+        }
     };
 
     const TemplateCard = ({ template }) => (
@@ -218,7 +323,7 @@ const Templates = () => {
                     <CardMedia
                         component="img"
                         height="200"
-                        image={template.imageUrl}
+                        image={getImageUrl(template.imageUrl)}
                         alt={template.name}
                         sx={{
                             objectFit: 'cover',
@@ -285,13 +390,22 @@ const Templates = () => {
                         }}
                     >
                         <Rating
-                            value={template.stats?.averageRating || 0}
-                            readOnly
+                            value={template.averageRating || 0}
+                            readOnly={!user}
                             size="small"
-                            precision={0.1}
+                            precision={0.5}
+                            onChange={(event, newValue) => handleRateTemplate(template, newValue, event)}
+                            sx={{
+                                '& .MuiRating-iconFilled': {
+                                    color: '#ffc107',
+                                },
+                                '& .MuiRating-iconHover': {
+                                    color: '#ffb300',
+                                },
+                            }}
                         />
                         <Typography variant="caption" sx={{ color: 'white', fontWeight: 600 }}>
-                            ({template.stats?.ratingsCount || 0})
+                            ({template.ratingCount || 0})
                         </Typography>
                     </Box>
                 </Box>
@@ -314,26 +428,41 @@ const Templates = () => {
 
                     <Box display="flex" alignItems="center" gap={1} mb={2}>
                         <Avatar
-                            src={template.creator?.profile?.avatar}
+                            src={getImageUrl(template.createdBy?.profile?.avatar)}
                             sx={{
                                 width: 24,
                                 height: 24,
                                 background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
                             }}
                         >
-                            {template.creator?.username?.[0]?.toUpperCase()}
+                            {template.createdBy?.username?.[0]?.toUpperCase()}
                         </Avatar>
                         <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            by {template.creator?.profile?.displayName || template.creator?.username}
+                            by {template.createdBy?.profile?.displayName || template.createdBy?.username || 'Unknown'}
                         </Typography>
                     </Box>
 
                     <Grid container spacing={2} sx={{ mb: 2 }}>
                         <Grid item xs={4}>
-                            <Box display="flex" alignItems="center" gap={0.5}>
+                            <Box 
+                                display="flex" 
+                                alignItems="center" 
+                                gap={0.5}
+                                sx={{ 
+                                    cursor: 'pointer',
+                                    p: 0.5,
+                                    borderRadius: '8px',
+                                    transition: 'background-color 0.2s',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                                    }
+                                }}
+                                onClick={(e) => handleDownloadTemplate(template, e)}
+                                title="Download template"
+                            >
                                 <Download fontSize="small" color="action" />
                                 <Typography variant="caption">
-                                    {template.stats?.downloads || 0}
+                                    {template.downloadCount || 0}
                                 </Typography>
                             </Box>
                         </Grid>
@@ -341,7 +470,7 @@ const Templates = () => {
                             <Box display="flex" alignItems="center" gap={0.5}>
                                 <Visibility fontSize="small" color="action" />
                                 <Typography variant="caption">
-                                    {template.stats?.views || 0}
+                                    {template.viewCount || 0}
                                 </Typography>
                             </Box>
                         </Grid>
@@ -349,7 +478,7 @@ const Templates = () => {
                             <Box display="flex" alignItems="center" gap={0.5}>
                                 <Star fontSize="small" sx={{ color: '#fbbf24' }} />
                                 <Typography variant="caption">
-                                    {template.stats?.memesCreated || 0}
+                                    {template.favoriteCount || 0}
                                 </Typography>
                             </Box>
                         </Grid>

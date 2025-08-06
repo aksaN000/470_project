@@ -498,6 +498,15 @@ const MemeGallery = () => {
                                                     </Box>
                                                 )}
                                                 
+                                                {/* Template Attribution */}
+                                                {meme.templateInfo && (
+                                                    <Box sx={{ mb: 2 }}>
+                                                        <Typography variant="caption" color="text.secondary">
+                                                            Template taken from: {meme.templateInfo.templateCreator?.username || 'Unknown'}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+                                                
                                                 <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                                                     <Chip 
                                                         label={meme.category} 

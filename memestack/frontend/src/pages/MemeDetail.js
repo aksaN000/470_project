@@ -312,6 +312,15 @@ const MemeDetail = () => {
                                 )}
                             </Box>
 
+                            {/* Template Attribution */}
+                            {meme.templateInfo && (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Template taken from: {meme.templateInfo.templateCreator?.username || 'Unknown'}
+                                    </Typography>
+                                </Box>
+                            )}
+
                             {/* Category and Tags */}
                             <Box mb={2}>
                                 <Chip 

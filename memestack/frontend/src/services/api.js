@@ -572,6 +572,16 @@ export const templatesAPI = {
         } catch (error) {
             throw error.response?.data || { message: 'Failed to download template' };
         }
+    },
+
+    // Track template usage (when actually used to create a meme)
+    trackTemplateUsage: async (templateId) => {
+        try {
+            const response = await API.post(`/templates/${templateId}/use`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to track template usage' };
+        }
     }
 };
 

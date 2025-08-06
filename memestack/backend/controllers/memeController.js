@@ -252,7 +252,8 @@ const createMeme = async (req, res) => {
             thumbnailUrl = '',
             imageData = {},
             metadata = {},
-            memeData = {}
+            memeData = {},
+            templateInfo = null
         } = req.body;
 
         // Validation
@@ -262,6 +263,17 @@ const createMeme = async (req, res) => {
                 message: 'Title is required'
             });
         }
+
+        // Map invalid categories to valid ones
+        const validCategories = ['funny', 'reaction', 'gaming', 'sports', 'political', 'wholesome', 'dark', 'trending', 'custom'];
+        const categoryMap = {
+            'popular': 'trending',
+            'meme': 'funny',
+            'template': 'custom',
+            'viral': 'trending'
+        };
+        
+        const mappedCategory = categoryMap[category] || (validCategories.includes(category) ? category : 'funny');
 
         // For new image uploads, imageData should contain file information
         // For legacy imageUrl uploads, we still support the old format
@@ -273,10 +285,17 @@ const createMeme = async (req, res) => {
         if (imageData && imageData.fileId) {
             finalImageUrl = imageData.urls?.optimized || imageData.urls?.original || imageUrl;
             finalThumbnailUrl = imageData.urls?.thumbnail || thumbnailUrl;
-        } else if (!imageUrl) {
+        } else if (!imageUrl && !templateInfo) {
+            // Only require imageUrl if not using a template
             return res.status(400).json({
                 success: false,
                 message: 'Image URL or image data is required'
+            });
+        } else if (templateInfo && !imageUrl) {
+            // For template usage without custom image, we should have the imageUrl from frontend
+            return res.status(400).json({
+                success: false,
+                message: 'Template image URL is required when using templates'
             });
         }
 
@@ -284,7 +303,7 @@ const createMeme = async (req, res) => {
         const newMeme = new Meme({
             title: title.trim(),
             description: description.trim(),
-            category,
+            category: mappedCategory,
             tags: Array.isArray(tags) ? tags : [],
             isPublic,
             visibility,
@@ -293,7 +312,8 @@ const createMeme = async (req, res) => {
             imageData: finalImageData,
             creator: req.user._id,
             metadata,
-            memeData
+            memeData,
+            templateInfo: templateInfo || null
         });
 
         await newMeme.save();
@@ -302,6 +322,26 @@ const createMeme = async (req, res) => {
         await User.findByIdAndUpdate(req.user._id, {
             $inc: { 'stats.memesCreated': 1 }
         });
+
+        // If meme was created from a template, update template usage stats
+        if (templateInfo && templateInfo.templateId) {
+            try {
+                const MemeTemplate = require('../models/MemeTemplate');
+                await MemeTemplate.findByIdAndUpdate(templateInfo.templateId, {
+                    $inc: { 
+                        usageCount: 1,
+                        'stats.totalUses': 1
+                    },
+                    $set: { 
+                        lastUsed: new Date() 
+                    }
+                });
+                console.log(`✅ Updated template usage for template: ${templateInfo.templateId}`);
+            } catch (templateError) {
+                console.error('⚠️ Error updating template usage:', templateError);
+                // Don't fail meme creation if template update fails
+            }
+        }
 
         // Populate creator info
         await newMeme.populate('creator', 'username profile.avatar profile.displayName');

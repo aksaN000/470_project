@@ -32,6 +32,7 @@ import ModerationDashboard from './pages/ModerationDashboard';
 import FolderManager from './pages/FolderManager';
 import Templates from './pages/Templates';
 import CreateTemplate from './pages/CreateTemplate';
+import TemplateDetail from './pages/TemplateDetail';
 import BatchProcessor from './pages/BatchProcessor';
 import Challenges from './pages/Challenges';
 import Groups from './pages/Groups';
@@ -165,6 +166,10 @@ function App() {
                         <Templates />
                       </ProtectedRoute>
                     } 
+                  />
+                  <Route 
+                    path="/templates/:id" 
+                    element={<TemplateDetail />} 
                   />
                   <Route 
                     path="/templates/create" 

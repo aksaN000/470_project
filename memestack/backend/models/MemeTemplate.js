@@ -167,6 +167,10 @@ const memeTemplateSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    viewCount: {
+        type: Number,
+        default: 0
+    },
     usageCount: {
         type: Number,
         default: 0

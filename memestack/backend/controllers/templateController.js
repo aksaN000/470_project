@@ -35,8 +35,9 @@ const createTemplate = async (req, res) => {
         // Handle file upload - use local storage if Cloudinary not configured
         let imageUrl, cloudinaryId;
         
-        if (process.env.CLOUDINARY_CLOUD_NAME) {
+        if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
             // Upload template image to Cloudinary
+            console.log('📁 Using Cloudinary for file upload');
             const result = await uploadToCloudinary(req.file.buffer, {
                 folder: 'memestack/templates',
                 transformation: [
@@ -49,6 +50,7 @@ const createTemplate = async (req, res) => {
             cloudinaryId = result.public_id;
         } else {
             // Save to local storage
+            console.log('📁 Using local storage for file upload');
             const fs = require('fs');
             const path = require('path');
             
@@ -56,6 +58,7 @@ const createTemplate = async (req, res) => {
             const uploadsDir = path.join(__dirname, '../uploads');
             if (!fs.existsSync(uploadsDir)) {
                 fs.mkdirSync(uploadsDir, { recursive: true });
+                console.log('📁 Created uploads directory:', uploadsDir);
             }
             
             // Generate unique filename
@@ -66,8 +69,9 @@ const createTemplate = async (req, res) => {
             
             // Save file
             fs.writeFileSync(filepath, req.file.buffer);
+            console.log('📁 File saved locally:', filepath);
             
-            // Set local URL
+            // Set local URL - this will be served by express.static
             imageUrl = `/uploads/${filename}`;
             cloudinaryId = null;
         }
@@ -272,16 +276,38 @@ const getTemplateById = async (req, res) => {
         }
 
         // Check if user can access this template
-        if (!template.isPublic && !template.createdBy._id.equals(req.user._id)) {
+        if (!template.isPublic && req.user && !template.createdBy._id.equals(req.user._id)) {
             return res.status(403).json({
                 success: false,
                 message: 'Access denied to this template'
             });
         }
 
-        // Increment usage count
-        template.usageCount += 1;
-        await template.save();
+        // Increment view count (only if not recently viewed by same user/IP)
+        const userKey = req.user ? req.user._id.toString() : req.ip;
+        const viewKey = `template_view_${req.params.id}_${userKey}`;
+        
+        // Simple in-memory cache to prevent duplicate views within 1 hour
+        if (!req.app.locals.viewCache) {
+            req.app.locals.viewCache = new Map();
+        }
+        
+        const lastView = req.app.locals.viewCache.get(viewKey);
+        const now = Date.now();
+        
+        if (!lastView || (now - lastView) > 3600000) { // 1 hour = 3600000ms
+            template.viewCount = (template.viewCount || 0) + 1;
+            await template.save();
+            req.app.locals.viewCache.set(viewKey, now);
+            
+            // Clean up old entries (keep cache from growing indefinitely)
+            if (req.app.locals.viewCache.size > 10000) {
+                const entries = Array.from(req.app.locals.viewCache.entries());
+                entries.slice(0, 5000).forEach(([key]) => {
+                    req.app.locals.viewCache.delete(key);
+                });
+            }
+        }
 
         res.json({
             success: true,
@@ -775,9 +801,8 @@ const downloadTemplate = async (req, res) => {
             });
         }
 
-        // Increment download count
+        // Increment download count only
         template.downloadCount = (template.downloadCount || 0) + 1;
-        template.usageCount = (template.usageCount || 0) + 1;
         await template.save();
 
         res.json({
@@ -802,6 +827,38 @@ const downloadTemplate = async (req, res) => {
     }
 };
 
+// Track template usage (when actually used to create a meme)
+const trackTemplateUsage = async (req, res) => {
+    try {
+        const template = await MemeTemplate.findById(req.params.id);
+
+        if (!template) {
+            return res.status(404).json({
+                success: false,
+                message: 'Template not found'
+            });
+        }
+
+        // Increment usage count
+        template.usageCount = (template.usageCount || 0) + 1;
+        await template.save();
+
+        res.json({
+            success: true,
+            message: 'Template usage tracked',
+            usageCount: template.usageCount
+        });
+
+    } catch (error) {
+        console.error('❌ Error tracking template usage:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error tracking template usage',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createTemplate,
     getTemplates,
@@ -815,5 +872,6 @@ module.exports = {
     favoriteTemplate,
     unfavoriteTemplate,
     rateTemplate,
-    downloadTemplate
+    downloadTemplate,
+    trackTemplateUsage
 };

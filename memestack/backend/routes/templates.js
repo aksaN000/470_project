@@ -22,7 +22,8 @@ const {
     favoriteTemplate,
     unfavoriteTemplate,
     rateTemplate,
-    downloadTemplate
+    downloadTemplate,
+    trackTemplateUsage
 } = require('../controllers/templateController');
 
 // Configure multer for file uploads
@@ -97,6 +98,11 @@ router.post('/:id/rate', protect, rateTemplate);
 // @route   GET /api/templates/:id/download
 // @access  Public
 router.get('/:id/download', downloadTemplate);
+
+// @desc    Track template usage
+// @route   POST /api/templates/:id/use
+// @access  Public
+router.post('/:id/use', trackTemplateUsage);
 
 // @desc    Update template
 // @route   PUT /api/templates/:id
