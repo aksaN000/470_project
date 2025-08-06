@@ -63,6 +63,15 @@ router.get('/category/:category', getMemesByCategory);
 // @params  :userId
 router.get('/user/:userId', getUserMemes);
 
+// ========================================
+// PROTECTED ROUTES (Authentication required)
+// ========================================
+
+// @desc    Get current user's memes (both public and private)
+// @route   GET /api/memes/my-memes
+// @params  ?includePrivate=true
+router.get('/my-memes', protect, getMyMemes);
+
 // @desc    Get single meme by ID (public or private if owner)
 // @route   GET /api/memes/:id
 // @params  :id
@@ -78,15 +87,6 @@ router.post('/:id/share', shareMeme);
 // @route   GET /api/memes/:id/download
 // @params  :id
 router.get('/:id/download', downloadMeme);
-
-// ========================================
-// PROTECTED ROUTES (Authentication required)
-// ========================================
-
-// @desc    Get current user's memes (both public and private)
-// @route   GET /api/memes/my-memes
-// @params  ?includePrivate=true
-router.get('/my-memes', protect, getMyMemes);
 
 // @desc    Create/Upload new meme
 // @route   POST /api/memes

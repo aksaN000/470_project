@@ -16,7 +16,13 @@ const {
     updateTemplate,
     deleteTemplate,
     getTemplateCategories,
-    getUserTemplates
+    getUserTemplates,
+    getTrendingTemplates,
+    getFavoriteTemplates,
+    favoriteTemplate,
+    unfavoriteTemplate,
+    rateTemplate,
+    downloadTemplate
 } = require('../controllers/templateController');
 
 // Configure multer for file uploads
@@ -50,20 +56,47 @@ router.get('/categories', getTemplateCategories);
 // @access  Private
 router.get('/my-templates', protect, getUserTemplates);
 
+// @desc    Get trending templates
+// @route   GET /api/templates/trending
+// @access  Public
+router.get('/trending', getTrendingTemplates);
+
+// @desc    Get favorite templates
+// @route   GET /api/templates/favorites
+// @access  Private
+router.get('/favorites', protect, getFavoriteTemplates);
+
 // @desc    Create a new template
 // @route   POST /api/templates
 // @access  Private
-router.post('/', protect, upload.single('image'), createTemplate);
+router.post('/', protect, upload.single('image'), (req, res, next) => {
+    console.log('🚨 Template creation route hit!');
+    console.log('📝 Headers:', req.headers);
+    console.log('📁 File:', req.file ? 'Present' : 'Missing');
+    console.log('📋 Body keys:', Object.keys(req.body));
+    next();
+}, createTemplate);
 
 // @desc    Get all templates (public + user's private)
 // @route   GET /api/templates
 // @access  Public (but user-specific data if authenticated)
 router.get('/', optionalAuth, getTemplates);
 
-// @desc    Get template by ID
-// @route   GET /api/templates/:id
+// @desc    Favorite/Unfavorite template
+// @route   POST/DELETE /api/templates/:id/favorite
+// @access  Private
+router.post('/:id/favorite', protect, favoriteTemplate);
+router.delete('/:id/favorite', protect, unfavoriteTemplate);
+
+// @desc    Rate template
+// @route   POST /api/templates/:id/rate
+// @access  Private
+router.post('/:id/rate', protect, rateTemplate);
+
+// @desc    Download template
+// @route   GET /api/templates/:id/download
 // @access  Public
-router.get('/:id', optionalAuth, getTemplateById);
+router.get('/:id/download', downloadTemplate);
 
 // @desc    Update template
 // @route   PUT /api/templates/:id
@@ -74,6 +107,11 @@ router.put('/:id', protect, upload.single('image'), updateTemplate);
 // @route   DELETE /api/templates/:id
 // @access  Private (own templates only)
 router.delete('/:id', protect, deleteTemplate);
+
+// @desc    Get template by ID (must be last among :id routes)
+// @route   GET /api/templates/:id
+// @access  Public
+router.get('/:id', optionalAuth, getTemplateById);
 
 // ========================================
 // ROUTE DOCUMENTATION & HELP

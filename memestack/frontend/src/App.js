@@ -30,11 +30,14 @@ import BrowseUsers from './pages/BrowseUsers';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import ModerationDashboard from './pages/ModerationDashboard';
 import FolderManager from './pages/FolderManager';
-import TemplateManager from './pages/TemplateManager';
+import Templates from './pages/Templates';
+import CreateTemplate from './pages/CreateTemplate';
 import BatchProcessor from './pages/BatchProcessor';
 import Challenges from './pages/Challenges';
 import Groups from './pages/Groups';
 import Collaborations from './pages/Collaborations';
+import CollaborationDetail from './pages/CollaborationDetail';
+import CreateCollaboration from './pages/CreateCollaboration';
 import ThemeDemo from './pages/ThemeDemo';
 import NotFound from './pages/NotFound';
 
@@ -159,7 +162,15 @@ function App() {
                     path="/templates" 
                     element={
                       <ProtectedRoute>
-                        <TemplateManager />
+                        <Templates />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="/templates/create" 
+                    element={
+                      <ProtectedRoute>
+                        <CreateTemplate />
                       </ProtectedRoute>
                     } 
                   />
@@ -176,6 +187,12 @@ function App() {
                   <Route path="/challenges" element={<Challenges />} />
                   <Route path="/groups" element={<Groups />} />
                   <Route path="/collaborations" element={<Collaborations />} />
+                  <Route path="/collaborations/create" element={
+                    <ProtectedRoute>
+                      <CreateCollaboration />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/collaborations/:id" element={<CollaborationDetail />} />
 
                   {/* Redirect /memes to /gallery for consistency */}
                   <Route path="/memes" element={<Navigate to="/gallery" replace />} />

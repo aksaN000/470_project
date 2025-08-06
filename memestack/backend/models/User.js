@@ -106,6 +106,12 @@ const userSchema = new mongoose.Schema({
         }
     },
     
+    // User's favorite templates
+    favoriteTemplates: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MemeTemplate'
+    }],
+    
     // Account status
     isActive: {
         type: Boolean,

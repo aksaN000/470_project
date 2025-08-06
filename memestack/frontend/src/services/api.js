@@ -267,9 +267,10 @@ export const memeAPI = {
     },
 
     // Get memes by specific user
-    getUserMemes: async (userId) => {
+    getUserMemes: async (userId = null) => {
         try {
-            const response = await API.get(`/memes/user/${userId}`);
+            const endpoint = userId ? `/memes/user/${userId}` : '/memes/my-memes';
+            const response = await API.get(endpoint);
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fetch user memes' };
@@ -445,7 +446,26 @@ export const templatesAPI = {
     // Create new template
     createTemplate: async (templateData) => {
         try {
-            const response = await API.post('/templates', templateData);
+            const formData = new FormData();
+            
+            // Add image file
+            if (templateData.image) {
+                formData.append('image', templateData.image);
+            }
+            
+            // Add other fields
+            formData.append('name', templateData.name);
+            if (templateData.category) formData.append('category', templateData.category);
+            if (templateData.description) formData.append('description', templateData.description);
+            if (templateData.textAreas) formData.append('textAreas', JSON.stringify(templateData.textAreas));
+            if (templateData.dimensions) formData.append('dimensions', JSON.stringify(templateData.dimensions));
+            formData.append('isPublic', templateData.isPublic ? 'true' : 'false');
+
+            const response = await API.post('/templates', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to create template' };
@@ -489,6 +509,68 @@ export const templatesAPI = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fetch user templates' };
+        }
+    },
+
+    // Get trending templates
+    getTrending: async () => {
+        try {
+            const response = await API.get('/templates/trending');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch trending templates' };
+        }
+    },
+
+    // Get favorite templates
+    getFavoriteTemplates: async () => {
+        try {
+            const response = await API.get('/templates/favorites');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch favorite templates' };
+        }
+    },
+
+    // Favorite a template
+    favoriteTemplate: async (templateId) => {
+        try {
+            const response = await API.post(`/templates/${templateId}/favorite`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to favorite template' };
+        }
+    },
+
+    // Unfavorite a template
+    unfavoriteTemplate: async (templateId) => {
+        try {
+            const response = await API.delete(`/templates/${templateId}/favorite`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to unfavorite template' };
+        }
+    },
+
+    // Rate a template
+    rateTemplate: async (templateId, rating) => {
+        try {
+            const response = await API.post(`/templates/${templateId}/rate`, { rating });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to rate template' };
+        }
+    },
+
+    // Download template
+    downloadTemplate: async (templateId) => {
+        try {
+            const response = await API.get(`/templates/${templateId}/download`, {
+                responseType: 'blob'
+            });
+            return response;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to download template' };
         }
     }
 };
@@ -881,6 +963,110 @@ export const collaborationsAPI = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fetch user collaborations' };
+        }
+    },
+
+    // Get collaboration by ID
+    getCollaborationById: async (id) => {
+        try {
+            const response = await API.get(`/collaborations/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch collaboration' };
+        }
+    },
+
+    // Create new collaboration
+    createCollaboration: async (collaborationData) => {
+        try {
+            const response = await API.post('/collaborations', collaborationData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to create collaboration' };
+        }
+    },
+
+    // Update collaboration
+    updateCollaboration: async (id, updates) => {
+        try {
+            const response = await API.put(`/collaborations/${id}`, updates);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update collaboration' };
+        }
+    },
+
+    // Join collaboration
+    joinCollaboration: async (id, message = '') => {
+        try {
+            const response = await API.post(`/collaborations/${id}/join`, { message });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to join collaboration' };
+        }
+    },
+
+    // Invite user to collaboration
+    inviteUser: async (id, username, role = 'contributor', message = '') => {
+        try {
+            const response = await API.post(`/collaborations/${id}/invite`, {
+                username,
+                role,
+                message
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to invite user' };
+        }
+    },
+
+    // Create new version
+    createVersion: async (id, versionData) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/versions`, versionData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to create version' };
+        }
+    },
+
+    // Fork collaboration
+    forkCollaboration: async (id, title) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/fork`, { title });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fork collaboration' };
+        }
+    },
+
+    // Add comment
+    addComment: async (id, commentData) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/comments`, commentData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to add comment' };
+        }
+    },
+
+    // Get meme remixes
+    getMemeRemixes: async (memeId) => {
+        try {
+            const response = await API.get(`/collaborations/meme/${memeId}/remixes`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch remixes' };
+        }
+    },
+
+    // Delete collaboration
+    deleteCollaboration: async (id) => {
+        try {
+            const response = await API.delete(`/collaborations/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete collaboration' };
         }
     }
 };

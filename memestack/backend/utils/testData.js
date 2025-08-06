@@ -137,6 +137,127 @@ async function createTestData() {
         });
 
         console.log('✅ Updated user stats');
+
+        // ========================================
+        // CREATE SAMPLE TEMPLATES
+        // ========================================
+        console.log('🎨 Creating sample templates...');
+        
+        const MemeTemplate = require('../models/MemeTemplate');
+        
+        const template1 = new MemeTemplate({
+            name: 'Drake Pointing',
+            description: 'Classic Drake pointing meme template',
+            category: 'reaction',
+            imageUrl: 'https://via.placeholder.com/400x400/1a1a1a/ffffff?text=Drake+Pointing',
+            textAreas: [
+                {
+                    id: 'top_text',
+                    x: 55, y: 25, width: 40, height: 20,
+                    defaultText: 'Nah', placeholder: 'Top text',
+                    fontSize: 32, fontFamily: 'Impact',
+                    fontColor: '#000000', strokeColor: '#FFFFFF', strokeWidth: 1,
+                    textAlign: 'left', verticalAlign: 'middle'
+                },
+                {
+                    id: 'bottom_text',
+                    x: 55, y: 70, width: 40, height: 20,
+                    defaultText: 'Yeah', placeholder: 'Bottom text',
+                    fontSize: 32, fontFamily: 'Impact',
+                    fontColor: '#000000', strokeColor: '#FFFFFF', strokeWidth: 1,
+                    textAlign: 'left', verticalAlign: 'middle'
+                }
+            ],
+            createdBy: user1._id,
+            isPublic: true,
+            isOfficial: true,
+            stats: { usageCount: 150, rating: 4.8, ratingCount: 45 },
+            favoriteCount: 32, downloadCount: 89, usageCount: 150,
+            averageRating: 4.8, ratingCount: 45, isActive: true,
+            dimensions: { width: 400, height: 400 }
+        });
+
+        const template2 = new MemeTemplate({
+            name: 'Distracted Boyfriend',
+            description: 'Guy looking at another girl while his girlfriend looks on',
+            category: 'reaction',
+            imageUrl: 'https://via.placeholder.com/500x300/2a2a2a/ffffff?text=Distracted+Boyfriend',
+            textAreas: [
+                {
+                    id: 'girlfriend',
+                    x: 10, y: 80, width: 25, height: 15,
+                    defaultText: 'Old thing', placeholder: 'Girlfriend label',
+                    fontSize: 24, fontFamily: 'Impact',
+                    fontColor: '#FFFFFF', strokeColor: '#000000', strokeWidth: 2,
+                    textAlign: 'center', verticalAlign: 'middle'
+                },
+                {
+                    id: 'boyfriend',
+                    x: 37, y: 80, width: 25, height: 15,
+                    defaultText: 'Me', placeholder: 'Boyfriend label',
+                    fontSize: 24, fontFamily: 'Impact',
+                    fontColor: '#FFFFFF', strokeColor: '#000000', strokeWidth: 2,
+                    textAlign: 'center', verticalAlign: 'middle'
+                },
+                {
+                    id: 'other_girl',
+                    x: 75, y: 80, width: 25, height: 15,
+                    defaultText: 'New thing', placeholder: 'Other girl label',
+                    fontSize: 24, fontFamily: 'Impact',
+                    fontColor: '#FFFFFF', strokeColor: '#000000', strokeWidth: 2,
+                    textAlign: 'center', verticalAlign: 'middle'
+                }
+            ],
+            createdBy: user2._id,
+            isPublic: true,
+            isOfficial: true,
+            stats: { usageCount: 230, rating: 4.9, ratingCount: 78 },
+            favoriteCount: 56, downloadCount: 134, usageCount: 230,
+            averageRating: 4.9, ratingCount: 78, isActive: true,
+            dimensions: { width: 500, height: 300 }
+        });
+
+        const template3 = new MemeTemplate({
+            name: 'Two Buttons',
+            description: 'Sweating guy choosing between two buttons',
+            category: 'reaction',
+            imageUrl: 'https://via.placeholder.com/400x400/3a3a3a/ffffff?text=Two+Buttons',
+            textAreas: [
+                {
+                    id: 'left_button',
+                    x: 15, y: 35, width: 30, height: 20,
+                    defaultText: 'Option A', placeholder: 'Left button',
+                    fontSize: 20, fontFamily: 'Arial',
+                    fontColor: '#000000', strokeColor: '#FFFFFF', strokeWidth: 1,
+                    textAlign: 'center', verticalAlign: 'middle'
+                },
+                {
+                    id: 'right_button',
+                    x: 55, y: 35, width: 30, height: 20,
+                    defaultText: 'Option B', placeholder: 'Right button',
+                    fontSize: 20, fontFamily: 'Arial',
+                    fontColor: '#000000', strokeColor: '#FFFFFF', strokeWidth: 1,
+                    textAlign: 'center', verticalAlign: 'middle'
+                }
+            ],
+            createdBy: user1._id,
+            isPublic: true,
+            isOfficial: true,
+            stats: { usageCount: 89, rating: 4.5, ratingCount: 23 },
+            favoriteCount: 18, downloadCount: 45, usageCount: 89,
+            averageRating: 4.5, ratingCount: 23, isActive: true,
+            dimensions: { width: 400, height: 400 }
+        });
+
+        await template1.save();
+        await template2.save();
+        await template3.save();
+        
+        console.log('🎨 New template created:', template1.name, 'by', user1.username);
+        console.log('🎨 New template created:', template2.name, 'by', user2.username);
+        console.log('🎨 New template created:', template3.name, 'by', user1.username);
+        console.log('✅ Created 3 sample templates');
+
         console.log('🎉 Test data created successfully!');
         console.log('📧 Test accounts:');
         console.log('   - test1@example.com / test123 (creator1)');

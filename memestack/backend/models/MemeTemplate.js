@@ -140,6 +140,52 @@ const memeTemplateSchema = new mongoose.Schema({
             type: Date
         }
     },
+    // Individual ratings from users
+    ratings: [{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        rating: {
+            type: Number,
+            required: true,
+            min: 1,
+            max: 5
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    // Template metrics
+    favoriteCount: {
+        type: Number,
+        default: 0
+    },
+    downloadCount: {
+        type: Number,
+        default: 0
+    },
+    usageCount: {
+        type: Number,
+        default: 0
+    },
+    averageRating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    ratingCount: {
+        type: Number,
+        default: 0
+    },
+    // Template state
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     // Dimensions for proper scaling
     dimensions: {
         width: {
