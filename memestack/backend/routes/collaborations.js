@@ -21,8 +21,21 @@ const {
     acceptInvite,
     declineInvite,
     updateCollaboratorRole,
-    getPendingInvites
+    getPendingInvites,
+    // New advanced features
+    mergeFork,
+    getCollaborationTemplates,
+    createFromTemplate,
+    getCollaborationInsights,
+    bulkOperations
 } = require('../controllers/collaborationController');
+
+// Import activity controller
+const {
+    getCollaborationActivity,
+    trackUserActivity,
+    getCollaborationStats
+} = require('../controllers/collaborationActivityController');
 const { protect: auth } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
@@ -263,5 +276,15 @@ router.put('/:id/collaborators/:collaboratorId/role', updateCollaboratorRole);
 // Invite management
 router.post('/:id/invites/accept', acceptInvite);
 router.post('/:id/invites/decline', declineInvite);
+
+// Advanced collaboration features
+router.get('/templates', getCollaborationTemplates);
+router.post('/from-template', auth, createFromTemplate);
+router.post('/:id/merge-fork', auth, mergeFork);
+router.get('/:id/insights', auth, getCollaborationInsights);
+router.get('/:id/activity', getCollaborationActivity);
+router.get('/:id/stats', getCollaborationStats);
+router.post('/:id/track-activity', auth, trackUserActivity);
+router.post('/bulk-operations', auth, bulkOperations);
 
 module.exports = router;

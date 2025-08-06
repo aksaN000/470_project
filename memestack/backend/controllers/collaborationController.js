@@ -763,6 +763,184 @@ const getPendingInvites = async (req, res) => {
     }
 };
 
+// Merge fork back to parent collaboration
+const mergeFork = async (req, res) => {
+    try {
+        const { id } = req.params; // Parent collaboration ID
+        const { forkId, mergeOptions = {} } = req.body;
+        const userId = req.user._id || req.user.userId;
+
+        const parentCollaboration = await Collaboration.findById(id);
+        if (!parentCollaboration) {
+            return res.status(404).json({ message: 'Parent collaboration not found' });
+        }
+
+        // Check if user has permission to merge (owner or admin)
+        if (!parentCollaboration.isOwner(userId) && !parentCollaboration.canUserInvite(userId)) {
+            return res.status(403).json({ message: 'Permission denied to merge fork' });
+        }
+
+        const mergeData = await parentCollaboration.mergeFromFork(forkId, mergeOptions);
+
+        const updatedCollaboration = await Collaboration.findById(id)
+            .populate('owner', 'username profile.displayName profile.avatar')
+            .populate('collaborators.user', 'username profile.displayName profile.avatar')
+            .populate('versions.createdBy', 'username profile.displayName profile.avatar');
+
+        res.json({
+            success: true,
+            collaboration: updatedCollaboration,
+            mergedData: mergeData,
+            message: 'Fork merged successfully'
+        });
+    } catch (error) {
+        console.error('Error merging fork:', error);
+        res.status(500).json({ message: 'Error merging fork', error: error.message });
+    }
+};
+
+// Get collaboration templates
+const getCollaborationTemplates = async (req, res) => {
+    try {
+        const { category } = req.query;
+        
+        const templates = Collaboration.getTemplates(category);
+        
+        res.json({
+            success: true,
+            templates,
+            categories: ['meme-remix', 'group-project', 'challenge-response', 'tutorial', 'quick']
+        });
+    } catch (error) {
+        console.error('Error getting collaboration templates:', error);
+        res.status(500).json({ message: 'Error fetching templates', error: error.message });
+    }
+};
+
+// Create collaboration from template
+const createFromTemplate = async (req, res) => {
+    try {
+        const { templateName, collaborationData } = req.body;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = Collaboration.createFromTemplate(templateName, collaborationData, userId);
+        await collaboration.save();
+
+        const populatedCollaboration = await Collaboration.findById(collaboration._id)
+            .populate('owner', 'username profile.displayName profile.avatar');
+
+        res.status(201).json({
+            success: true,
+            collaboration: populatedCollaboration,
+            message: `Collaboration created from ${templateName} template`
+        });
+    } catch (error) {
+        console.error('Error creating collaboration from template:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Get collaboration insights
+const getCollaborationInsights = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        // Check if user is a collaborator to view insights
+        if (!collaboration.isCollaborator(userId) && !collaboration.settings.isPublic) {
+            return res.status(403).json({ message: 'Permission denied' });
+        }
+
+        const insights = collaboration.getInsights();
+
+        res.json({
+            success: true,
+            insights,
+            collaborationId: id
+        });
+    } catch (error) {
+        console.error('Error getting collaboration insights:', error);
+        res.status(500).json({ message: 'Error fetching insights', error: error.message });
+    }
+};
+
+// Bulk operations for collaborations
+const bulkOperations = async (req, res) => {
+    try {
+        const { operation, collaborationIds, data = {} } = req.body;
+        const userId = req.user._id || req.user.userId;
+
+        const results = [];
+
+        for (const id of collaborationIds) {
+            try {
+                const collaboration = await Collaboration.findById(id);
+                if (!collaboration) {
+                    results.push({ id, success: false, error: 'Collaboration not found' });
+                    continue;
+                }
+
+                // Check permissions
+                if (!collaboration.isOwner(userId)) {
+                    results.push({ id, success: false, error: 'Permission denied' });
+                    continue;
+                }
+
+                switch (operation) {
+                    case 'update_status':
+                        collaboration.status = data.status;
+                        await collaboration.save();
+                        results.push({ id, success: true, message: 'Status updated' });
+                        break;
+                    
+                    case 'update_settings':
+                        Object.assign(collaboration.settings, data.settings);
+                        await collaboration.save();
+                        results.push({ id, success: true, message: 'Settings updated' });
+                        break;
+                    
+                    case 'add_tags':
+                        collaboration.tags = [...new Set([...collaboration.tags, ...data.tags])];
+                        await collaboration.save();
+                        results.push({ id, success: true, message: 'Tags added' });
+                        break;
+                    
+                    case 'archive':
+                        collaboration.status = 'completed';
+                        collaboration.settings.isPublic = false;
+                        await collaboration.save();
+                        results.push({ id, success: true, message: 'Collaboration archived' });
+                        break;
+                    
+                    default:
+                        results.push({ id, success: false, error: 'Unknown operation' });
+                }
+            } catch (error) {
+                results.push({ id, success: false, error: error.message });
+            }
+        }
+
+        res.json({
+            success: true,
+            operation,
+            results,
+            summary: {
+                total: collaborationIds.length,
+                successful: results.filter(r => r.success).length,
+                failed: results.filter(r => !r.success).length
+            }
+        });
+    } catch (error) {
+        console.error('Error performing bulk operations:', error);
+        res.status(500).json({ message: 'Error performing bulk operations', error: error.message });
+    }
+};
+
 module.exports = {
     getCollaborations,
     getCollaborationById,
@@ -781,5 +959,11 @@ module.exports = {
     acceptInvite,
     declineInvite,
     updateCollaboratorRole,
-    getPendingInvites
+    getPendingInvites,
+    // New advanced features
+    mergeFork,
+    getCollaborationTemplates,
+    createFromTemplate,
+    getCollaborationInsights,
+    bulkOperations
 };

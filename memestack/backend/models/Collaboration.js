@@ -302,6 +302,56 @@ const collaborationSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true
+    }],
+    templateUsed: {
+        type: String,
+        default: null
+    },
+    workflow: [{
+        step: {
+            type: Number,
+            required: true
+        },
+        name: {
+            type: String,
+            required: true
+        },
+        description: {
+            type: String,
+            required: true
+        },
+        completed: {
+            type: Boolean,
+            default: false
+        },
+        completedAt: {
+            type: Date,
+            default: null
+        },
+        completedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        }
+    }],
+    mergeHistory: [{
+        fromFork: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Collaboration'
+        },
+        mergedAt: {
+            type: Date,
+            default: Date.now
+        },
+        mergedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        mergeData: {
+            versionsAdded: { type: Number, default: 0 },
+            commentsAdded: { type: Number, default: 0 },
+            collaboratorsAdded: { type: Number, default: 0 }
+        }
     }]
 }, {
     timestamps: true,
@@ -557,6 +607,118 @@ collaborationSchema.methods.fork = function(newOwner, title) {
     });
 };
 
+// Instance method to merge fork back to parent
+collaborationSchema.methods.mergeFromFork = function(forkId, options = {}) {
+    const { mergeVersions = true, mergeComments = false, mergeCollaborators = false } = options;
+    
+    return this.constructor.findById(forkId).then(fork => {
+        if (!fork || fork.parentCollaboration.toString() !== this._id.toString()) {
+            throw new Error('Invalid fork for merging');
+        }
+        
+        const mergeData = {
+            mergedVersions: [],
+            mergedComments: [],
+            mergedCollaborators: []
+        };
+        
+        if (mergeVersions && fork.versions.length > 0) {
+            // Merge versions from fork
+            fork.versions.forEach(version => {
+                const newVersion = {
+                    ...version.toObject(),
+                    version: this.versions.length + 1,
+                    mergedFrom: forkId,
+                    isCurrent: false
+                };
+                this.versions.push(newVersion);
+                mergeData.mergedVersions.push(newVersion);
+            });
+        }
+        
+        if (mergeComments && fork.comments.length > 0) {
+            // Merge comments from fork
+            fork.comments.forEach(comment => {
+                this.comments.push({
+                    ...comment.toObject(),
+                    mergedFrom: forkId
+                });
+                mergeData.mergedComments.push(comment);
+            });
+        }
+        
+        if (mergeCollaborators && fork.collaborators.length > 0) {
+            // Merge unique collaborators from fork
+            fork.collaborators.forEach(forkCollab => {
+                const exists = this.collaborators.some(collab => 
+                    collab.user.toString() === forkCollab.user.toString()
+                );
+                if (!exists) {
+                    this.collaborators.push({
+                        ...forkCollab.toObject(),
+                        joinedAt: new Date(),
+                        contributionScore: Math.floor(forkCollab.contributionScore / 2) // Reduce score for merge
+                    });
+                    mergeData.mergedCollaborators.push(forkCollab);
+                }
+            });
+        }
+        
+        // Update stats
+        this.stats.totalVersions = this.versions.length;
+        this.stats.totalComments = this.comments.length;
+        this.stats.totalContributors = this.collaborators.length + 1;
+        
+        return this.save().then(() => mergeData);
+    });
+};
+
+// Instance method to get collaboration insights
+collaborationSchema.methods.getInsights = function() {
+    const now = new Date();
+    const daysSinceCreation = (now - this.createdAt) / (1000 * 60 * 60 * 24);
+    
+    const insights = {
+        engagement: {
+            versionsPerDay: this.versions.length / Math.max(daysSinceCreation, 1),
+            commentsPerDay: this.comments.length / Math.max(daysSinceCreation, 1),
+            collaboratorGrowthRate: this.collaborators.length / Math.max(daysSinceCreation, 1)
+        },
+        quality: {
+            averageVersionQuality: this.versions.reduce((sum, v) => sum + (v.approved ? 10 : 5), 0) / Math.max(this.versions.length, 1),
+            collaboratorRetention: this.collaborators.filter(c => 
+                (now - c.lastActive) < (7 * 24 * 60 * 60 * 1000) // Active in last week
+            ).length / Math.max(this.collaborators.length, 1),
+            completionScore: this.status === 'completed' ? 100 : 
+                            this.status === 'reviewing' ? 75 :
+                            this.status === 'active' ? 50 : 25
+        },
+        activity: {
+            isHot: this.versions.length > 5 && daysSinceCreation < 7,
+            isTrending: this.collaborators.length > 3 && this.stats.totalViews > 100,
+            needsAttention: daysSinceCreation > 7 && this.versions.length === 0,
+            isSuccessful: this.status === 'completed' && this.stats.totalForks > 0
+        },
+        recommendations: []
+    };
+    
+    // Generate recommendations
+    if (insights.activity.needsAttention) {
+        insights.recommendations.push('Consider inviting more collaborators or creating the first version');
+    }
+    if (insights.engagement.versionsPerDay < 0.1) {
+        insights.recommendations.push('Try adding more engaging content or clearer collaboration goals');
+    }
+    if (insights.quality.collaboratorRetention < 0.5) {
+        insights.recommendations.push('Focus on improving collaborator engagement and communication');
+    }
+    if (this.versions.length > 0 && insights.quality.averageVersionQuality < 7) {
+        insights.recommendations.push('Consider implementing version approval process for higher quality');
+    }
+    
+    return insights;
+};
+
 // Static method to get trending collaborations
 collaborationSchema.statics.getTrending = function() {
     return this.find({
@@ -584,6 +746,134 @@ collaborationSchema.statics.getUserCollaborations = function(userId) {
     .populate('owner', 'username profile.displayName profile.avatar')
     .populate('originalMeme', 'title imageUrl')
     .populate('finalMeme', 'title imageUrl');
+};
+
+// Static method to create collaboration template
+collaborationSchema.statics.createTemplate = function(templateData) {
+    const {
+        name,
+        description,
+        category,
+        defaultSettings,
+        requiredRoles = ['owner', 'contributor'],
+        workflow = [],
+        tags = []
+    } = templateData;
+    
+    return {
+        name,
+        description,
+        category, // 'meme-remix', 'group-project', 'challenge-response', 'tutorial'
+        defaultSettings: {
+            isPublic: true,
+            allowForks: true,
+            requireApproval: false,
+            maxCollaborators: 10,
+            ...defaultSettings
+        },
+        requiredRoles,
+        workflow: workflow.length > 0 ? workflow : [
+            { step: 1, name: 'Planning', description: 'Define collaboration goals and invite team' },
+            { step: 2, name: 'Creation', description: 'Create initial versions and iterations' },
+            { step: 3, name: 'Review', description: 'Review and refine versions' },
+            { step: 4, name: 'Finalization', description: 'Complete and publish final version' }
+        ],
+        tags: [...tags, 'template'],
+        createdAt: new Date()
+    };
+};
+
+// Static method to get collaboration templates
+collaborationSchema.statics.getTemplates = function(category = null) {
+    const templates = [
+        this.createTemplate({
+            name: 'Meme Remix Collaboration',
+            description: 'Collaborate on remixing and improving existing memes',
+            category: 'meme-remix',
+            defaultSettings: { maxCollaborators: 5, requireApproval: false },
+            tags: ['remix', 'creative', 'quick']
+        }),
+        this.createTemplate({
+            name: 'Group Meme Project',
+            description: 'Large-scale collaborative meme creation with multiple contributors',
+            category: 'group-project',
+            defaultSettings: { maxCollaborators: 15, requireApproval: true },
+            requiredRoles: ['owner', 'admin', 'editor', 'contributor'],
+            tags: ['group', 'structured', 'long-term']
+        }),
+        this.createTemplate({
+            name: 'Challenge Response',
+            description: 'Respond to community challenges with collaborative solutions',
+            category: 'challenge-response',
+            defaultSettings: { maxCollaborators: 8, allowForks: true },
+            tags: ['challenge', 'community', 'competitive']
+        }),
+        this.createTemplate({
+            name: 'Tutorial Creation',
+            description: 'Create educational content and tutorials collaboratively',
+            category: 'tutorial',
+            defaultSettings: { maxCollaborators: 6, requireApproval: true },
+            requiredRoles: ['owner', 'editor', 'reviewer', 'contributor'],
+            tags: ['educational', 'tutorial', 'structured']
+        }),
+        this.createTemplate({
+            name: 'Quick Collaboration',
+            description: 'Fast-paced collaboration for simple improvements',
+            category: 'quick',
+            defaultSettings: { maxCollaborators: 3, requireApproval: false },
+            workflow: [
+                { step: 1, name: 'Setup', description: 'Quick setup and invite 1-2 collaborators' },
+                { step: 2, name: 'Create', description: 'Create 2-3 versions rapidly' },
+                { step: 3, name: 'Finish', description: 'Pick best version and complete' }
+            ],
+            tags: ['quick', 'simple', 'fast']
+        })
+    ];
+    
+    return category ? templates.filter(t => t.category === category) : templates;
+};
+
+// Static method to create from template
+collaborationSchema.statics.createFromTemplate = function(templateName, collaborationData, ownerId) {
+    const templates = this.getTemplates();
+    const template = templates.find(t => t.name === templateName);
+    
+    if (!template) {
+        throw new Error('Template not found');
+    }
+    
+    const collaboration = new this({
+        title: collaborationData.title || `${template.name} - ${new Date().toLocaleDateString()}`,
+        description: collaborationData.description || template.description,
+        type: collaborationData.type || 'collaboration',
+        owner: ownerId,
+        status: 'draft',
+        settings: {
+            ...template.defaultSettings,
+            ...collaborationData.settings
+        },
+        tags: [
+            ...template.tags,
+            ...(collaborationData.tags || [])
+        ],
+        workflow: template.workflow,
+        templateUsed: templateName,
+        collaborators: [],
+        pendingInvites: [],
+        versions: [],
+        comments: [],
+        stats: {
+            totalContributors: 1,
+            totalViews: 0,
+            totalForks: 0,
+            totalVersions: 0,
+            totalLikes: 0,
+            totalComments: 0,
+            completionRate: 0
+        }
+    });
+    
+    return collaboration;
 };
 
 const Collaboration = mongoose.model('Collaboration', collaborationSchema);
