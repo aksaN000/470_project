@@ -258,13 +258,19 @@ const BatchProcessor = () => {
                                     p: 4,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(50px)',
+                                    borderRadius: 3,
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
-                                    borderRadius: '24px',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                        : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                     position: 'relative',
                                     overflow: 'hidden',
                                     '&::before': {
@@ -346,13 +352,19 @@ const BatchProcessor = () => {
                             elevation={0}
                             sx={{
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+                                backdropFilter: 'blur(40px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
-                                borderRadius: '20px',
+                                    ? '2px solid rgba(255, 255, 255, 0.1)'
+                                    : '2px solid rgba(99, 102, 241, 0.1)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.15)'
+                                    : '3px solid rgba(99, 102, 241, 0.15)',
+                                borderRadius: '16px',
+                                boxShadow: mode === 'dark'
+                                    ? '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                    : '0 12px 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 p: 4,
                             }}
                         >
@@ -362,11 +374,19 @@ const BatchProcessor = () => {
                         elevation={0}
                         sx={{
                             background: mode === 'dark' 
-                                ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(10px)',
+                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                            backdropFilter: 'blur(30px)',
                             borderRadius: 2,
-                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            border: mode === 'dark'
+                                ? '2px solid rgba(255, 255, 255, 0.08)'
+                                : '2px solid rgba(99, 102, 241, 0.08)',
+                            borderTop: mode === 'dark'
+                                ? '3px solid rgba(255, 255, 255, 0.12)'
+                                : '3px solid rgba(99, 102, 241, 0.12)',
+                            boxShadow: mode === 'dark'
+                                ? '0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+                                : '0 8px 30px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
                             p: 3,
                             mb: 3
                         }}
@@ -423,6 +443,24 @@ const BatchProcessor = () => {
                                         onDelete={() => removeFile(index)}
                                         size="small"
                                         icon={<ImageIcon />}
+                                        sx={{
+                                            background: mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
+                                                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.15)'
+                                                : '1px solid rgba(255, 255, 255, 0.3)',
+                                            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'white',
+                                            fontWeight: 600,
+                                            '&:hover': {
+                                                transform: 'translateY(-1px)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 4px 15px rgba(99, 102, 241, 0.3)'
+                                                    : '0 4px 15px rgba(99, 102, 241, 0.4)',
+                                            },
+                                            transition: 'all 0.2s ease',
+                                        }}
                                     />
                                 ))}
                             </Box>
@@ -435,11 +473,19 @@ const BatchProcessor = () => {
                         elevation={0}
                         sx={{
                             background: mode === 'dark' 
-                                ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(10px)',
+                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                            backdropFilter: 'blur(30px)',
                             borderRadius: 2,
-                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            border: mode === 'dark'
+                                ? '2px solid rgba(255, 255, 255, 0.08)'
+                                : '2px solid rgba(99, 102, 241, 0.08)',
+                            borderTop: mode === 'dark'
+                                ? '3px solid rgba(255, 255, 255, 0.12)'
+                                : '3px solid rgba(99, 102, 241, 0.12)',
+                            boxShadow: mode === 'dark'
+                                ? '0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+                                : '0 8px 30px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
                             p: 3,
                             mb: 3
                         }}
@@ -470,6 +516,41 @@ const BatchProcessor = () => {
                                         applyPreset(presetName);
                                     }}
                                     size="small"
+                                    sx={{
+                                        background: preset === presetName 
+                                            ? (mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(139, 92, 246, 0.4) 100%)'
+                                                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)')
+                                            : (mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 100%)'),
+                                        backdropFilter: 'blur(15px)',
+                                        border: preset === presetName
+                                            ? (mode === 'dark'
+                                                ? '1px solid rgba(99, 102, 241, 0.3)'
+                                                : '1px solid rgba(99, 102, 241, 0.5)')
+                                            : (mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.1)'
+                                                : '1px solid rgba(99, 102, 241, 0.2)'),
+                                        color: preset === presetName
+                                            ? (mode === 'dark' ? 'rgba(255, 255, 255, 0.95)' : 'white')
+                                            : (mode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : theme.palette.text.primary),
+                                        fontWeight: preset === presetName ? 600 : 500,
+                                        '&:hover': {
+                                            transform: 'translateY(-1px)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 4px 15px rgba(99, 102, 241, 0.2)'
+                                                : '0 4px 15px rgba(99, 102, 241, 0.3)',
+                                            background: preset === presetName 
+                                                ? (mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(139, 92, 246, 0.5) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(99, 102, 241, 1) 0%, rgba(139, 92, 246, 1) 100%)')
+                                                : (mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)'),
+                                        },
+                                        transition: 'all 0.2s ease',
+                                    }}
                                 />
                             ))}
                         </Box>
@@ -669,11 +750,19 @@ const BatchProcessor = () => {
                         elevation={0}
                         sx={{
                             background: mode === 'dark' 
-                                ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(255, 255, 255, 0.15)',
-                            backdropFilter: 'blur(10px)',
+                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                            backdropFilter: 'blur(30px)',
                             borderRadius: 2,
-                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                            border: mode === 'dark'
+                                ? '2px solid rgba(255, 255, 255, 0.08)'
+                                : '2px solid rgba(99, 102, 241, 0.08)',
+                            borderTop: mode === 'dark'
+                                ? '3px solid rgba(255, 255, 255, 0.12)'
+                                : '3px solid rgba(99, 102, 241, 0.12)',
+                            boxShadow: mode === 'dark'
+                                ? '0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+                                : '0 8px 30px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
                             p: 3,
                             mb: 3
                         }}
@@ -727,11 +816,19 @@ const BatchProcessor = () => {
                             elevation={0}
                             sx={{
                                 background: mode === 'dark' 
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.15)',
-                                backdropFilter: 'blur(10px)',
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                                backdropFilter: 'blur(30px)',
                                 borderRadius: 2,
-                                border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.2)'}`,
+                                border: mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.08)'
+                                    : '2px solid rgba(99, 102, 241, 0.08)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.12)'
+                                    : '3px solid rgba(99, 102, 241, 0.12)',
+                                boxShadow: mode === 'dark'
+                                    ? '0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
+                                    : '0 8px 30px rgba(99, 102, 241, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
                                 p: 3
                             }}
                         >
@@ -771,7 +868,32 @@ const BatchProcessor = () => {
                         <Grid container spacing={2}>
                             {results.map((result, index) => (
                                 <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                                    <Card variant="outlined">
+                                    <Card 
+                                        variant="outlined"
+                                        sx={{
+                                            background: mode === 'dark'
+                                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%)'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.06)'
+                                                : '1px solid rgba(99, 102, 241, 0.06)',
+                                            borderTop: mode === 'dark'
+                                                ? '2px solid rgba(255, 255, 255, 0.08)'
+                                                : '2px solid rgba(99, 102, 241, 0.08)',
+                                            borderRadius: '12px',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 4px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+                                                : '0 4px 20px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4)',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 30px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                            }
+                                        }}
+                                    >
                                         <CardContent sx={{ p: 2 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                                 {result.success ? (

@@ -167,15 +167,21 @@ const EditProfile = () => {
                                     p: 4,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
                                     borderRadius: '24px',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                        : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                     '&::before': {
                                         content: '""',
                                         position: 'absolute',
@@ -290,13 +296,19 @@ const EditProfile = () => {
                             elevation={0}
                             sx={{
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                backdropFilter: 'blur(50px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? '2px solid rgba(255, 255, 255, 0.15)'
+                                    : '2px solid rgba(99, 102, 241, 0.15)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.25)'
+                                    : '3px solid rgba(99, 102, 241, 0.25)',
                                 borderRadius: '24px',
+                                boxShadow: mode === 'dark'
+                                    ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                    : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                 overflow: 'hidden',
                             }}
                         >
@@ -396,14 +408,20 @@ const EditProfile = () => {
                                             sx={{
                                                 p: 2,
                                                 background: mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.05)'
-                                                    : 'rgba(255, 255, 255, 0.6)',
-                                                backdropFilter: 'blur(10px)',
+                                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%)',
+                                                backdropFilter: 'blur(40px)',
                                                 border: mode === 'dark'
-                                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                                    ? '2px solid rgba(255, 255, 255, 0.12)'
+                                                    : '2px solid rgba(99, 102, 241, 0.12)',
+                                                borderTop: mode === 'dark'
+                                                    ? '3px solid rgba(255, 255, 255, 0.2)'
+                                                    : '3px solid rgba(99, 102, 241, 0.2)',
                                                 borderRadius: '12px',
                                                 textAlign: 'center',
+                                                boxShadow: mode === 'dark'
+                                                    ? '0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                    : '0 8px 30px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                             }}
                                         >
                                             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -581,13 +599,19 @@ const EditProfile = () => {
                                             p: 3,
                                             mt: 3,
                                             background: mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(255, 255, 255, 0.6)',
-                                            backdropFilter: 'blur(10px)',
+                                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.75) 100%)',
+                                            backdropFilter: 'blur(40px)',
                                             border: mode === 'dark'
-                                                ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                                ? '2px solid rgba(255, 255, 255, 0.12)'
+                                                : '2px solid rgba(99, 102, 241, 0.12)',
+                                            borderTop: mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.2)'
+                                                : '3px solid rgba(99, 102, 241, 0.2)',
                                             borderRadius: '12px',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                : '0 8px 30px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                         }}
                                     >
                                         <FormControlLabel

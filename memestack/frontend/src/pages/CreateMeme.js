@@ -303,16 +303,38 @@ const CreateMeme = () => {
                             sx={{
                                 p: 4,
                                 mb: 4,
-                                background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
-                                border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                background: theme.palette.mode === 'dark'
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(50px)',
+                                WebkitBackdropFilter: 'blur(50px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: theme.palette.mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
                                 borderRadius: '24px',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 position: 'relative',
                                 overflow: 'hidden',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: theme.palette.mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                },
                                 '&::before': {
                                     content: '""',
                                     position: 'absolute',
@@ -386,15 +408,37 @@ const CreateMeme = () => {
                         <Paper
                             elevation={0}
                             sx={{
-                                background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
-                                border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                background: theme.palette.mode === 'dark'
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(40px)',
+                                WebkitBackdropFilter: 'blur(40px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: theme.palette.mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
                                 borderRadius: '20px',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2)',
                                 p: 4,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: theme.palette.mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3)',
+                                },
                             }}
                         >
                         <Typography 
@@ -426,7 +470,40 @@ const CreateMeme = () => {
                 <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
                     {/* Image Upload Section */}
                     <Box sx={{ flex: 1 }}>
-                        <Card>
+                        <Card
+                            sx={{
+                                background: theme.palette.mode === 'dark'
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(40px)',
+                                WebkitBackdropFilter: 'blur(40px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: theme.palette.mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
+                                borderRadius: '20px',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: theme.palette.mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3)',
+                                },
+                            }}
+                        >
                             <CardContent>
                                 <Typography variant="h6" gutterBottom>
                                     Upload Image
@@ -434,15 +511,28 @@ const CreateMeme = () => {
                                 
                                 <Paper
                                     sx={{
-                                        border: '2px dashed',
-                                        borderColor: 'primary.main',
-                                        borderRadius: 2,
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%)',
+                                        backdropFilter: 'blur(25px)',
+                                        WebkitBackdropFilter: 'blur(25px)',
+                                        border: theme.palette.mode === 'dark'
+                                            ? '2px dashed rgba(255, 255, 255, 0.4)'
+                                            : '2px dashed rgba(0, 0, 0, 0.3)',
+                                        borderRadius: '16px',
                                         p: 4,
                                         textAlign: 'center',
                                         cursor: 'pointer',
                                         mb: 2,
+                                        transition: 'all 0.3s ease',
                                         '&:hover': {
-                                            backgroundColor: 'action.hover',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '2px dashed rgba(255, 255, 255, 0.5)'
+                                                : '2px dashed rgba(0, 0, 0, 0.4)',
+                                            transform: 'translateY(-2px)',
                                         },
                                     }}
                                     onClick={() => document.getElementById('file-input').click()}
@@ -520,7 +610,40 @@ const CreateMeme = () => {
 
                     {/* Meme Details Section */}
                     <Box sx={{ flex: 1 }}>
-                        <Card>
+                        <Card
+                            sx={{
+                                background: theme.palette.mode === 'dark'
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(40px)',
+                                WebkitBackdropFilter: 'blur(40px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: theme.palette.mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
+                                borderRadius: '20px',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2)',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: theme.palette.mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3)',
+                                },
+                            }}
+                        >
                             <CardContent>
                                 <Typography variant="h6" gutterBottom>
                                     Meme Details

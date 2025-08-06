@@ -174,15 +174,21 @@ const FollowingFeed = () => {
                                     p: 4,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
                                     borderRadius: '24px',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                        : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                     '&::before': {
                                         content: '""',
                                         position: 'absolute',
@@ -258,14 +264,20 @@ const FollowingFeed = () => {
                             elevation={0}
                             sx={{
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                backdropFilter: 'blur(50px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? '2px solid rgba(255, 255, 255, 0.15)'
+                                    : '2px solid rgba(99, 102, 241, 0.15)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.25)'
+                                    : '3px solid rgba(99, 102, 241, 0.25)',
                                 borderRadius: '20px',
                                 p: 4,
+                                boxShadow: mode === 'dark'
+                                    ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                    : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                             }}
                         >
             {loading ? (
@@ -309,9 +321,26 @@ const FollowingFeed = () => {
                                     sx={{
                                         height: '100%',
                                         cursor: 'pointer',
-                                        transition: 'transform 0.2s ease-in-out',
+                                        transition: 'all 0.3s ease-in-out',
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+                                        backdropFilter: 'blur(40px)',
+                                        border: mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.1)'
+                                            : '2px solid rgba(99, 102, 241, 0.1)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.15)'
+                                            : '3px solid rgba(99, 102, 241, 0.15)',
+                                        borderRadius: '16px',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                            : '0 12px 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                         '&:hover': {
-                                            transform: 'translateY(-2px)',
+                                            transform: 'translateY(-4px) scale(1.02)',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                : '0 20px 60px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                         },
                                     }}
                                     onClick={() => navigate(`/meme/${meme.id}`)}
@@ -356,12 +385,31 @@ const FollowingFeed = () => {
                                             <Chip 
                                                 label={meme.category} 
                                                 size="small" 
-                                                color="primary" 
+                                                sx={{
+                                                    background: mode === 'dark'
+                                                        ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
+                                                        : 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    border: mode === 'dark'
+                                                        ? '1px solid rgba(99, 102, 241, 0.4)'
+                                                        : '1px solid rgba(99, 102, 241, 0.2)',
+                                                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'white',
+                                                    fontWeight: 600,
+                                                }}
                                             />
                                             <Chip 
                                                 label={`❤️ ${meme.stats?.likesCount || 0}`} 
                                                 size="small" 
-                                                variant="outlined" 
+                                                sx={{
+                                                    background: mode === 'dark'
+                                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    border: mode === 'dark'
+                                                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                                                        : '1px solid rgba(99, 102, 241, 0.2)',
+                                                    color: theme.palette.text.primary,
+                                                }}
                                             />
                                         </Box>
                                         

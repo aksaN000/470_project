@@ -151,12 +151,19 @@ const Home = () => {
                 sx={{
                     position: 'relative',
                     minHeight: '100vh',
-                    background: `
-                        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(120, 200, 255, 0.3) 0%, transparent 50%),
-                        linear-gradient(135deg, ${theme.palette.mode === 'dark' ? '#0f172a' : '#ffffff'} 0%, ${theme.palette.mode === 'dark' ? '#1e293b' : '#f8fafc'} 100%)
-                    `,
+                    background: theme.palette.mode === 'dark' 
+                        ? `
+                            radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 70%),
+                            radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 70%),
+                            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 70%),
+                            linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)
+                        `
+                        : `
+                            radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 70%),
+                            radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 70%),
+                            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 70%),
+                            linear-gradient(135deg, #e8f2ff 0%, #f0f4ff 50%, #f8faff 100%)
+                        `,
                     color: theme.palette.text.primary,
                     display: 'flex',
                     alignItems: 'center',
@@ -168,15 +175,22 @@ const Home = () => {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: `
-                            radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                            radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-                            radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)
-                        `,
-                        animation: 'float 6s ease-in-out infinite',
+                        background: theme.palette.mode === 'dark'
+                            ? `
+                                radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 60%),
+                                radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.1) 0%, transparent 60%),
+                                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 80%)
+                            `
+                            : `
+                                radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
+                                radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 60%),
+                                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 80%)
+                            `,
+                        animation: 'float 8s ease-in-out infinite',
                         '@keyframes float': {
                             '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-                            '50%': { transform: 'translateY(-20px) rotate(180deg)' },
+                            '33%': { transform: 'translateY(-15px) rotate(120deg)' },
+                            '66%': { transform: 'translateY(-10px) rotate(240deg)' },
                         },
                     },
                 }}
@@ -386,26 +400,36 @@ const Home = () => {
                                                         sx={{
                                                             p: 3,
                                                             textAlign: 'center',
-                                                            background: theme.palette.mode === 'dark' 
-                                                                ? 'rgba(255, 255, 255, 0.05)' 
-                                                                : 'rgba(255, 255, 255, 0.9)',
-                                                            backdropFilter: 'blur(20px)',
+                                                            background: theme.palette.mode === 'dark'
+                                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                                            backdropFilter: 'blur(50px)',
+                                                            WebkitBackdropFilter: 'blur(50px)',
                                                             border: theme.palette.mode === 'dark'
-                                                                ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                                                ? '2px solid rgba(255, 255, 255, 0.3)'
+                                                                : '2px solid rgba(0, 0, 0, 0.15)',
+                                                            borderTop: theme.palette.mode === 'dark'
+                                                                ? '3px solid rgba(255, 255, 255, 0.4)'
+                                                                : '3px solid rgba(0, 0, 0, 0.2)',
                                                             borderRadius: '20px',
-                                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                            boxShadow: theme.palette.mode === 'dark'
+                                                                ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                                : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                            transition: 'all 0.3s ease',
                                                             '&:hover': {
-                                                                transform: 'translateY(-8px)',
+                                                                transform: 'translateY(-5px)',
                                                                 background: theme.palette.mode === 'dark'
-                                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                                    : 'rgba(255, 255, 255, 1)',
+                                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                                                border: theme.palette.mode === 'dark'
+                                                                    ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                                    : '2px solid rgba(0, 0, 0, 0.25)',
+                                                                borderTop: theme.palette.mode === 'dark'
+                                                                    ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                                    : '3px solid rgba(0, 0, 0, 0.3)',
                                                                 boxShadow: theme.palette.mode === 'dark'
-                                                                    ? '0 20px 40px rgba(99, 102, 241, 0.2)'
-                                                                    : '0 20px 40px rgba(99, 102, 241, 0.15)',
-                                                                borderColor: theme.palette.mode === 'dark'
-                                                                    ? 'rgba(99, 102, 241, 0.3)'
-                                                                    : 'rgba(99, 102, 241, 0.2)',
+                                                                    ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                                                    : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
                                                             },
                                                         }}
                                                     >
@@ -569,25 +593,37 @@ const Home = () => {
                                 <Card
                                     sx={{
                                         height: '100%',
-                                        background: currentThemeColors?.surface || (theme.palette.mode === 'dark' 
-                                            ? 'rgba(255, 255, 255, 0.05)' 
-                                            : 'rgba(255, 255, 255, 0.9)'),
-                                        backdropFilter: 'blur(20px)',
-                                        border: `1px solid ${currentThemeColors?.primary || (theme.palette.mode === 'dark'
-                                            ? 'rgba(255, 255, 255, 0.1)'
-                                            : 'rgba(99, 102, 241, 0.1)')}`,
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                        backdropFilter: 'blur(50px)',
+                                        WebkitBackdropFilter: 'blur(50px)',
+                                        border: theme.palette.mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.3)'
+                                            : '2px solid rgba(0, 0, 0, 0.15)',
+                                        borderTop: theme.palette.mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.4)'
+                                            : '3px solid rgba(0, 0, 0, 0.2)',
                                         borderRadius: '24px',
-                                        overflow: 'visible',
-                                        position: 'relative',
+                                        boxShadow: theme.palette.mode === 'dark'
+                                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                            : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                        transition: 'all 0.3s ease',
                                         cursor: 'pointer',
-                                        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                                         '&:hover': {
-                                            transform: 'translateY(-12px)',
-                                            background: currentThemeColors?.surfaceHover || (theme.palette.mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.08)'
-                                                : 'rgba(255, 255, 255, 1)'),
-                                            boxShadow: `0 25px 60px ${currentThemeColors?.primary || 'rgba(99, 102, 241, 0.3)'}`,
-                                            borderColor: currentThemeColors?.primary || 'rgba(99, 102, 241, 0.4)',
+                                            transform: 'translateY(-8px)',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                : '2px solid rgba(0, 0, 0, 0.25)',
+                                            borderTop: theme.palette.mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                : '3px solid rgba(0, 0, 0, 0.3)',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                                : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
                                         },
                                     }}
                                 >
@@ -628,13 +664,20 @@ const Home = () => {
                                         <Chip
                                             label={feature.stats}
                                             sx={{
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
-                                                color: 'white',
-                                                fontWeight: 600,
-                                                border: 'none',
-                                                '& .MuiChip-label': {
-                                                    color: 'white'
-                                                }
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                    : '1px solid rgba(0, 0, 0, 0.2)',
+                                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                                fontWeight: 700,
+                                                fontSize: '0.875rem',
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                boxShadow: theme.palette.mode === 'dark'
+                                                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                             }}
                                         />
                                     </CardContent>
@@ -685,27 +728,37 @@ const Home = () => {
                                     <Card
                                         sx={{
                                             height: '100%',
-                                            background: theme.palette.mode === 'dark' 
-                                                ? 'rgba(255, 255, 255, 0.05)' 
-                                                : 'rgba(255, 255, 255, 0.9)',
-                                            backdropFilter: 'blur(20px)',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                            backdropFilter: 'blur(40px)',
+                                            WebkitBackdropFilter: 'blur(40px)',
                                             border: theme.palette.mode === 'dark'
-                                                ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                : '1px solid rgba(99, 102, 241, 0.1)',
-                                            borderRadius: '16px',
+                                                ? '2px solid rgba(255, 255, 255, 0.3)'
+                                                : '2px solid rgba(0, 0, 0, 0.15)',
+                                            borderTop: theme.palette.mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.4)'
+                                                : '3px solid rgba(0, 0, 0, 0.2)',
+                                            borderRadius: '20px',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                                : '0 8px 32px rgba(31, 38, 135, 0.2)',
                                             transition: 'all 0.3s ease',
                                             cursor: 'pointer',
                                             '&:hover': {
-                                                transform: 'translateY(-8px)',
+                                                transform: 'translateY(-5px)',
                                                 background: theme.palette.mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                    : 'rgba(255, 255, 255, 1)',
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                    : '2px solid rgba(0, 0, 0, 0.25)',
+                                                borderTop: theme.palette.mode === 'dark'
+                                                    ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                    : '3px solid rgba(0, 0, 0, 0.3)',
                                                 boxShadow: theme.palette.mode === 'dark'
-                                                    ? '0 20px 60px rgba(99, 102, 241, 0.3)'
-                                                    : '0 20px 60px rgba(99, 102, 241, 0.2)',
-                                                borderColor: theme.palette.mode === 'dark'
-                                                    ? 'rgba(99, 102, 241, 0.4)'
-                                                    : 'rgba(99, 102, 241, 0.3)',
+                                                    ? '0 16px 48px rgba(0, 0, 0, 0.5)'
+                                                    : '0 16px 48px rgba(31, 38, 135, 0.3)',
                                             },
                                         }}
                                     >
@@ -854,13 +907,35 @@ const Home = () => {
                                             cursor: 'pointer',
                                             borderRadius: '20px',
                                             overflow: 'hidden',
-                                            background: theme.palette.background.paper,
-                                            border: `1px solid ${theme.palette.divider}`,
-                                            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                            position: 'relative',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                            backdropFilter: 'blur(40px)',
+                                            WebkitBackdropFilter: 'blur(40px)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '2px solid rgba(255, 255, 255, 0.3)'
+                                                : '2px solid rgba(0, 0, 0, 0.15)',
+                                            borderTop: theme.palette.mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.4)'
+                                                : '3px solid rgba(0, 0, 0, 0.2)',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                                : '0 8px 32px rgba(31, 38, 135, 0.2)',
+                                            transition: 'all 0.3s ease',
                                             '&:hover': {
-                                                transform: 'translateY(-12px) scale(1.02)',
-                                                boxShadow: '0 25px 80px rgba(0, 0, 0, 0.15)',
+                                                transform: 'translateY(-8px)',
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                    : '2px solid rgba(0, 0, 0, 0.25)',
+                                                borderTop: theme.palette.mode === 'dark'
+                                                    ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                    : '3px solid rgba(0, 0, 0, 0.3)',
+                                                boxShadow: theme.palette.mode === 'dark'
+                                                    ? '0 16px 48px rgba(0, 0, 0, 0.5)'
+                                                    : '0 16px 48px rgba(31, 38, 135, 0.3)',
                                                 '& .meme-image': {
                                                     transform: 'scale(1.1)',
                                                 },
@@ -933,15 +1008,53 @@ const Home = () => {
                                                     position: 'absolute',
                                                     top: 12,
                                                     left: 12,
-                                                    background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
-                                                    color: 'white',
-                                                    fontWeight: 600,
-                                                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                                                    background: theme.palette.mode === 'dark'
+                                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    WebkitBackdropFilter: 'blur(20px)',
+                                                    border: theme.palette.mode === 'dark'
+                                                        ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                        : '1px solid rgba(0, 0, 0, 0.2)',
+                                                    color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.75rem',
                                                 }}
                                             />
                                         </Box>
                                         
-                                        <CardContent sx={{ p: 3 }}>
+                                        <CardContent sx={{ 
+                                            p: 3,
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%)',
+                                            position: 'relative',
+                                            '&::before': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                background: 'transparent',
+                                                backdropFilter: 'blur(25px)',
+                                                WebkitBackdropFilter: 'blur(25px)',
+                                                borderRadius: '0 0 20px 20px',
+                                                zIndex: -1,
+                                            },
+                                            '&::after': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                height: '1px',
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)'
+                                                    : 'linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent)',
+                                                zIndex: 1,
+                                            }
+                                        }}>
                                             <Typography 
                                                 variant="h6" 
                                                 component="h3" 
@@ -951,20 +1064,37 @@ const Home = () => {
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     whiteSpace: 'nowrap',
+                                                    position: 'relative',
+                                                    zIndex: 1,
                                                 }}
                                             >
                                                 {meme.title}
                                             </Typography>
                                             
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                alignItems: 'center', 
+                                                mb: 2,
+                                                position: 'relative',
+                                                zIndex: 1,
+                                            }}>
                                                 <Chip 
                                                     label={meme.category} 
                                                     size="small" 
                                                     variant="outlined"
                                                     sx={{ 
-                                                        borderColor: theme.palette.primary.main,
+                                                        border: theme.palette.mode === 'dark'
+                                                            ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                            : '1px solid rgba(0, 0, 0, 0.2)',
                                                         color: theme.palette.primary.main,
-                                                        fontWeight: 500,
+                                                        fontWeight: 700,
+                                                        background: theme.palette.mode === 'dark'
+                                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                        backdropFilter: 'blur(15px)',
+                                                        WebkitBackdropFilter: 'blur(15px)',
+                                                        fontSize: '0.75rem',
                                                     }}
                                                 />
                                                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -993,6 +1123,8 @@ const Home = () => {
                                                     WebkitLineClamp: 2,
                                                     WebkitBoxOrient: 'vertical',
                                                     lineHeight: 1.5,
+                                                    position: 'relative',
+                                                    zIndex: 1,
                                                 }}
                                             >
                                                 {meme.description || 'A hilarious meme that\'s taking the internet by storm!'}

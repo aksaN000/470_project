@@ -121,14 +121,38 @@ const Dashboard = () => {
                             elevation={0}
                             sx={{
                                 p: 4,
-                                background: mode === 'light'
-                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)'
-                                    : 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.7) 100%)',
-                                backdropFilter: 'blur(20px)',
-                                border: `1px solid ${mode === 'light' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)'}`,
+                                background: theme.palette.mode === 'dark'
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(50px)',
+                                WebkitBackdropFilter: 'blur(50px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: theme.palette.mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
                                 borderRadius: '24px',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 position: 'relative',
                                 overflow: 'hidden',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: theme.palette.mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: theme.palette.mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                },
                                 '&::before': {
                                     content: '""',
                                     position: 'absolute',
@@ -216,10 +240,20 @@ const Dashboard = () => {
                                             label="Trending Creator"
                                             size="small"
                                             sx={{
-                                                background: `linear-gradient(135deg, ${currentThemeColors?.warning || '#f59e0b'} 0%, ${currentThemeColors?.error || '#ef4444'} 100%)`,
-                                                color: 'white',
-                                                fontWeight: 600,
-                                                '& .MuiChip-icon': { color: 'white' },
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                    : '1px solid rgba(0, 0, 0, 0.2)',
+                                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                                fontWeight: 700,
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                boxShadow: theme.palette.mode === 'dark'
+                                                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                '& .MuiChip-icon': { color: theme.palette.mode === 'dark' ? 'white' : 'black' },
                                             }}
                                         />
                                         <Chip
@@ -228,9 +262,20 @@ const Dashboard = () => {
                                             size="small"
                                             variant="outlined"
                                             sx={{ 
-                                                borderColor: theme.palette.primary.main, 
-                                                color: theme.palette.primary.main,
-                                                '& .MuiChip-icon': { color: theme.palette.primary.main },
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                    : '1px solid rgba(0, 0, 0, 0.2)',
+                                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                                fontWeight: 700,
+                                                backdropFilter: 'blur(20px)',
+                                                WebkitBackdropFilter: 'blur(20px)',
+                                                boxShadow: theme.palette.mode === 'dark'
+                                                    ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                    : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                '& .MuiChip-icon': { color: theme.palette.mode === 'dark' ? 'white' : 'black' },
                                             }}
                                         />
                                     </Stack>
@@ -266,29 +311,39 @@ const Dashboard = () => {
                                 <Card
                                     sx={{
                                         height: '200px',
-                                        background: mode === 'dark' 
-                                            ? 'rgba(255, 255, 255, 0.05)' 
-                                            : 'rgba(255, 255, 255, 0.9)',
-                                        backdropFilter: 'blur(20px)',
-                                        border: mode === 'dark'
-                                            ? '1px solid rgba(255, 255, 255, 0.1)'
-                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                        backdropFilter: 'blur(50px)',
+                                        WebkitBackdropFilter: 'blur(50px)',
+                                        border: theme.palette.mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.3)'
+                                            : '2px solid rgba(0, 0, 0, 0.15)',
+                                        borderTop: theme.palette.mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.4)'
+                                            : '3px solid rgba(0, 0, 0, 0.2)',
                                         borderRadius: '20px',
+                                        boxShadow: theme.palette.mode === 'dark'
+                                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                            : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                         overflow: 'hidden',
                                         position: 'relative',
                                         cursor: 'pointer',
                                         transition: 'all 0.3s ease',
                                         '&:hover': {
                                             transform: 'translateY(-8px)',
-                                            background: mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.08)'
-                                                : 'rgba(255, 255, 255, 1)',
-                                            boxShadow: mode === 'dark'
-                                                ? '0 20px 60px rgba(99, 102, 241, 0.3)'
-                                                : '0 20px 60px rgba(99, 102, 241, 0.2)',
-                                            borderColor: mode === 'dark'
-                                                ? 'rgba(99, 102, 241, 0.4)'
-                                                : 'rgba(99, 102, 241, 0.3)',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                : '2px solid rgba(0, 0, 0, 0.25)',
+                                            borderTop: theme.palette.mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                : '3px solid rgba(0, 0, 0, 0.3)',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                                : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
                                         },
                                     }}
                                 >
@@ -359,29 +414,39 @@ const Dashboard = () => {
                                         onClick={action.action}
                                         sx={{
                                             height: '320px',
-                                            background: mode === 'dark' 
-                                                ? 'rgba(255, 255, 255, 0.05)' 
-                                                : 'rgba(255, 255, 255, 0.9)',
-                                            backdropFilter: 'blur(20px)',
-                                            border: mode === 'dark'
-                                                ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                            backdropFilter: 'blur(50px)',
+                                            WebkitBackdropFilter: 'blur(50px)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '2px solid rgba(255, 255, 255, 0.3)'
+                                                : '2px solid rgba(0, 0, 0, 0.15)',
+                                            borderTop: theme.palette.mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.4)'
+                                                : '3px solid rgba(0, 0, 0, 0.2)',
                                             borderRadius: '24px',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                             cursor: 'pointer',
                                             position: 'relative',
                                             overflow: 'hidden',
                                             transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                                             '&:hover': {
                                                 transform: 'translateY(-12px)',
-                                                background: mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                    : 'rgba(255, 255, 255, 1)',
-                                                boxShadow: mode === 'dark'
-                                                    ? '0 25px 80px rgba(99, 102, 241, 0.3)'
-                                                    : '0 25px 80px rgba(99, 102, 241, 0.2)',
-                                                borderColor: mode === 'dark'
-                                                    ? 'rgba(99, 102, 241, 0.4)'
-                                                    : 'rgba(99, 102, 241, 0.3)',
+                                                background: theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                                border: theme.palette.mode === 'dark'
+                                                    ? '2px solid rgba(255, 255, 255, 0.4)'
+                                                    : '2px solid rgba(0, 0, 0, 0.25)',
+                                                borderTop: theme.palette.mode === 'dark'
+                                                    ? '3px solid rgba(255, 255, 255, 0.5)'
+                                                    : '3px solid rgba(0, 0, 0, 0.3)',
+                                                boxShadow: theme.palette.mode === 'dark'
+                                                    ? '0 25px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                                    : '0 25px 80px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
                                             },
                                         }}
                                     >
@@ -391,12 +456,21 @@ const Dashboard = () => {
                                                     label={action.badge}
                                                     size="small"
                                                     sx={{
-                                                        background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
-                                                        color: 'white',
-                                                        fontWeight: 600,
-                                                        border: 'none',
+                                                        background: theme.palette.mode === 'dark'
+                                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                        border: theme.palette.mode === 'dark'
+                                                            ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                            : '1px solid rgba(0, 0, 0, 0.2)',
+                                                        color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                                        fontWeight: 700,
+                                                        backdropFilter: 'blur(20px)',
+                                                        WebkitBackdropFilter: 'blur(20px)',
+                                                        boxShadow: theme.palette.mode === 'dark'
+                                                            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                                         '& .MuiChip-label': {
-                                                            color: 'white'
+                                                            color: theme.palette.mode === 'dark' ? 'white' : 'black'
                                                         }
                                                     }}
                                                 />

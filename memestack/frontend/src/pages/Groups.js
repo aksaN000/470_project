@@ -156,24 +156,37 @@ const Groups = () => {
                     flexDirection: 'column',
                     cursor: 'pointer',
                     background: mode === 'dark'
-                        ? 'rgba(255, 255, 255, 0.05)'
-                        : 'rgba(255, 255, 255, 0.9)',
-                    backdropFilter: 'blur(20px)',
+                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                    backdropFilter: 'blur(50px)',
+                    WebkitBackdropFilter: 'blur(50px)',
                     border: mode === 'dark'
-                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                        : '1px solid rgba(99, 102, 241, 0.1)',
+                        ? '2px solid rgba(255, 255, 255, 0.3)'
+                        : '2px solid rgba(0, 0, 0, 0.15)',
+                    borderTop: mode === 'dark'
+                        ? '3px solid rgba(255, 255, 255, 0.4)'
+                        : '3px solid rgba(0, 0, 0, 0.2)',
                     borderRadius: '20px',
+                    boxShadow: mode === 'dark'
+                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                        : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                     '&:hover': {
                         transform: 'translateY(-8px)',
-                        boxShadow: mode === 'dark'
-                            ? '0 20px 40px rgba(99, 102, 241, 0.3)'
-                            : '0 20px 40px rgba(99, 102, 241, 0.2)',
+                        background: mode === 'dark'
+                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
                         border: mode === 'dark'
-                            ? '1px solid rgba(99, 102, 241, 0.3)'
-                            : '1px solid rgba(99, 102, 241, 0.2)',
-                    }
+                            ? '2px solid rgba(255, 255, 255, 0.4)'
+                            : '2px solid rgba(0, 0, 0, 0.25)',
+                        borderTop: mode === 'dark'
+                            ? '3px solid rgba(255, 255, 255, 0.5)'
+                            : '3px solid rgba(0, 0, 0, 0.3)',
+                        boxShadow: mode === 'dark'
+                            ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                            : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                    },
                 }}
                 onClick={() => navigate(`/groups/${group.slug}`)}
             >
@@ -231,16 +244,35 @@ const Groups = () => {
                                     label={group.privacy.replace('_', ' ')}
                                     size="small"
                                     sx={{
-                                        background: getPrivacyColor(group.privacy) === 'success' 
-                                            ? `linear-gradient(135deg, ${currentThemeColors?.primary || '#10b981'}, ${currentThemeColors?.secondary || '#059669'})`
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                        backdropFilter: 'blur(20px)',
+                                        WebkitBackdropFilter: 'blur(20px)',
+                                        border: mode === 'dark'
+                                            ? '1px solid rgba(255, 255, 255, 0.3)'
+                                            : '1px solid rgba(0, 0, 0, 0.2)',
+                                        color: getPrivacyColor(group.privacy) === 'success' 
+                                            ? '#10b981'
                                             : getPrivacyColor(group.privacy) === 'error'
-                                            ? `linear-gradient(135deg, ${currentThemeColors?.accent || '#ef4444'}, #dc2626)`
+                                            ? '#ef4444'
                                             : getPrivacyColor(group.privacy) === 'warning'
-                                            ? `linear-gradient(135deg, ${currentThemeColors?.tertiary || '#f59e0b'}, #d97706)`
-                                            : `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}, ${currentThemeColors?.secondary || '#8b5cf6'})`,
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        '& .MuiChip-icon': { color: 'white' },
+                                            ? '#f59e0b'
+                                            : '#6366f1',
+                                        fontWeight: 700,
+                                        fontSize: '0.75rem',
+                                        boxShadow: mode === 'dark'
+                                            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                        '& .MuiChip-icon': { 
+                                            color: getPrivacyColor(group.privacy) === 'success' 
+                                                ? '#10b981'
+                                                : getPrivacyColor(group.privacy) === 'error'
+                                                ? '#ef4444'
+                                                : getPrivacyColor(group.privacy) === 'warning'
+                                                ? '#f59e0b'
+                                                : '#6366f1'
+                                        },
                                     }}
                                 />
                             </Box>
@@ -410,15 +442,38 @@ const Groups = () => {
                                     p: 4,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    backdropFilter: 'blur(50px)',
+                                    WebkitBackdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.3)'
+                                        : '2px solid rgba(0, 0, 0, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.4)'
+                                        : '3px solid rgba(0, 0, 0, 0.2)',
                                     borderRadius: '24px',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                        : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                        border: mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.4)'
+                                            : '2px solid rgba(0, 0, 0, 0.25)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.5)'
+                                            : '3px solid rgba(0, 0, 0, 0.3)',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                            : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                    },
                                     '&::before': {
                                         content: '""',
                                         position: 'absolute',
@@ -525,14 +580,36 @@ const Groups = () => {
                             sx={{
                                 mb: 4,
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(40px)',
+                                WebkitBackdropFilter: 'blur(40px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
                                 borderRadius: '20px',
+                                boxShadow: mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 overflow: 'hidden',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                },
                             }}
                         >
                             <Tabs 
@@ -567,13 +644,35 @@ const Groups = () => {
                                     p: 3,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    backdropFilter: 'blur(40px)',
+                                    WebkitBackdropFilter: 'blur(40px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.3)'
+                                        : '2px solid rgba(0, 0, 0, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.4)'
+                                        : '3px solid rgba(0, 0, 0, 0.2)',
                                     borderRadius: '20px',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                        : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                        border: mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.4)'
+                                            : '2px solid rgba(0, 0, 0, 0.25)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.5)'
+                                            : '3px solid rgba(0, 0, 0, 0.3)',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                            : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                    },
                                 }}
                             >
                                 <Box display="flex" gap={2} flexWrap="wrap">
@@ -663,14 +762,20 @@ const Groups = () => {
                                 sx={{
                                     mb: 3,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(40px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
                                     borderRadius: '12px',
                                     overflow: 'hidden',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                        : '0 8px 30px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 }}
                             >
                                 <LinearProgress 
@@ -701,13 +806,19 @@ const Groups = () => {
                                     p: 8,
                                     textAlign: 'center',
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
                                     borderRadius: '20px',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                        : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                 }}
                             >
                                 <GroupsIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
@@ -754,13 +865,19 @@ const Groups = () => {
                                     sx={{
                                         p: 2,
                                         background: mode === 'dark'
-                                            ? 'rgba(255, 255, 255, 0.05)'
-                                            : 'rgba(255, 255, 255, 0.9)',
-                                        backdropFilter: 'blur(20px)',
+                                            ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                        backdropFilter: 'blur(40px)',
                                         border: mode === 'dark'
-                                            ? '1px solid rgba(255, 255, 255, 0.1)'
-                                            : '1px solid rgba(99, 102, 241, 0.1)',
+                                            ? '2px solid rgba(255, 255, 255, 0.15)'
+                                            : '2px solid rgba(99, 102, 241, 0.15)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.25)'
+                                            : '3px solid rgba(99, 102, 241, 0.25)',
                                         borderRadius: '16px',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                            : '0 8px 30px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                     }}
                                 >
                                     <Box display="flex" alignItems="center" gap={2}>

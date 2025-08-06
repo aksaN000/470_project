@@ -214,11 +214,19 @@ const ModerationDashboard = () => {
                         elevation={0}
                         sx={{
                             background: mode === 'dark' 
-                                ? 'rgba(255, 255, 255, 0.08)'
-                                : 'rgba(255, 255, 255, 0.25)',
-                            backdropFilter: 'blur(20px)',
+                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                            backdropFilter: 'blur(50px)',
                             borderRadius: 3,
-                            border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'}`,
+                            border: mode === 'dark'
+                                ? '2px solid rgba(255, 255, 255, 0.15)'
+                                : '2px solid rgba(99, 102, 241, 0.15)',
+                            borderTop: mode === 'dark'
+                                ? '3px solid rgba(255, 255, 255, 0.25)'
+                                : '3px solid rgba(99, 102, 241, 0.25)',
+                            boxShadow: mode === 'dark'
+                                ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                             p: { xs: 2, md: 4 }
                         }}
                     >
@@ -277,7 +285,24 @@ const ModerationDashboard = () => {
             )}
 
             {/* Reports Table */}
-            <Card>
+            <Card
+                sx={{
+                    background: mode === 'dark'
+                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+                    backdropFilter: 'blur(40px)',
+                    border: mode === 'dark'
+                        ? '2px solid rgba(255, 255, 255, 0.1)'
+                        : '2px solid rgba(99, 102, 241, 0.1)',
+                    borderTop: mode === 'dark'
+                        ? '3px solid rgba(255, 255, 255, 0.15)'
+                        : '3px solid rgba(99, 102, 241, 0.15)',
+                    borderRadius: '16px',
+                    boxShadow: mode === 'dark'
+                        ? '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                        : '0 12px 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                }}
+            >
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={activeTab} onChange={handleTabChange}>
                         <Tab label="All Reports" />
@@ -338,15 +363,51 @@ const ModerationDashboard = () => {
                                         <TableCell>
                                             <Chip
                                                 label={report.priority}
-                                                color={getPriorityColor(report.priority)}
                                                 size="small"
+                                                sx={{
+                                                    background: mode === 'dark'
+                                                        ? getPriorityColor(report.priority) === 'error' 
+                                                            ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%)'
+                                                            : getPriorityColor(report.priority) === 'warning'
+                                                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.3) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
+                                                        : getPriorityColor(report.priority) === 'error' 
+                                                            ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)'
+                                                            : getPriorityColor(report.priority) === 'warning'
+                                                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(217, 119, 6, 0.9) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    border: mode === 'dark'
+                                                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                                                        : '1px solid rgba(255, 255, 255, 0.3)',
+                                                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'white',
+                                                    fontWeight: 600,
+                                                }}
                                             />
                                         </TableCell>
                                         <TableCell>
                                             <Chip
                                                 label={report.status.replace('_', ' ')}
-                                                color={getStatusColor(report.status)}
                                                 size="small"
+                                                sx={{
+                                                    background: mode === 'dark'
+                                                        ? getStatusColor(report.status) === 'success' 
+                                                            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(5, 150, 105, 0.3) 100%)'
+                                                            : getStatusColor(report.status) === 'warning'
+                                                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(217, 119, 6, 0.3) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
+                                                        : getStatusColor(report.status) === 'success' 
+                                                            ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%)'
+                                                            : getStatusColor(report.status) === 'warning'
+                                                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(217, 119, 6, 0.9) 100%)'
+                                                            : 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    border: mode === 'dark'
+                                                        ? '1px solid rgba(255, 255, 255, 0.15)'
+                                                        : '1px solid rgba(255, 255, 255, 0.3)',
+                                                    color: mode === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'white',
+                                                    fontWeight: 600,
+                                                }}
                                             />
                                         </TableCell>
                                         <TableCell>

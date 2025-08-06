@@ -266,15 +266,38 @@ const TemplateManager = () => {
                                     p: 4,
                                     mb: 4,
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    backdropFilter: 'blur(50px)',
+                                    WebkitBackdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.3)'
+                                        : '2px solid rgba(0, 0, 0, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.4)'
+                                        : '3px solid rgba(0, 0, 0, 0.2)',
                                     borderRadius: '24px',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                        : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                        border: mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.4)'
+                                            : '2px solid rgba(0, 0, 0, 0.25)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.5)'
+                                            : '3px solid rgba(0, 0, 0, 0.3)',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                            : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                    },
                                     '&::before': {
                                         content: '""',
                                         position: 'absolute',
@@ -372,14 +395,36 @@ const TemplateManager = () => {
                             elevation={0}
                             sx={{
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                backdropFilter: 'blur(50px)',
+                                WebkitBackdropFilter: 'blur(50px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? '2px solid rgba(255, 255, 255, 0.3)'
+                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.4)'
+                                    : '3px solid rgba(0, 0, 0, 0.2)',
                                 borderRadius: '20px',
+                                boxShadow: mode === 'dark'
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                 p: 4,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                    border: mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.4)'
+                                        : '2px solid rgba(0, 0, 0, 0.25)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.5)'
+                                        : '3px solid rgba(0, 0, 0, 0.3)',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                        : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                },
                             }}
                         >
             {/* Alerts */}
@@ -449,7 +494,43 @@ const TemplateManager = () => {
                     <Grid container spacing={3}>
                         {templates.map((template) => (
                             <Grid item xs={12} sm={6} md={4} lg={3} key={template._id}>
-                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                <Card sx={{ 
+                                    height: '100%', 
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    background: mode === 'dark'
+                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    backdropFilter: 'blur(40px)',
+                                    WebkitBackdropFilter: 'blur(40px)',
+                                    border: mode === 'dark'
+                                        ? '2px solid rgba(255, 255, 255, 0.3)'
+                                        : '2px solid rgba(0, 0, 0, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.4)'
+                                        : '3px solid rgba(0, 0, 0, 0.2)',
+                                    borderRadius: '16px',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                        : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                    transition: 'all 0.3s ease',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        transform: 'translateY(-4px)',
+                                        background: mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                        border: mode === 'dark'
+                                            ? '2px solid rgba(255, 255, 255, 0.4)'
+                                            : '2px solid rgba(0, 0, 0, 0.25)',
+                                        borderTop: mode === 'dark'
+                                            ? '3px solid rgba(255, 255, 255, 0.5)'
+                                            : '3px solid rgba(0, 0, 0, 0.3)',
+                                        boxShadow: mode === 'dark'
+                                            ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                            : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                                    },
+                                }}>
                                     <CardMedia
                                         component="img"
                                         height="200"
@@ -469,6 +550,22 @@ const TemplateManager = () => {
                                                 label={template.category}
                                                 size="small"
                                                 icon={<CategoryIcon />}
+                                                sx={{
+                                                    background: mode === 'dark'
+                                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                                    backdropFilter: 'blur(20px)',
+                                                    WebkitBackdropFilter: 'blur(20px)',
+                                                    border: mode === 'dark'
+                                                        ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                        : '1px solid rgba(0, 0, 0, 0.2)',
+                                                    color: mode === 'dark' ? 'white' : 'black',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.75rem',
+                                                    boxShadow: mode === 'dark'
+                                                        ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                        : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                }}
                                             />
                                             {template.isPublic ? (
                                                 <Chip
@@ -476,6 +573,22 @@ const TemplateManager = () => {
                                                     size="small"
                                                     color="success"
                                                     icon={<VisibilityIcon />}
+                                                    sx={{
+                                                        background: mode === 'dark'
+                                                            ? 'linear-gradient(145deg, rgba(0, 120, 0, 0.3) 0%, rgba(0, 100, 0, 0.1) 100%)'
+                                                            : 'linear-gradient(145deg, rgba(76, 175, 80, 0.8) 0%, rgba(76, 175, 80, 0.4) 100%)',
+                                                        backdropFilter: 'blur(20px)',
+                                                        WebkitBackdropFilter: 'blur(20px)',
+                                                        border: mode === 'dark'
+                                                            ? '1px solid rgba(76, 175, 80, 0.5)'
+                                                            : '1px solid rgba(76, 175, 80, 0.3)',
+                                                        color: mode === 'dark' ? '#4caf50' : 'white',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.75rem',
+                                                        boxShadow: mode === 'dark'
+                                                            ? 'inset 0 1px 0 rgba(76, 175, 80, 0.3)'
+                                                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                    }}
                                                 />
                                             ) : (
                                                 <Chip
@@ -483,6 +596,22 @@ const TemplateManager = () => {
                                                     size="small"
                                                     color="default"
                                                     icon={<VisibilityOffIcon />}
+                                                    sx={{
+                                                        background: mode === 'dark'
+                                                            ? 'linear-gradient(145deg, rgba(120, 120, 120, 0.3) 0%, rgba(100, 100, 100, 0.1) 100%)'
+                                                            : 'linear-gradient(145deg, rgba(158, 158, 158, 0.8) 0%, rgba(158, 158, 158, 0.4) 100%)',
+                                                        backdropFilter: 'blur(20px)',
+                                                        WebkitBackdropFilter: 'blur(20px)',
+                                                        border: mode === 'dark'
+                                                            ? '1px solid rgba(158, 158, 158, 0.5)'
+                                                            : '1px solid rgba(158, 158, 158, 0.3)',
+                                                        color: mode === 'dark' ? '#9e9e9e' : 'white',
+                                                        fontWeight: 700,
+                                                        fontSize: '0.75rem',
+                                                        boxShadow: mode === 'dark'
+                                                            ? 'inset 0 1px 0 rgba(158, 158, 158, 0.3)'
+                                                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                                    }}
                                                 />
                                             )}
                                         </Box>

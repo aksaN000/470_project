@@ -113,15 +113,21 @@ const BrowseUsers = () => {
                                     mb: 4,
                                     textAlign: 'center',
                                     background: mode === 'dark'
-                                        ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(255, 255, 255, 0.9)',
-                                    backdropFilter: 'blur(20px)',
+                                        ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                    backdropFilter: 'blur(50px)',
                                     border: mode === 'dark'
-                                        ? '1px solid rgba(255, 255, 255, 0.1)'
-                                        : '1px solid rgba(99, 102, 241, 0.1)',
+                                        ? '2px solid rgba(255, 255, 255, 0.15)'
+                                        : '2px solid rgba(99, 102, 241, 0.15)',
+                                    borderTop: mode === 'dark'
+                                        ? '3px solid rgba(255, 255, 255, 0.25)'
+                                        : '3px solid rgba(99, 102, 241, 0.25)',
                                     borderRadius: '24px',
                                     position: 'relative',
                                     overflow: 'hidden',
+                                    boxShadow: mode === 'dark'
+                                        ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                        : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                                     '&::before': {
                                         content: '""',
                                         position: 'absolute',
@@ -197,13 +203,19 @@ const BrowseUsers = () => {
                                 p: 3,
                                 mb: 4,
                                 background: mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(255, 255, 255, 0.9)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                backdropFilter: 'blur(50px)',
                                 border: mode === 'dark'
-                                    ? '1px solid rgba(255, 255, 255, 0.1)'
-                                    : '1px solid rgba(99, 102, 241, 0.1)',
+                                    ? '2px solid rgba(255, 255, 255, 0.15)'
+                                    : '2px solid rgba(99, 102, 241, 0.15)',
+                                borderTop: mode === 'dark'
+                                    ? '3px solid rgba(255, 255, 255, 0.25)'
+                                    : '3px solid rgba(99, 102, 241, 0.25)',
                                 borderRadius: '20px',
+                                boxShadow: mode === 'dark'
+                                    ? '0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                                    : '0 20px 60px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 0 1px rgba(99, 102, 241, 0.1)',
                             }}
                         >
                             <Grid container spacing={3} alignItems="center">
@@ -304,8 +316,15 @@ const BrowseUsers = () => {
                         p: 8,
                         textAlign: 'center',
                         background: mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.05)'
-                            : 'rgba(255, 255, 255, 0.9)',
+                            ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                        backdropFilter: 'blur(50px)',
+                        border: mode === 'dark'
+                            ? '2px solid rgba(255, 255, 255, 0.15)'
+                            : '2px solid rgba(99, 102, 241, 0.15)',
+                        borderTop: mode === 'dark'
+                            ? '3px solid rgba(255, 255, 255, 0.25)'
+                            : '3px solid rgba(99, 102, 241, 0.25)',
                         backdropFilter: 'blur(20px)',
                         border: mode === 'dark'
                             ? '1px solid rgba(255, 255, 255, 0.1)'
@@ -334,21 +353,27 @@ const BrowseUsers = () => {
                                             height: '100%',
                                             cursor: 'pointer',
                                             background: mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(255, 255, 255, 0.9)',
-                                            backdropFilter: 'blur(20px)',
+                                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)'
+                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+                                            backdropFilter: 'blur(40px)',
                                             border: mode === 'dark'
-                                                ? '1px solid rgba(255, 255, 255, 0.1)'
-                                                : '1px solid rgba(99, 102, 241, 0.1)',
+                                                ? '2px solid rgba(255, 255, 255, 0.1)'
+                                                : '2px solid rgba(99, 102, 241, 0.1)',
+                                            borderTop: mode === 'dark'
+                                                ? '3px solid rgba(255, 255, 255, 0.15)'
+                                                : '3px solid rgba(99, 102, 241, 0.15)',
                                             borderRadius: '20px',
+                                            boxShadow: mode === 'dark'
+                                                ? '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                                                : '0 12px 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
                                             transition: 'all 0.3s ease',
                                             '&:hover': {
-                                                transform: 'translateY(-8px)',
+                                                transform: 'translateY(-8px) scale(1.02)',
                                                 boxShadow: mode === 'dark'
-                                                    ? '0 20px 40px rgba(99, 102, 241, 0.3)'
-                                                    : '0 20px 40px rgba(99, 102, 241, 0.2)',
+                                                    ? '0 24px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                    : '0 24px 60px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                                                 border: mode === 'dark'
-                                                    ? `1px solid ${currentThemeColors?.primary || '#6366f1'}50`
+                                                    ? `2px solid ${currentThemeColors?.primary || '#6366f1'}50`
                                                     : `1px solid ${currentThemeColors?.primary || '#6366f1'}30`,
                                             },
                                         }}

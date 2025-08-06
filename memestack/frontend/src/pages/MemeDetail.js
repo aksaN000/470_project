@@ -25,7 +25,8 @@ import {
     Select,
     MenuItem,
     Alert,
-    Snackbar
+    Snackbar,
+    useTheme
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -48,6 +49,7 @@ const MemeDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated } = useAuth();
+    const theme = useTheme();
     
     const [meme, setMeme] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -237,7 +239,39 @@ const MemeDetail = () => {
             <Grid container spacing={3}>
                 {/* Meme Image and Details */}
                 <Grid item xs={12}>
-                    <Card>
+                    <Card sx={{
+                        background: theme.palette.mode === 'dark'
+                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                        backdropFilter: 'blur(50px)',
+                        WebkitBackdropFilter: 'blur(50px)',
+                        border: theme.palette.mode === 'dark'
+                            ? '2px solid rgba(255, 255, 255, 0.3)'
+                            : '2px solid rgba(0, 0, 0, 0.15)',
+                        borderTop: theme.palette.mode === 'dark'
+                            ? '3px solid rgba(255, 255, 255, 0.4)'
+                            : '3px solid rgba(0, 0, 0, 0.2)',
+                        borderRadius: '20px',
+                        boxShadow: theme.palette.mode === 'dark'
+                            ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                            : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            background: theme.palette.mode === 'dark'
+                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
+                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                            border: theme.palette.mode === 'dark'
+                                ? '2px solid rgba(255, 255, 255, 0.4)'
+                                : '2px solid rgba(0, 0, 0, 0.25)',
+                            borderTop: theme.palette.mode === 'dark'
+                                ? '3px solid rgba(255, 255, 255, 0.5)'
+                                : '3px solid rgba(0, 0, 0, 0.3)',
+                            boxShadow: theme.palette.mode === 'dark'
+                                ? '0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                                : '0 16px 48px rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                        },
+                    }}>
                         <CardMedia
                             component="img"
                             image={meme.imageUrl}
@@ -284,7 +318,23 @@ const MemeDetail = () => {
                                     label={meme.category} 
                                     color="primary" 
                                     size="small"
-                                    sx={{ mr: 1 }}
+                                    sx={{ 
+                                        mr: 1,
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                        backdropFilter: 'blur(20px)',
+                                        WebkitBackdropFilter: 'blur(20px)',
+                                        border: theme.palette.mode === 'dark'
+                                            ? '1px solid rgba(255, 255, 255, 0.3)'
+                                            : '1px solid rgba(0, 0, 0, 0.2)',
+                                        color: theme.palette.primary.main,
+                                        fontWeight: 700,
+                                        fontSize: '0.75rem',
+                                        boxShadow: theme.palette.mode === 'dark'
+                                            ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                            : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                    }}
                                 />
                                 {meme.tags?.map((tag, index) => (
                                     <Chip 
@@ -292,7 +342,24 @@ const MemeDetail = () => {
                                         label={tag} 
                                         variant="outlined" 
                                         size="small"
-                                        sx={{ mr: 1, mb: 1 }}
+                                        sx={{ 
+                                            mr: 1, 
+                                            mb: 1,
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%)',
+                                            backdropFilter: 'blur(20px)',
+                                            WebkitBackdropFilter: 'blur(20px)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.3)'
+                                                : '1px solid rgba(0, 0, 0, 0.2)',
+                                            color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                            fontWeight: 700,
+                                            fontSize: '0.75rem',
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? 'inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+                                                : 'inset 0 1px 0 rgba(255, 255, 255, 0.6)',
+                                        }}
                                     />
                                 ))}
                             </Box>
