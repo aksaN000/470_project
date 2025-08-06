@@ -944,10 +944,10 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                 🎨 Meme Editor
             </Typography>
 
-            <Grid container spacing={3}>
-                {/* Canvas Area */}
-                <Grid item xs={12} md={8}>
-                    <Paper elevation={3} sx={{ p: 2, textAlign: 'center' }}>
+            {/* First Row - Canvas Always Centered */}
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Paper elevation={3} sx={{ p: 2, textAlign: 'center', maxWidth: '800px', width: '100%' }}>
                         <canvas
                             ref={canvasRef}
                             onMouseDown={handleCanvasMouseDown}
@@ -999,9 +999,12 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                         </Box>
                     </Paper>
                 </Grid>
+            </Grid>
 
+            {/* Second Row - Edit Options Organized */}
+            <Grid container spacing={3}>
                 {/* Controls Panel */}
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12}>
                     <Paper elevation={3} sx={{ p: 2 }}>
                         <Typography variant="h6" gutterBottom>
                             🎨 Meme Creator Tools
@@ -1351,7 +1354,17 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                         <Typography variant="h6" gutterBottom>
                                             🎭 Image Effects
                                         </Typography>
-                                        
+                                        <Typography variant="caption" display="block" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                            💡 Adjust image appearance with filters and transformations
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+
+                                <Accordion>
+                                    <AccordionSummary expandIcon={<ExpandMore />}>
+                                        <Typography>🔆 Lighting & Color</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <Typography gutterBottom>Brightness: {imageEffects.brightness}%</Typography>
                                         <Slider
                                             value={imageEffects.brightness}
@@ -1369,7 +1382,14 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                             onChange={(e, value) => updateImageEffect('contrast', value)}
                                             sx={{ mb: 2 }}
                                         />
+                                    </AccordionDetails>
+                                </Accordion>
 
+                                <Accordion sx={{ mt: 1 }}>
+                                    <AccordionSummary expandIcon={<ExpandMore />}>
+                                        <Typography>🎨 Effects & Transforms</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <Typography gutterBottom>Blur: {imageEffects.blur}px</Typography>
                                         <Slider
                                             value={imageEffects.blur}
@@ -1419,8 +1439,8 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                         >
                                             Reset Effects
                                         </Button>
-                                    </CardContent>
-                                </Card>
+                                    </AccordionDetails>
+                                </Accordion>
                             </Box>
                         )}
 
@@ -1478,26 +1498,44 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                         <Typography variant="h6" gutterBottom>
                                             🔺 Add Shapes
                                         </Typography>
-                                        
+                                        <Typography variant="caption" display="block" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                            💡 Add geometric shapes and lines to your meme
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+
+                                <Accordion>
+                                    <AccordionSummary expandIcon={<ExpandMore />}>
+                                        <Typography>🎨 Shape Tools</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                                             {drawingTools.map((tool) => (
                                                 <Button
                                                     key={tool}
                                                     variant="outlined"
                                                     onClick={() => addShape(tool)}
-                                                    sx={{ textTransform: 'capitalize' }}
+                                                    sx={{ textTransform: 'capitalize', flex: '1 1 45%' }}
                                                 >
                                                     {tool}
                                                 </Button>
                                             ))}
                                         </Box>
+                                    </AccordionDetails>
+                                </Accordion>
 
+                                <Accordion sx={{ mt: 1 }}>
+                                    <AccordionSummary expandIcon={<ExpandMore />}>
+                                        <Typography>🎯 Shape Properties</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <TextField
+                                            fullWidth
                                             label="Shape Color"
                                             type="color"
                                             value={shapeColor}
                                             onChange={(e) => setShapeColor(e.target.value)}
-                                            sx={{ mr: 1, mb: 2, width: '48%' }}
+                                            sx={{ mb: 2 }}
                                         />
 
                                         <Typography gutterBottom>Shape Opacity: {shapeOpacity}%</Typography>
@@ -1508,8 +1546,8 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                             onChange={(e, value) => setShapeOpacity(value)}
                                             sx={{ mb: 2 }}
                                         />
-                                    </CardContent>
-                                </Card>
+                                    </AccordionDetails>
+                                </Accordion>
                             </Box>
                         )}
 
@@ -1521,7 +1559,17 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                         <Typography variant="h6" gutterBottom>
                                             📋 Meme Templates
                                         </Typography>
-                                        
+                                        <Typography variant="caption" display="block" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                            💡 Apply popular meme text layouts and color schemes
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+
+                                <Accordion>
+                                    <AccordionSummary expandIcon={<ExpandMore />}>
+                                        <Typography>📝 Text Templates</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
                                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                             {memeTemplatePresets.map((template) => (
                                                 <Button
@@ -1534,10 +1582,10 @@ const MemeEditor = ({ imageUrl, onSave, onCancel }) => {
                                                 </Button>
                                             ))}
                                         </Box>
-                                    </CardContent>
-                                </Card>
+                                    </AccordionDetails>
+                                </Accordion>
 
-                                <Accordion>
+                                <Accordion sx={{ mt: 1 }}>
                                     <AccordionSummary expandIcon={<ExpandMore />}>
                                         <Typography>🎨 Color Palettes</Typography>
                                     </AccordionSummary>
