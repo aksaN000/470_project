@@ -572,10 +572,12 @@ collaborationSchema.statics.getTrending = function() {
 
 // Static method to get user collaborations
 collaborationSchema.statics.getUserCollaborations = function(userId) {
+    // Always compare userId as string to avoid ObjectId mismatch
+    const userIdStr = typeof userId === 'string' ? userId : userId.toString();
     return this.find({
         $or: [
-            { owner: userId },
-            { 'collaborators.user': userId }
+            { owner: userIdStr },
+            { 'collaborators.user': userIdStr, status: { $ne: 'draft' } }
         ]
     })
     .sort({ updatedAt: -1 })

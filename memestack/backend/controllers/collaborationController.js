@@ -510,10 +510,18 @@ const getUserCollaborations = async (req, res) => {
     try {
         const userId = req.user._id || req.user.userId;
         const collaborations = await Collaboration.getUserCollaborations(userId);
-        res.json(collaborations);
+        res.json({
+            success: true,
+            collaborations,
+            total: collaborations.length
+        });
     } catch (error) {
         console.error('Error getting user collaborations:', error);
-        res.status(500).json({ message: 'Error fetching user collaborations', error: error.message });
+        res.status(500).json({ 
+            success: false,
+            message: 'Error fetching user collaborations', 
+            error: error.message 
+        });
     }
 };
 
