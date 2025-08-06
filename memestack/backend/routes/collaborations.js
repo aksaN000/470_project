@@ -16,12 +16,17 @@ const {
     getTrendingCollaborations,
     getUserCollaborations,
     getMemeRemixes,
-    deleteCollaboration
+    deleteCollaboration,
+    removeCollaborator,
+    acceptInvite,
+    declineInvite,
+    updateCollaboratorRole,
+    getPendingInvites
 } = require('../controllers/collaborationController');
 const { protect: auth } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
-// Validation middleware
+// Validation middleware for creation
 const validateCollaboration = [
     body('title')
         .trim()
@@ -54,11 +59,53 @@ const validateCollaboration = [
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log('❌ Collaboration validation failed:', errors.array());
+            console.log('Request body:', req.body);
             return res.status(400).json({ 
                 message: 'Validation failed', 
                 errors: errors.array() 
             });
         }
+        console.log('✅ Collaboration validation passed');
+        next();
+    }
+];
+
+// Validation middleware for updates (only validate provided fields)
+const validateCollaborationUpdate = [
+    body('title')
+        .optional()
+        .trim()
+        .isLength({ min: 3, max: 200 })
+        .withMessage('Title must be between 3 and 200 characters'),
+    body('description')
+        .optional()
+        .trim()
+        .isLength({ max: 1000 })
+        .withMessage('Description cannot exceed 1000 characters'),
+    body('type')
+        .optional()
+        .isIn(['remix', 'collaboration', 'template_creation', 'challenge_response'])
+        .withMessage('Invalid collaboration type'),
+    body('status')
+        .optional()
+        .isIn(['draft', 'active', 'reviewing', 'completed'])
+        .withMessage('Invalid status'),
+    body('settings.maxCollaborators')
+        .optional()
+        .isInt({ min: 2, max: 50 })
+        .withMessage('Max collaborators must be between 2 and 50'),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log('❌ Collaboration update validation failed:', errors.array());
+            console.log('Request body:', req.body);
+            return res.status(400).json({ 
+                message: 'Validation failed', 
+                errors: errors.array() 
+            });
+        }
+        console.log('✅ Collaboration update validation passed');
         next();
     }
 ];
@@ -191,7 +238,7 @@ router.use(auth); // All routes below require authentication
 
 // Collaboration management
 router.post('/', validateCollaboration, createCollaboration);
-router.put('/:id', validateCollaboration, updateCollaboration);
+router.put('/:id', auth, validateCollaborationUpdate, updateCollaboration);
 router.delete('/:id', deleteCollaboration);
 
 // Participation
@@ -207,5 +254,14 @@ router.post('/:id/comments', validateComment, addComment);
 
 // User collaborations
 router.get('/user/collaborations', getUserCollaborations);
+router.get('/user/invites', getPendingInvites);
+
+// Collaboration management (admin actions)
+router.delete('/:id/collaborators/:collaboratorId', removeCollaborator);
+router.put('/:id/collaborators/:collaboratorId/role', updateCollaboratorRole);
+
+// Invite management
+router.post('/:id/invites/accept', acceptInvite);
+router.post('/:id/invites/decline', declineInvite);
 
 module.exports = router;

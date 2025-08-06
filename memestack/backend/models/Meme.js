@@ -288,7 +288,7 @@ memeSchema.virtual('isLikedBy').get(function() {
 
 // Get formatted creation date
 memeSchema.virtual('createdAtFormatted').get(function() {
-    return this.createdAt.toLocaleDateString();
+    return this.createdAt ? this.createdAt.toLocaleDateString() : 'N/A';
 });
 
 // ========================================

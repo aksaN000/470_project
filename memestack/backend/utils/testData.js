@@ -2,6 +2,7 @@
 const User = require('../models/User');
 const Meme = require('../models/Meme');
 const Follow = require('../models/Follow');
+const Collaboration = require('../models/Collaboration');
 const bcrypt = require('bcryptjs');
 
 async function createTestData() {
@@ -257,6 +258,87 @@ async function createTestData() {
         console.log('🎨 New template created:', template2.name, 'by', user2.username);
         console.log('🎨 New template created:', template3.name, 'by', user1.username);
         console.log('✅ Created 3 sample templates');
+
+        // Create sample collaborations
+        console.log('🤝 Creating sample collaborations...');
+
+        const collaboration1 = new Collaboration({
+            title: 'Epic Cat Remix Project',
+            description: 'A fun collaboration to remix the funny cat meme with new captions',
+            type: 'remix',
+            owner: user1._id,
+            originalMeme: meme1._id,
+            settings: {
+                isPublic: true,
+                allowForks: true,
+                requireApproval: false,
+                maxCollaborators: 5,
+                allowAnonymous: false
+            },
+            tags: ['funny', 'cats', 'remix'],
+            status: 'active',
+            stats: {
+                totalViews: 45,
+                totalContributors: 2,
+                totalComments: 3,
+                totalForks: 1
+            }
+        });
+
+        const collaboration2 = new Collaboration({
+            title: 'Gaming Meme Collaboration',
+            description: 'Collaborative project to create the ultimate gaming meme',
+            type: 'collaboration',
+            owner: user2._id,
+            originalMeme: meme2._id,
+            settings: {
+                isPublic: true,
+                allowForks: true,
+                requireApproval: true,
+                maxCollaborators: 8,
+                allowAnonymous: false
+            },
+            tags: ['gaming', 'collab', 'epic'],
+            status: 'active',
+            stats: {
+                totalViews: 78,
+                totalContributors: 3,
+                totalComments: 8,
+                totalForks: 2
+            }
+        });
+
+        const collaboration3 = new Collaboration({
+            title: 'Reaction Meme Workshop',
+            description: 'Open workshop for creating reaction memes',
+            type: 'template_creation',
+            owner: user1._id,
+            originalMeme: meme3._id,
+            settings: {
+                isPublic: true,
+                allowForks: true,
+                requireApproval: false,
+                maxCollaborators: 15,
+                allowAnonymous: true
+            },
+            tags: ['reaction', 'template', 'workshop'],
+            status: 'active',
+            stats: {
+                totalViews: 23,
+                totalContributors: 1,
+                totalComments: 1,
+                totalForks: 0
+            }
+        });
+
+        await collaboration1.save();
+        await collaboration2.save();
+        await collaboration3.save();
+
+        console.log('🤝 New collaboration created:', collaboration1.title, 'by', user1.username);
+        console.log('🤝 New collaboration created:', collaboration2.title, 'by', user2.username);
+        console.log('🤝 New collaboration created:', collaboration3.title, 'by', user1.username);
+        console.log('✅ Created 3 sample collaborations');
 
         console.log('🎉 Test data created successfully!');
         console.log('📧 Test accounts:');

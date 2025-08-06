@@ -1043,7 +1043,9 @@ export const collaborationsAPI = {
     // Fork collaboration
     forkCollaboration: async (id, title) => {
         try {
-            const response = await API.post(`/collaborations/${id}/fork`, { title });
+            // Only send title if it's not empty (let backend generate default title)
+            const body = title && title.trim() ? { title: title.trim() } : {};
+            const response = await API.post(`/collaborations/${id}/fork`, body);
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fork collaboration' };
@@ -1057,6 +1059,56 @@ export const collaborationsAPI = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to add comment' };
+        }
+    },
+
+    // Remove collaborator (admin only)
+    removeCollaborator: async (id, collaboratorId) => {
+        try {
+            const response = await API.delete(`/collaborations/${id}/collaborators/${collaboratorId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to remove collaborator' };
+        }
+    },
+
+    // Update collaborator role (admin only)
+    updateCollaboratorRole: async (id, collaboratorId, role) => {
+        try {
+            const response = await API.put(`/collaborations/${id}/collaborators/${collaboratorId}/role`, { role });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update collaborator role' };
+        }
+    },
+
+    // Accept collaboration invite
+    acceptInvite: async (id) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/invites/accept`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to accept invite' };
+        }
+    },
+
+    // Decline collaboration invite
+    declineInvite: async (id) => {
+        try {
+            const response = await API.post(`/collaborations/${id}/invites/decline`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to decline invite' };
+        }
+    },
+
+    // Get user's pending invites
+    getPendingInvites: async () => {
+        try {
+            const response = await API.get('/collaborations/user/invites');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to get pending invites' };
         }
     },
 

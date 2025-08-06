@@ -20,11 +20,16 @@ const getCollaborations = async (req, res) => {
             search
         } = req.query;
 
-        // Build filter object
-        const filter = { 'settings.isPublic': true };
+        // Build filter object - Only show published public collaborations
+        const filter = { 
+            'settings.isPublic': true,
+            status: { $ne: 'draft' } // Exclude drafts from public view
+        };
+        
+        console.log('🔍 getCollaborations - Filter before type/status:', filter);
         
         if (type) filter.type = type;
-        if (status) filter.status = status;
+        if (status) filter.status = status; // Allow status filtering on top of the base filter
         
         if (search) {
             filter.$or = [
@@ -33,6 +38,8 @@ const getCollaborations = async (req, res) => {
                 { tags: { $in: [new RegExp(search, 'i')] } }
             ];
         }
+        
+        console.log('🔍 getCollaborations - Final filter:', filter);
 
         // Build sort object
         let sortObj = {};
@@ -61,6 +68,16 @@ const getCollaborations = async (req, res) => {
             .lean();
 
         const total = await Collaboration.countDocuments(filter);
+        
+        console.log('🔍 getCollaborations - Results:');
+        console.log('   Found collaborations:', collaborations.length);
+        console.log('   Total count:', total);
+        console.log('   Collaborations data:', collaborations.map(c => ({
+            id: c._id,
+            title: c.title,
+            type: c.type,
+            settings: c.settings
+        })));
 
         res.json({
             collaborations,
@@ -78,7 +95,7 @@ const getCollaborations = async (req, res) => {
 const getCollaborationById = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user?.id;
+        const userId = req.user?._id || req.user?.userId; // Fix: use _id instead of id
         
         const collaboration = await Collaboration.findById(id)
             .populate('owner', 'username profile.displayName profile.avatar stats.totalMemes')
@@ -131,7 +148,10 @@ const getCollaborationById = async (req, res) => {
 // Create new collaboration
 const createCollaboration = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId; // Fix: use _id instead of id
+        console.log('Creating collaboration for user:', userId); // Debug log
+        console.log('Request body:', req.body); // Debug log
+        
         const {
             title,
             description,
@@ -193,7 +213,23 @@ const createCollaboration = async (req, res) => {
             tags: Array.isArray(tags) ? tags : []
         });
 
+        console.log('Collaboration object before save:', {
+            title: collaboration.title,
+            type: collaboration.type,
+            owner: collaboration.owner,
+            originalMeme: collaboration.originalMeme,
+            settings: collaboration.settings
+        }); // Debug log
+
         await collaboration.save();
+        
+        console.log('✅ Collaboration saved successfully:', {
+            id: collaboration._id,
+            title: collaboration.title,
+            isPublic: collaboration.settings.isPublic,
+            type: collaboration.type,
+            owner: collaboration.owner
+        });
         
         // Populate created collaboration
         const populatedCollaboration = await Collaboration.findById(collaboration._id)
@@ -213,7 +249,7 @@ const createCollaboration = async (req, res) => {
 const updateCollaboration = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId;
         const updates = req.body;
 
         const collaboration = await Collaboration.findById(id);
@@ -233,13 +269,15 @@ const updateCollaboration = async (req, res) => {
         delete updates.versions;
         delete updates.stats;
 
-        Object.assign(collaboration, updates);
-        await collaboration.save();
-
-        const updatedCollaboration = await Collaboration.findById(id)
-            .populate('owner', 'username profile.displayName profile.avatar')
-            .populate('originalMeme', 'title imageUrl')
-            .populate('finalMeme', 'title imageUrl');
+        // Use findByIdAndUpdate to avoid full validation on partial updates
+        const updatedCollaboration = await Collaboration.findByIdAndUpdate(
+            id, 
+            { $set: updates }, 
+            { new: true, runValidators: false } // Skip validation for partial updates
+        )
+        .populate('owner', 'username profile.displayName profile.avatar')
+        .populate('originalMeme', 'title imageUrl')
+        .populate('finalMeme', 'title imageUrl');
 
         res.json(updatedCollaboration);
     } catch (error) {
@@ -252,7 +290,7 @@ const updateCollaboration = async (req, res) => {
 const joinCollaboration = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId;
         const { message } = req.body;
 
         const collaboration = await Collaboration.findById(id);
@@ -303,7 +341,7 @@ const inviteUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { username, role = 'contributor', message = '' } = req.body;
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId;
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
@@ -334,13 +372,23 @@ const inviteUser = async (req, res) => {
 const createVersion = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        console.log('🔍 Create version - req.user:', req.user);
+        console.log('🔍 Create version - req.user._id:', req.user?._id);
+        console.log('🔍 Create version - req.user.userId:', req.user?.userId);
+        
+        const userId = req.user._id || req.user.userId;
         const { title, memeId, changes = [], description = '' } = req.body;
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
             return res.status(404).json({ message: 'Collaboration not found' });
         }
+
+        console.log('🔍 Collaboration owner:', collaboration.owner);
+        console.log('🔍 User ID:', userId);
+        console.log('🔍 User ID type:', typeof userId);
+        console.log('🔍 Owner ID type:', typeof collaboration.owner);
+        console.log('🔍 isCollaborator result:', collaboration.isCollaborator(userId));
 
         // Check if user is collaborator
         if (!collaboration.isCollaborator(userId)) {
@@ -377,8 +425,18 @@ const createVersion = async (req, res) => {
 const forkCollaboration = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        console.log('🔍 Full request object keys:', Object.keys(req));
+        console.log('🔍 User object details:', req.user);
+        console.log('🔍 User object type:', typeof req.user);
+        console.log('🔍 User _id:', req.user?._id);
+        console.log('🔍 User userId:', req.user?.userId);
+        console.log('🔍 User id:', req.user?.id);
+        
+        const userId = req.user?._id || req.user?.userId || req.user?.id;
         const { title } = req.body;
+        
+        console.log('🍴 Fork request:', { collaborationId: id, userId, title });
+        console.log('🔍 Final userId value:', userId, 'type:', typeof userId);
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
@@ -408,8 +466,18 @@ const forkCollaboration = async (req, res) => {
 const addComment = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        console.log('🔍 Comment - Full request object keys:', Object.keys(req));
+        console.log('🔍 Comment - User object details:', req.user);
+        console.log('🔍 Comment - User object type:', typeof req.user);
+        console.log('🔍 Comment - User _id:', req.user?._id);
+        console.log('🔍 Comment - User userId:', req.user?.userId);
+        console.log('🔍 Comment - User id:', req.user?.id);
+        
+        const userId = req.user?._id || req.user?.userId || req.user?.id;
         const { content, versionNumber, elementId } = req.body;
+        
+        console.log('💬 Comment request:', { collaborationId: id, userId, content });
+        console.log('🔍 Final userId value:', userId, 'type:', typeof userId);
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
@@ -437,21 +505,10 @@ const addComment = async (req, res) => {
     }
 };
 
-// Get trending collaborations
-const getTrendingCollaborations = async (req, res) => {
-    try {
-        const collaborations = await Collaboration.getTrending();
-        res.json(collaborations);
-    } catch (error) {
-        console.error('Error getting trending collaborations:', error);
-        res.status(500).json({ message: 'Error fetching trending collaborations', error: error.message });
-    }
-};
-
 // Get user's collaborations
 const getUserCollaborations = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId;
         const collaborations = await Collaboration.getUserCollaborations(userId);
         res.json(collaborations);
     } catch (error) {
@@ -468,7 +525,8 @@ const getMemeRemixes = async (req, res) => {
         const remixes = await Collaboration.find({
             originalMeme: memeId,
             type: 'remix',
-            'settings.isPublic': true
+            'settings.isPublic': true,
+            status: { $ne: 'draft' } // Exclude drafts from public remixes
         })
         .populate('owner', 'username profile.displayName profile.avatar')
         .populate('finalMeme', 'title imageUrl stats.likes stats.views')
@@ -485,7 +543,7 @@ const getMemeRemixes = async (req, res) => {
 const deleteCollaboration = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id || req.user.userId;
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
@@ -512,6 +570,191 @@ const deleteCollaboration = async (req, res) => {
     }
 };
 
+// Get trending collaborations
+const getTrendingCollaborations = async (req, res) => {
+    try {
+        const collaborations = await Collaboration.find({ 
+            'settings.isPublic': true,
+            status: { $in: ['active', 'completed'] }
+        })
+        .sort({ 
+            'stats.totalViews': -1,
+            'stats.totalContributors': -1,
+            'stats.totalComments': -1,
+            updatedAt: -1
+        })
+        .limit(20)
+        .populate('owner', 'username profile.avatar')
+        .populate('collaborators.user', 'username profile.avatar')
+        .populate('originalMeme', 'title imageUrl')
+        .populate('challenge', 'title description')
+        .lean();
+
+        console.log('🔍 getTrendingCollaborations - Results:');
+        console.log('   Found trending collaborations:', collaborations.length);
+        console.log('   Trending data:', collaborations.map(c => ({
+            id: c._id,
+            title: c.title,
+            type: c.type,
+            stats: c.stats
+        })));
+
+        res.json({ 
+            success: true,
+            data: collaborations || []
+        });
+    } catch (error) {
+        console.error('Error fetching trending collaborations:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Error fetching trending collaborations', 
+            data: []
+        });
+    }
+};
+
+// Remove collaborator
+const removeCollaborator = async (req, res) => {
+    try {
+        const { id, collaboratorId } = req.params;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        // Check if user has permission to remove collaborators (owner or admin)
+        if (!collaboration.isOwner(userId) && !collaboration.canUserInvite(userId)) {
+            return res.status(403).json({ message: 'Permission denied' });
+        }
+
+        await collaboration.removeCollaborator(collaboratorId);
+
+        const updatedCollaboration = await Collaboration.findById(id)
+            .populate('owner', 'username profile.displayName profile.avatar')
+            .populate('collaborators.user', 'username profile.displayName profile.avatar')
+            .populate('originalMeme', 'title imageUrl');
+
+        res.json(updatedCollaboration);
+    } catch (error) {
+        console.error('Error removing collaborator:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Accept collaboration invite
+const acceptInvite = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        await collaboration.acceptInvite(userId);
+
+        const updatedCollaboration = await Collaboration.findById(id)
+            .populate('owner', 'username profile.displayName profile.avatar')
+            .populate('collaborators.user', 'username profile.displayName profile.avatar')
+            .populate('originalMeme', 'title imageUrl');
+
+        res.json({ message: 'Invite accepted successfully', collaboration: updatedCollaboration });
+    } catch (error) {
+        console.error('Error accepting invite:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Decline collaboration invite
+const declineInvite = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        await collaboration.declineInvite(userId);
+
+        res.json({ message: 'Invite declined successfully' });
+    } catch (error) {
+        console.error('Error declining invite:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Update collaborator role
+const updateCollaboratorRole = async (req, res) => {
+    try {
+        const { id, collaboratorId } = req.params;
+        const { role } = req.body;
+        const userId = req.user._id || req.user.userId;
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        // Check if user has permission to update roles (owner or admin)
+        if (!collaboration.isOwner(userId) && !collaboration.canUserInvite(userId)) {
+            return res.status(403).json({ message: 'Permission denied' });
+        }
+
+        await collaboration.updateCollaboratorRole(collaboratorId, role);
+
+        const updatedCollaboration = await Collaboration.findById(id)
+            .populate('owner', 'username profile.displayName profile.avatar')
+            .populate('collaborators.user', 'username profile.displayName profile.avatar')
+            .populate('originalMeme', 'title imageUrl');
+
+        res.json(updatedCollaboration);
+    } catch (error) {
+        console.error('Error updating collaborator role:', error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+// Get user's pending invites
+const getPendingInvites = async (req, res) => {
+    try {
+        const userId = req.user._id || req.user.userId;
+
+        const collaborations = await Collaboration.find({
+            'pendingInvites.user': userId
+        })
+        .populate('owner', 'username profile.displayName profile.avatar')
+        .populate('originalMeme', 'title imageUrl')
+        .populate('pendingInvites.invitedBy', 'username profile.displayName profile.avatar');
+
+        const invites = collaborations.map(collab => {
+            const userInvite = collab.pendingInvites.find(invite => 
+                invite.user.toString() === userId
+            );
+            return {
+                collaboration: {
+                    _id: collab._id,
+                    title: collab.title,
+                    description: collab.description,
+                    type: collab.type,
+                    owner: collab.owner,
+                    originalMeme: collab.originalMeme
+                },
+                invite: userInvite
+            };
+        });
+
+        res.json(invites);
+    } catch (error) {
+        console.error('Error getting pending invites:', error);
+        res.status(500).json({ message: 'Error getting pending invites', error: error.message });
+    }
+};
+
 module.exports = {
     getCollaborations,
     getCollaborationById,
@@ -525,5 +768,10 @@ module.exports = {
     getTrendingCollaborations,
     getUserCollaborations,
     getMemeRemixes,
-    deleteCollaboration
+    deleteCollaboration,
+    removeCollaborator,
+    acceptInvite,
+    declineInvite,
+    updateCollaboratorRole,
+    getPendingInvites
 };

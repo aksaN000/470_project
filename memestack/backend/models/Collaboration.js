@@ -320,29 +320,58 @@ collaborationSchema.index({ createdAt: -1 });
 
 // Virtual for getting current version
 collaborationSchema.virtual('currentVersion').get(function() {
+    if (!this.versions || this.versions.length === 0) {
+        return null;
+    }
     return this.versions.find(v => v.isCurrent) || this.versions[this.versions.length - 1];
 });
 
-// Virtual for checking if user is collaborator
-collaborationSchema.virtual('isCollaborator').get(function() {
-    return function(userId) {
-        return this.collaborators.some(collab => 
-            collab.user.toString() === userId.toString()
-        ) || this.owner.toString() === userId.toString();
-    }.bind(this);
-});
+// Instance method to check if user is collaborator
+collaborationSchema.methods.isCollaborator = function(userId) {
+    // Owner is always considered a collaborator
+    if (this.owner.toString() === userId.toString()) {
+        return true;
+    }
+    
+    // Check if user is in collaborators list
+    return this.collaborators.some(collab => 
+        collab.user.toString() === userId.toString()
+    );
+};
 
-// Virtual for getting user role
-collaborationSchema.virtual('getUserRole').get(function() {
-    return function(userId) {
-        if (this.owner.toString() === userId.toString()) return 'owner';
-        
-        const collaborator = this.collaborators.find(collab => 
-            collab.user.toString() === userId.toString()
-        );
-        return collaborator ? collaborator.role : null;
-    }.bind(this);
-});
+// Instance method to check if user is owner
+collaborationSchema.methods.isOwner = function(userId) {
+    return this.owner.toString() === userId.toString();
+};
+
+// Instance method to get user role
+collaborationSchema.methods.getUserRole = function(userId) {
+    if (this.isOwner(userId)) return 'owner';
+    
+    const collaborator = this.collaborators.find(collab => 
+        collab.user.toString() === userId.toString()
+    );
+    
+    return collaborator ? collaborator.role : null;
+};
+
+// Instance method to check if user can edit
+collaborationSchema.methods.canUserEdit = function(userId) {
+    const role = this.getUserRole(userId);
+    return ['owner', 'admin', 'editor'].includes(role);
+};
+
+// Instance method to check if user can create versions
+collaborationSchema.methods.canUserCreateVersions = function(userId) {
+    const role = this.getUserRole(userId);
+    return ['owner', 'admin', 'editor', 'contributor'].includes(role);
+};
+
+// Instance method to check if user can invite others
+collaborationSchema.methods.canUserInvite = function(userId) {
+    const role = this.getUserRole(userId);
+    return ['owner', 'admin', 'editor'].includes(role);
+};
 
 // Instance method to add collaborator
 collaborationSchema.methods.addCollaborator = function(userId, role = 'contributor', permissions = []) {
@@ -360,6 +389,80 @@ collaborationSchema.methods.addCollaborator = function(userId, role = 'contribut
         permissions 
     });
     this.stats.totalContributors = this.collaborators.length + 1; // +1 for owner
+    return this.save();
+};
+
+// Instance method to remove collaborator
+collaborationSchema.methods.removeCollaborator = function(userId) {
+    const initialLength = this.collaborators.length;
+    this.collaborators = this.collaborators.filter(collab => 
+        collab.user.toString() !== userId.toString()
+    );
+    
+    if (this.collaborators.length === initialLength) {
+        throw new Error('User is not a collaborator');
+    }
+    
+    this.stats.totalContributors = this.collaborators.length + 1; // +1 for owner
+    return this.save();
+};
+
+// Instance method to update collaborator role
+collaborationSchema.methods.updateCollaboratorRole = function(userId, newRole) {
+    const collaborator = this.collaborators.find(collab => 
+        collab.user.toString() === userId.toString()
+    );
+    
+    if (!collaborator) {
+        throw new Error('User is not a collaborator');
+    }
+    
+    collaborator.role = newRole;
+    return this.save();
+};
+
+// Instance method to accept invite
+collaborationSchema.methods.acceptInvite = function(userId) {
+    const inviteIndex = this.pendingInvites.findIndex(invite => 
+        invite.user.toString() === userId.toString()
+    );
+    
+    if (inviteIndex === -1) {
+        throw new Error('No pending invite found');
+    }
+    
+    const invite = this.pendingInvites[inviteIndex];
+    this.pendingInvites.splice(inviteIndex, 1);
+    
+    return this.addCollaborator(userId, invite.role);
+};
+
+// Instance method to decline invite
+collaborationSchema.methods.declineInvite = function(userId) {
+    const inviteIndex = this.pendingInvites.findIndex(invite => 
+        invite.user.toString() === userId.toString()
+    );
+    
+    if (inviteIndex === -1) {
+        throw new Error('No pending invite found');
+    }
+    
+    this.pendingInvites.splice(inviteIndex, 1);
+    return this.save();
+};
+
+// Instance method to add comment
+collaborationSchema.methods.addComment = function(userId, content, versionNumber = null, elementId = null) {
+    const comment = {
+        user: userId,
+        content,
+        versionNumber,
+        elementId,
+        createdAt: new Date()
+    };
+    
+    this.comments.push(comment);
+    this.stats.totalComments = this.comments.length;
     return this.save();
 };
 
@@ -427,11 +530,30 @@ collaborationSchema.methods.fork = function(newOwner, title) {
         owner: newOwner,
         parentCollaboration: this._id,
         originalMeme: this.originalMeme,
+        challenge: this.challenge,
+        group: this.group,
+        status: 'active',
         settings: {
             ...this.settings,
             maxCollaborators: Math.min(this.settings.maxCollaborators, 10)
         },
-        tags: [...this.tags]
+        remixInfo: {
+            ...this.remixInfo
+        },
+        tags: [...(this.tags || [])],
+        collaborators: [],
+        pendingInvites: [],
+        versions: [],
+        comments: [],
+        stats: {
+            totalContributors: 1,
+            totalViews: 0,
+            totalForks: 0,
+            totalVersions: 0,
+            totalLikes: 0,
+            totalComments: 0,
+            completionRate: 0
+        }
     });
 };
 

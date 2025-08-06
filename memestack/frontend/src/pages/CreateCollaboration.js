@@ -46,6 +46,7 @@ const CreateCollaboration = () => {
     const { mode } = useThemeMode() || { mode: 'light' };
     
     const [loading, setLoading] = useState(false);
+    const [loadingOptions, setLoadingOptions] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [activeStep, setActiveStep] = useState(0);
@@ -84,22 +85,63 @@ const CreateCollaboration = () => {
 
     const loadOptions = async () => {
         try {
+            setLoadingOptions(true);
+            console.log('Loading options for collaboration...');
+            
             // Load user's memes for remixing
             const memesResponse = await memeAPI.getMyMemes();
-            console.log('🎭 Loaded memes:', memesResponse);
-            setMemes(memesResponse.memes || []);
+            console.log('Memes API response:', memesResponse);
+            
+            // Fix: Access the correct nested structure - try multiple possible structures
+            const memesList = memesResponse.data?.memes || 
+                             memesResponse.memes || 
+                             memesResponse.data || 
+                             (Array.isArray(memesResponse) ? memesResponse : []);
+            
+            console.log('Processed memes list:', memesList);
+            console.log('Sample meme object:', memesList[0]);
+            
+            // Normalize meme objects to ensure they have proper IDs
+            const normalizedMemes = memesList.map((meme, index) => {
+                if (!meme) return null;
+                
+                // Handle different possible ID field names - backend returns 'id', not '_id'
+                const memeId = meme._id || meme.id || meme.memeId || `temp-id-${index}`;
+                
+                return {
+                    ...meme,
+                    _id: memeId, // Normalize to _id for consistency in frontend
+                    id: memeId,
+                    title: meme.title || meme.name || 'Untitled Meme',
+                    imageUrl: meme.imageUrl || meme.image || meme.url
+                };
+            }).filter(Boolean);
+            
+            console.log('Normalized memes:', normalizedMemes);
+            setMemes(normalizedMemes);
 
             // Load available challenges
-            const challengesResponse = await challengesAPI.getChallenges({ status: 'active' });
-            console.log('🏆 Loaded challenges:', challengesResponse);
-            setChallenges(challengesResponse.challenges || []);
+            try {
+                const challengesResponse = await challengesAPI.getChallenges({ status: 'active' });
+                setChallenges(challengesResponse.challenges || challengesResponse.data || []);
+            } catch (challengeError) {
+                console.warn('Could not load challenges:', challengeError);
+                setChallenges([]);
+            }
 
             // Load user's groups
-            const groupsResponse = await groupsAPI.getUserGroups();
-            console.log('👥 Loaded groups:', groupsResponse);
-            setGroups(groupsResponse.groups || []);
+            try {
+                const groupsResponse = await groupsAPI.getUserGroups();
+                setGroups(groupsResponse.groups || groupsResponse.data || []);
+            } catch (groupError) {
+                console.warn('Could not load groups:', groupError);
+                setGroups([]);
+            }
         } catch (error) {
             console.error('Error loading options:', error);
+            setError('Failed to load collaboration options. Please try refreshing the page.');
+        } finally {
+            setLoadingOptions(false);
         }
     };
 
@@ -130,6 +172,14 @@ const CreateCollaboration = () => {
             if (!formData.title.trim()) {
                 throw new Error('Title is required');
             }
+            
+            if (formData.title.trim().length < 3) {
+                throw new Error('Title must be at least 3 characters long');
+            }
+            
+            if (formData.title.trim().length > 200) {
+                throw new Error('Title cannot exceed 200 characters');
+            }
 
             if (formData.type === 'remix' && !formData.originalMeme) {
                 throw new Error('Original meme is required for remixes');
@@ -138,8 +188,6 @@ const CreateCollaboration = () => {
             if (formData.type === 'challenge_response' && !formData.challenge) {
                 throw new Error('Challenge is required for challenge responses');
             }
-
-            console.log('🚀 Creating collaboration with data:', formData);
 
             // Clean the data - remove empty strings for optional fields
             const cleanedData = {
@@ -150,13 +198,47 @@ const CreateCollaboration = () => {
                 description: formData.description.trim() || undefined
             };
 
-            console.log('🧹 Cleaned data:', cleanedData);
+            // Remove undefined values to avoid sending them to the API
+            Object.keys(cleanedData).forEach(key => {
+                if (cleanedData[key] === undefined) {
+                    delete cleanedData[key];
+                }
+            });
+
+            console.log('Data being sent to API:', cleanedData);
+            console.log('Original meme ID type:', typeof cleanedData.originalMeme);
+            console.log('Original meme ID value:', cleanedData.originalMeme);
+            console.log('Original meme ID length:', cleanedData.originalMeme?.length);
+            console.log('Settings:', cleanedData.settings);
+
+            // Validate ObjectId format before sending (24 character hex string)
+            if (cleanedData.originalMeme && !/^[0-9a-fA-F]{24}$/.test(cleanedData.originalMeme)) {
+                throw new Error(`Invalid meme ID format: ${cleanedData.originalMeme}. Must be a 24-character hexadecimal string.`);
+            }
 
             // Create collaboration
             const collaboration = await collaborationsAPI.createCollaboration(cleanedData);
             
-            console.log('✅ Collaboration created:', collaboration);
             setSuccess('Collaboration created successfully!');
+            
+            // Clear form data
+            setFormData({
+                title: '',
+                description: '',
+                type: searchParams.get('type') || 'collaboration',
+                originalMeme: '',
+                challenge: '',
+                group: '',
+                settings: {
+                    isPublic: true,
+                    allowForks: true,
+                    requireApproval: false,
+                    maxCollaborators: 10,
+                    allowAnonymous: false,
+                    deadline: ''
+                },
+                tags: []
+            });
             
             // Redirect to the new collaboration
             setTimeout(() => {
@@ -164,12 +246,38 @@ const CreateCollaboration = () => {
             }, 1500);
 
         } catch (error) {
-            console.error('❌ Error creating collaboration:', error);
-            setError(
-                error.message || 
-                error.errors?.map(e => e.msg).join(', ') ||
-                'Failed to create collaboration. Please check all required fields.'
-            );
+            console.error('Full error object:', error);
+            console.error('Error response:', error.response);
+            console.error('Error data:', error.response?.data);
+            console.error('Error status:', error.response?.status);
+            
+            let errorMessage = 'Failed to create collaboration. Please check all required fields.';
+            
+            if (error.response?.data) {
+                if (typeof error.response.data === 'string') {
+                    errorMessage = error.response.data;
+                } else if (error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data.error) {
+                    errorMessage = error.response.data.error;
+                } else if (error.response.data.errors) {
+                    if (Array.isArray(error.response.data.errors)) {
+                        // Handle express-validator errors
+                        const validationErrors = error.response.data.errors.map(e => e.msg || e.message || e).join(', ');
+                        errorMessage = `Validation failed: ${validationErrors}`;
+                    } else {
+                        errorMessage = JSON.stringify(error.response.data.errors);
+                    }
+                } else {
+                    // Try to extract any error message from the data object
+                    errorMessage = JSON.stringify(error.response.data);
+                }
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            console.error('Final error message:', errorMessage);
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -187,7 +295,9 @@ const CreateCollaboration = () => {
                         onChange={(e) => handleInputChange('title', e.target.value)}
                         margin="normal"
                         required
-                        placeholder="Give your collaboration a catchy title"
+                        placeholder="Give your collaboration a catchy title (3-200 characters)"
+                        helperText={`${formData.title.length}/200 characters (minimum 3)`}
+                        error={formData.title.length > 0 && formData.title.length < 3}
                     />
 
                     <TextField
@@ -202,11 +312,12 @@ const CreateCollaboration = () => {
                     />
 
                     <FormControl fullWidth margin="normal" required>
-                        <InputLabel>Collaboration Type</InputLabel>
+                        <InputLabel id="collaboration-type-label">Collaboration Type</InputLabel>
                         <Select
-                            value={formData.type}
+                            labelId="collaboration-type-label"
+                            value={formData.type || ''}
                             label="Collaboration Type"
-                            onChange={(e) => handleInputChange('type', e.target.value)}
+                            onChange={(e) => handleInputChange('type', e.target.value || '')}
                         >
                             <MenuItem value="collaboration">General Collaboration</MenuItem>
                             <MenuItem value="remix">Meme Remix</MenuItem>
@@ -222,9 +333,17 @@ const CreateCollaboration = () => {
                         value={formData.tags}
                         onChange={(e, newValue) => handleInputChange('tags', newValue)}
                         renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                                <Chip key={index} label={option} {...getTagProps({ index })} />
-                            ))
+                            value.map((option, index) => {
+                                const tagProps = getTagProps({ index });
+                                const { key, ...otherProps } = tagProps;
+                                return (
+                                    <Chip 
+                                        key={`tag-${index}-${option}`}
+                                        label={option} 
+                                        {...otherProps} 
+                                    />
+                                );
+                            })
                         }
                         renderInput={(params) => (
                             <TextField
@@ -251,26 +370,210 @@ const CreateCollaboration = () => {
                     )}
 
                     {formData.type === 'remix' && (
-                        <FormControl fullWidth margin="normal" required>
-                            <InputLabel>Original Meme to Remix</InputLabel>
-                            <Select
-                                value={formData.originalMeme}
-                                label="Original Meme to Remix"
-                                onChange={(e) => handleInputChange('originalMeme', e.target.value)}
-                            >
-                                {memes.length === 0 ? (
-                                    <MenuItem disabled>
-                                        No memes available - Create some memes first!
-                                    </MenuItem>
-                                ) : (
-                                    memes.map((meme) => (
-                                        <MenuItem key={meme._id} value={meme._id}>
-                                            {meme.title}
+                        <Box>
+                            {/* Info about meme selection */}
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                <Typography variant="body2">
+                                    🎭 <strong>Remix Collaboration:</strong> Choose one of your own memes as the starting point. 
+                                    Other collaborators will be able to create variations and improvements based on your original.
+                                </Typography>
+                            </Alert>
+                            
+                            <FormControl fullWidth margin="normal" required>
+                                <InputLabel id="original-meme-label">
+                                    Original Meme to Remix
+                                </InputLabel>
+                                <Select
+                                    labelId="original-meme-label"
+                                    value={formData.originalMeme || ''}
+                                    label="Original Meme to Remix"
+                                    onChange={(e) => {
+                                        const selectedValue = e.target.value || '';
+                                        console.log('Meme selected:', selectedValue);
+                                        console.log('Available memes:', memes);
+                                        
+                                        setFormData(prev => {
+                                            const newData = {
+                                                ...prev,
+                                                originalMeme: selectedValue
+                                            };
+                                            console.log('Updated form data:', newData);
+                                            return newData;
+                                        });
+                                    }}
+                                    disabled={loadingOptions}
+                                    displayEmpty
+                                    renderValue={(selected) => {
+                                        if (!selected || selected === '') {
+                                            return <em>Select a meme to remix</em>;
+                                        }
+                                        const selectedMeme = memes.find(m => m._id === selected);
+                                        console.log('Rendering value for:', selected, selectedMeme);
+                                        return (
+                                            <Box display="flex" alignItems="center" gap={1}>
+                                                {selectedMeme && selectedMeme.imageUrl && (
+                                                    <img 
+                                                        src={selectedMeme.imageUrl} 
+                                                        alt={selectedMeme.title || 'Meme'}
+                                                        style={{ 
+                                                            width: 24, 
+                                                            height: 24, 
+                                                            objectFit: 'cover',
+                                                            borderRadius: 4
+                                                        }}
+                                                        onError={(e) => {
+                                                            console.error('Image failed to load:', selectedMeme.imageUrl);
+                                                            e.target.style.display = 'none';
+                                                        }}
+                                                    />
+                                                )}
+                                                <span>{selectedMeme ? (selectedMeme.title || 'Untitled Meme') : 'Unknown meme'}</span>
+                                            </Box>
+                                        );
+                                    }}
+                                >
+                                    {loadingOptions ? (
+                                        <MenuItem disabled>
+                                            <CircularProgress size={20} sx={{ mr: 1 }} />
+                                            Loading your memes...
                                         </MenuItem>
-                                    ))
-                                )}
-                            </Select>
-                        </FormControl>
+                                    ) : memes.length === 0 ? (
+                                        <MenuItem disabled value="">
+                                            No memes available - Create some memes first!
+                                        </MenuItem>
+                                    ) : (
+                                        memes.map((meme) => {
+                                            if (!meme || !meme._id) {
+                                                console.warn('Invalid meme object:', meme);
+                                                return null;
+                                            }
+                                            return (
+                                                <MenuItem 
+                                                    key={meme._id} 
+                                                    value={meme._id}
+                                                >
+                                                    <Box display="flex" alignItems="center" gap={1} width="100%">
+                                                        {meme.imageUrl && (
+                                                            <img 
+                                                                src={meme.imageUrl} 
+                                                                alt={meme.title || 'Meme'}
+                                                                style={{ 
+                                                                    width: 40, 
+                                                                    height: 40, 
+                                                                    objectFit: 'cover',
+                                                                    borderRadius: 4,
+                                                                    flexShrink: 0
+                                                                }}
+                                                                onError={(e) => {
+                                                                    console.error('Image failed to load:', meme.imageUrl);
+                                                                    e.target.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        )}
+                                                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                            <Typography variant="body2" noWrap>
+                                                                {meme.title || 'Untitled Meme'}
+                                                            </Typography>
+                                                            <Typography variant="caption" color="text.secondary" noWrap>
+                                                                {meme.description || 'No description'}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                </MenuItem>
+                                            );
+                                        }).filter(Boolean)
+                                    )}
+                                </Select>
+                            </FormControl>
+                            
+                            {/* Show currently selected meme */}
+                            {formData.originalMeme && (
+                                <Box sx={{ mt: 1, p: 2, bgcolor: 'success.light', borderRadius: 1 }}>
+                                    <Box display="flex" alignItems="center" gap={1} mb={1}>
+                                        {(() => {
+                                            const selectedMeme = memes.find(m => m._id === formData.originalMeme);
+                                            return selectedMeme ? (
+                                                <>
+                                                    <img 
+                                                        src={selectedMeme.imageUrl} 
+                                                        alt={selectedMeme.title}
+                                                        style={{ 
+                                                            width: 30, 
+                                                            height: 30, 
+                                                            objectFit: 'cover',
+                                                            borderRadius: 4
+                                                        }}
+                                                    />
+                                                    <Typography variant="body2" color="success.dark" sx={{ fontWeight: 'bold' }}>
+                                                        ✅ Selected: {selectedMeme.title || 'Untitled Meme'}
+                                                    </Typography>
+                                                </>
+                                            ) : (
+                                                <Typography variant="body2" color="success.dark" sx={{ fontWeight: 'bold' }}>
+                                                    ✅ Selected: Unknown meme
+                                                </Typography>
+                                            );
+                                        })()}
+                                    </Box>
+                                    <Typography variant="caption" color="success.dark">
+                                        ID: {formData.originalMeme}
+                                    </Typography>
+                                </Box>
+                            )}
+                            
+                            {/* Debug info for development */}
+                            {process.env.NODE_ENV === 'development' && (
+                                <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+                                    <Typography variant="caption" component="div">
+                                        Debug Info:
+                                    </Typography>
+                                    <Typography variant="caption" component="div">
+                                        - Memes loaded: {memes.length}
+                                    </Typography>
+                                    <Typography variant="caption" component="div">
+                                        - Loading: {loadingOptions ? 'Yes' : 'No'}
+                                    </Typography>
+                                    <Typography variant="caption" component="div">
+                                        - Selected meme ID: {formData.originalMeme || 'None'}
+                                    </Typography>
+                                    {memes.length > 0 && (
+                                        <>
+                                            <Typography variant="caption" component="div">
+                                                - First meme ID: {memes[0]?._id || 'Missing'}
+                                            </Typography>
+                                            <Typography variant="caption" component="div">
+                                                - First meme title: {memes[0]?.title || 'Missing'}
+                                            </Typography>
+                                            <Typography variant="caption" component="div">
+                                                - First meme raw: {JSON.stringify(memes[0], null, 2)}
+                                            </Typography>
+                                        </>
+                                    )}
+                                </Box>
+                            )}
+                            
+                            {/* Helper Actions Outside Select */}
+                            {memes.length === 0 && !loadingOptions && (
+                                <Box display="flex" gap={1} mt={1}>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => window.open('/meme-editor', '_blank')}
+                                        startIcon="🎨"
+                                    >
+                                        Create a new meme
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => loadOptions()}
+                                        startIcon="🔄"
+                                    >
+                                        Refresh meme list
+                                    </Button>
+                                </Box>
+                            )}
+                        </Box>
                     )}
 
                     {formData.type === 'template_creation' && (
@@ -283,11 +586,12 @@ const CreateCollaboration = () => {
 
                     {formData.type === 'challenge_response' && (
                         <FormControl fullWidth margin="normal" required>
-                            <InputLabel>Challenge</InputLabel>
+                            <InputLabel id="challenge-label">Challenge</InputLabel>
                             <Select
-                                value={formData.challenge}
+                                labelId="challenge-label"
+                                value={formData.challenge || ''}
                                 label="Challenge"
-                                onChange={(e) => handleInputChange('challenge', e.target.value)}
+                                onChange={(e) => handleInputChange('challenge', e.target.value || '')}
                             >
                                 {challenges.map((challenge) => (
                                     <MenuItem key={challenge._id} value={challenge._id}>
@@ -299,11 +603,12 @@ const CreateCollaboration = () => {
                     )}
 
                     <FormControl fullWidth margin="normal">
-                        <InputLabel>Group (Optional)</InputLabel>
+                        <InputLabel id="group-label">Group (Optional)</InputLabel>
                         <Select
-                            value={formData.group}
+                            labelId="group-label"
+                            value={formData.group || ''}
                             label="Group (Optional)"
-                            onChange={(e) => handleInputChange('group', e.target.value)}
+                            onChange={(e) => handleInputChange('group', e.target.value || '')}
                         >
                             <MenuItem value="">None</MenuItem>
                             {groups.map((group) => (
@@ -403,12 +708,28 @@ const CreateCollaboration = () => {
     const isStepValid = (stepIndex) => {
         switch (stepIndex) {
             case 0:
-                return formData.title.trim().length > 0;
+                // Basic Information - require title with proper length
+                return formData.title && 
+                       formData.title.trim().length >= 3 && 
+                       formData.title.trim().length <= 200;
             case 1:
-                if (formData.type === 'remix') return formData.originalMeme;
-                if (formData.type === 'challenge_response') return formData.challenge;
+                // Source Content - validate based on collaboration type
+                if (formData.type === 'remix') {
+                    const isValid = formData.originalMeme && formData.originalMeme.trim() !== '';
+                    console.log('Remix validation:', { 
+                        originalMeme: formData.originalMeme, 
+                        isValid,
+                        memesAvailable: memes.length 
+                    });
+                    return isValid;
+                }
+                if (formData.type === 'challenge_response') {
+                    return formData.challenge && formData.challenge.trim() !== '';
+                }
+                // For other types, this step is always valid
                 return true;
             case 2:
+                // Settings - always valid (all settings have defaults)
                 return true;
             default:
                 return false;
@@ -433,17 +754,17 @@ const CreateCollaboration = () => {
         }}>
             <Fade in timeout={800}>
                 <Container maxWidth="md">
-                    {error && (
-                        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-                            {error}
-                        </Alert>
-                    )}
+                        {error && (
+                            <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+                                {error}
+                            </Alert>
+                        )}
 
-                    {success && (
-                        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
-                            {success}
-                        </Alert>
-                    )}
+                        {success && (
+                            <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
+                                {success}
+                            </Alert>
+                        )}
 
                     <Paper
                         elevation={0}

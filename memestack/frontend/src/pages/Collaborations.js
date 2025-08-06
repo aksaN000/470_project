@@ -1,7 +1,7 @@
 // 🤝 Collaborations Page Component
 // Displays all collaborations, remixes, and collaborative projects
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Container,
     Typography,
@@ -21,13 +21,10 @@ import {
     Select,
     Avatar,
     LinearProgress,
-    IconButton,
-    Tooltip,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    Badge,
     AvatarGroup,
     Paper,
     Fade,
@@ -44,15 +41,16 @@ import {
     Star,
     Visibility,
     CallSplit,
-    Comment,
     Code,
     Palette,
-    ContentCopy
+    ContentCopy,
+    Notifications
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
-import api, { collaborationsAPI } from '../services/api';
+import { collaborationsAPI } from '../services/api';
+import PendingInvites from '../components/PendingInvites';
 
 const Collaborations = () => {
     const navigate = useNavigate();
@@ -69,6 +67,7 @@ const Collaborations = () => {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [invitesDialogOpen, setInvitesDialogOpen] = useState(false);
 
     const types = [
         { value: 'remix', label: 'Remix', icon: <Shuffle /> },
@@ -90,18 +89,24 @@ const Collaborations = () => {
         { value: 'active', label: 'Most Active' }
     ];
 
-    useEffect(() => {
-        fetchCollaborations();
-    }, [tabValue, searchTerm, typeFilter, statusFilter, sortBy, currentPage]);
-
-    const fetchCollaborations = async () => {
+    const fetchCollaborations = useCallback(async () => {
         try {
             setLoading(true);
             
             if (tabValue === 1) {
                 // Trending
                 const response = await collaborationsAPI.getTrending();
-                setCollaborations(response.data);
+                console.log('Trending response:', response);
+                console.log('🔍 Trending response structure:', {
+                    hasData: !!response?.data,
+                    hasSuccess: !!response?.success,
+                    responseKeys: Object.keys(response || {}),
+                    dataLength: response?.data?.length
+                });
+                
+                // Extract trending data - the backend returns { success: true, data: collaborations }
+                const data = response?.data || response?.collaborations || [];
+                setCollaborations(Array.isArray(data) ? data : []);
                 setLoading(false);
                 return;
             } else if (tabValue === 2) {
@@ -112,7 +117,18 @@ const Collaborations = () => {
                     return;
                 }
                 const response = await collaborationsAPI.getUserCollaborations();
-                setCollaborations(response.data);
+                console.log('User collaborations response:', response);
+                console.log('🔍 User collaborations response structure:', {
+                    hasData: !!response?.data,
+                    hasCollaborations: !!response?.collaborations,
+                    responseKeys: Object.keys(response || {}),
+                    dataLength: response?.data?.length,
+                    collaborationsLength: response?.collaborations?.length
+                });
+                
+                // Extract user collaborations data
+                const data = response?.data || response?.collaborations || [];
+                setCollaborations(Array.isArray(data) ? data : []);
                 setLoading(false);
                 return;
             }
@@ -129,14 +145,36 @@ const Collaborations = () => {
             if (statusFilter) paramsObj.status = statusFilter;
 
             const response = await collaborationsAPI.getCollaborations(paramsObj);
-            setCollaborations(response.data.collaborations);
-            setTotalPages(response.data.totalPages);
+            console.log('All collaborations response:', response);
+            console.log('🔍 Response structure:', {
+                hasCollaborations: !!response?.collaborations,
+                hasData: !!response?.data,
+                hasDataData: !!response?.data?.data,
+                responseKeys: Object.keys(response || {}),
+                collaborationsLength: response?.collaborations?.length,
+                dataLength: response?.data?.length
+            });
+            
+            // Extract collaborations data - the backend returns { collaborations, totalPages, currentPage, total }
+            const collaborationsData = response?.collaborations || response?.data?.collaborations || [];
+            const totalPagesData = response?.totalPages || response?.data?.totalPages || 1;
+            
+            setCollaborations(Array.isArray(collaborationsData) ? collaborationsData : []);
+            console.log('🔍 Set collaborations state:', collaborationsData);
+            console.log('🔍 Collaborations array length:', collaborationsData.length);
+            console.log('🔍 Loading state:', false);
+            setTotalPages(totalPagesData);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching collaborations:', error);
+            setCollaborations([]); // Ensure collaborations is always an array
             setLoading(false);
         }
-    };
+    }, [tabValue, searchTerm, typeFilter, statusFilter, sortBy, currentPage, user]);
+
+    useEffect(() => {
+        fetchCollaborations();
+    }, [fetchCollaborations]);
 
     const getTypeIcon = (type) => {
         const typeData = types.find(t => t.value === type);
@@ -150,6 +188,26 @@ const Collaborations = () => {
             case 'completed': return 'info';
             case 'draft': return 'default';
             default: return 'default';
+        }
+    };
+
+    const handlePublishDraft = async (collaborationId, event) => {
+        event.stopPropagation(); // Prevent card click navigation
+        try {
+            // Update to active status and ensure it's public
+            await collaborationsAPI.updateCollaboration(collaborationId, { 
+                status: 'active',
+                'settings.isPublic': true 
+            });
+            
+            // Refresh the collaborations list
+            fetchCollaborations();
+            
+            // You could add a success toast notification here
+            console.log('✅ Collaboration published successfully!');
+        } catch (error) {
+            console.error('❌ Error publishing collaboration:', error);
+            // You could add an error toast notification here
         }
     };
 
@@ -343,6 +401,30 @@ const Collaborations = () => {
                         </Typography>
                     </Box>
                 )}
+
+                {/* Publish Button for Draft Collaborations */}
+                {collaboration.status === 'draft' && user && collaboration.owner._id === user._id && (
+                    <Box mt={2} pt={2} borderTop="1px solid" borderColor="divider">
+                        <Button
+                            variant="contained"
+                            size="small"
+                            fullWidth
+                            onClick={(e) => handlePublishDraft(collaboration._id, e)}
+                            sx={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                color: 'white',
+                                fontWeight: 600,
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+                                    transform: 'translateY(-1px)',
+                                },
+                                transition: 'all 0.2s ease-in-out',
+                            }}
+                        >
+                            Publish Collaboration
+                        </Button>
+                    </Box>
+                )}
             </CardContent>
         </Card>
     );
@@ -493,9 +575,38 @@ const Collaborations = () => {
                                         </Typography>
                                     </Box>
                                     
-                                    {/* Absolutely positioned button */}
+                                    {/* Absolutely positioned buttons */}
                                     {user && (
-                                        <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
+                                        <Box sx={{ position: 'absolute', top: 0, right: 0, display: 'flex', gap: 1 }}>
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<Notifications />}
+                                                onClick={() => setInvitesDialogOpen(true)}
+                                                size="large"
+                                                sx={{
+                                                    background: mode === 'dark' 
+                                                        ? 'rgba(255, 255, 255, 0.1)'
+                                                        : 'rgba(255, 255, 255, 0.9)',
+                                                    backdropFilter: 'blur(10px)',
+                                                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                                                    borderRadius: '16px',
+                                                    px: 2,
+                                                    py: 1.5,
+                                                    textTransform: 'none',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 600,
+                                                    color: theme.palette.text.primary,
+                                                    '&:hover': {
+                                                        background: mode === 'dark' 
+                                                            ? 'rgba(255, 255, 255, 0.15)'
+                                                            : 'rgba(255, 255, 255, 1)',
+                                                        transform: 'translateY(-1px)',
+                                                    },
+                                                    transition: 'all 0.2s ease-in-out',
+                                                }}
+                                            >
+                                                Invites
+                                            </Button>
                                             <Button
                                                 variant="contained"
                                                 startIcon={<Add sx={{ color: 'inherit' }} />}
@@ -663,7 +774,10 @@ const Collaborations = () => {
                         )}
 
                         {/* Loading */}
-                        {loading && <LinearProgress sx={{ mb: 3 }} />}
+                        {(() => {
+                            console.log('🔍 Loading state check:', { loading });
+                            return loading ? <LinearProgress sx={{ mb: 3 }} /> : null;
+                        })()}
 
                         {/* Main Content Card */}
                         <Paper
@@ -680,37 +794,57 @@ const Collaborations = () => {
                         >
                             {/* Collaborations Grid */}
                             <Grid container spacing={3}>
-                                {collaborations.map((collaboration) => (
-                                    <Grid item xs={12} sm={6} md={4} key={collaboration._id}>
-                                        <CollaborationCard collaboration={collaboration} />
-                                    </Grid>
-                                ))}
+                                {(() => {
+                                    console.log('🔍 Render check:', {
+                                        loading,
+                                        collaborations: collaborations,
+                                        collaborationsLength: collaborations?.length,
+                                        collaborationsType: typeof collaborations,
+                                        isArray: Array.isArray(collaborations)
+                                    });
+                                    
+                                    return !loading && collaborations && collaborations.length > 0 ? collaborations.map((collaboration) => (
+                                        <Grid item xs={12} sm={6} md={4} key={collaboration._id}>
+                                            <CollaborationCard collaboration={collaboration} />
+                                        </Grid>
+                                    )) : null;
+                                })()}
                             </Grid>
 
                             {/* Empty State */}
-                            {!loading && collaborations.length === 0 && (
-                                <Box textAlign="center" py={6}>
-                                    <Handshake sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
-                                    <Typography variant="h5" color="text.secondary" gutterBottom>
-                                        No collaborations found
-                                    </Typography>
-                                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                                        {tabValue === 2 
-                                            ? "You haven't started any collaborations yet."
-                                            : "Be the first to start a collaborative project!"
-                                        }
-                                    </Typography>
-                                    {user && (
-                                        <Button
-                                            variant="contained"
-                                            startIcon={<Add sx={{ color: 'inherit' }} />}
-                                            onClick={() => setCreateDialogOpen(true)}
-                                        >
-                                            Start Collaboration
-                                        </Button>
-                                    )}
-                                </Box>
-                            )}
+                            {(() => {
+                                const shouldShowEmpty = !loading && (!collaborations || collaborations.length === 0);
+                                console.log('🔍 Empty state check:', {
+                                    loading,
+                                    collaborations: collaborations,
+                                    collaborationsLength: collaborations?.length,
+                                    shouldShowEmpty: shouldShowEmpty
+                                });
+                                
+                                return shouldShowEmpty ? (
+                                    <Box textAlign="center" py={6}>
+                                        <Handshake sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                                        <Typography variant="h5" color="text.secondary" gutterBottom>
+                                            No collaborations found
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                                            {tabValue === 2 
+                                                ? "You haven't started any collaborations yet."
+                                                : "Be the first to start a collaborative project!"
+                                            }
+                                        </Typography>
+                                        {user && (
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<Add sx={{ color: 'inherit' }} />}
+                                                onClick={() => setCreateDialogOpen(true)}
+                                            >
+                                                Start Collaboration
+                                            </Button>
+                                        )}
+                                    </Box>
+                                ) : null;
+                            })()}
                         </Paper>
 
                         {/* Pagination */}
@@ -735,6 +869,10 @@ const Collaborations = () => {
                         )}
 
                         <CreateCollaborationDialog />
+                        <PendingInvites 
+                            open={invitesDialogOpen} 
+                            onClose={() => setInvitesDialogOpen(false)} 
+                        />
                         </Paper>
                     </Box>
                 </Fade>
