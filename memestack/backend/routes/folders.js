@@ -74,16 +74,16 @@ router.get('/shared/:token', getSharedFolder);
 router.use(auth); // Apply auth middleware to all routes below
 
 // Folder CRUD operations
-router.post('/', createFolder);
-router.get('/', getUserFolders);
-router.get('/:id', getFolder);
-router.put('/:id', updateFolder);
-router.delete('/:id', deleteFolder);
+router.post('/', auth, createFolder);
+router.get('/', auth, getUserFolders);
+router.get('/:id', auth, getFolder);
+router.put('/:id', auth, updateFolder);
+router.delete('/:id', auth, deleteFolder);
 
 // Meme management within folders
-router.post('/:id/memes/:memeId', addMemeToFolder);
-router.delete('/:id/memes/:memeId', removeMemeFromFolder);
-router.post('/:id/memes/bulk', bulkAddMemesToFolder);
+router.post('/:id/memes/:memeId', auth, addMemeToFolder);
+router.delete('/:id/memes/:memeId', auth, removeMemeFromFolder);
+router.post('/:id/memes/bulk', auth, bulkAddMemesToFolder);
 
 // Sharing
 router.post('/:id/share', generateShareLink);

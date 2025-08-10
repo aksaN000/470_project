@@ -121,7 +121,10 @@ const getChallengeById = async (req, res) => {
 // Create new challenge
 const createChallenge = async (req, res) => {
     try {
-        const userId = req.user.id;
+        console.log('🏆 Creating challenge with data:', req.body);
+        console.log('🏆 User ID:', req.user._id);
+        
+        const userId = req.user._id;
         const {
             title,
             description,
@@ -138,39 +141,85 @@ const createChallenge = async (req, res) => {
             tags
         } = req.body;
 
-        // Validate end date
-        if (new Date(endDate) <= new Date()) {
-            return res.status(400).json({ message: 'End date must be in the future' });
+        // Validate required fields
+        if (!title || !title.trim()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed', 
+                errors: ['Title is required'] 
+            });
         }
 
+        if (!endDate) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed', 
+                errors: ['End date is required'] 
+            });
+        }
+
+        // Validate end date
+        if (new Date(endDate) <= new Date()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed', 
+                errors: ['End date must be in the future'] 
+            });
+        }
+
+        console.log('🏆 Creating challenge object...');
+
         const challenge = new Challenge({
-            title,
-            description,
+            title: title.trim(),
+            description: description ? description.trim() : '',
             creator: userId,
-            type,
-            category,
-            template,
+            type: type || 'challenge',
+            category: category || 'freestyle',
+            template: template || null,
             rules: Array.isArray(rules) ? rules : [],
             endDate: new Date(endDate),
-            maxParticipants: maxParticipants || 100,
+            maxParticipants: Math.max(2, parseInt(maxParticipants) || 100),
             isPublic: isPublic !== false,
             prizes: Array.isArray(prizes) ? prizes : [],
             votingSystem: votingSystem || { type: 'public' },
             judges: Array.isArray(judges) ? judges : [],
-            tags: Array.isArray(tags) ? tags : []
+            tags: Array.isArray(tags) ? tags : [],
+            status: 'active'
         });
 
+        console.log('🏆 Saving challenge...');
         await challenge.save();
         
+        console.log('🏆 Challenge saved, populating...');
         // Populate created challenge
         const populatedChallenge = await Challenge.findById(challenge._id)
             .populate('creator', 'username profile.displayName profile.avatar')
             .populate('template', 'name imageUrl');
 
-        res.status(201).json(populatedChallenge);
+        console.log('🏆 Challenge created successfully:', populatedChallenge._id);
+        res.status(201).json({
+            success: true,
+            data: populatedChallenge,
+            _id: populatedChallenge._id
+        });
     } catch (error) {
-        console.error('Error creating challenge:', error);
-        res.status(500).json({ message: 'Error creating challenge', error: error.message });
+        console.error('🟥 Error creating challenge:', error);
+        
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed', 
+                errors 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false,
+            message: 'Error creating challenge', 
+            error: error.message 
+        });
     }
 };
 
@@ -178,7 +227,7 @@ const createChallenge = async (req, res) => {
 const updateChallenge = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id;
         const updates = req.body;
 
         const challenge = await Challenge.findById(id);
@@ -222,7 +271,7 @@ const updateChallenge = async (req, res) => {
 const joinChallenge = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id;
 
         const challenge = await Challenge.findById(id);
         if (!challenge) {
@@ -243,7 +292,7 @@ const submitMeme = async (req, res) => {
     try {
         const { id } = req.params;
         const { memeId } = req.body;
-        const userId = req.user.id;
+        const userId = req.user._id;
 
         const challenge = await Challenge.findById(id);
         if (!challenge) {
@@ -273,7 +322,7 @@ const submitMeme = async (req, res) => {
 const voteOnSubmission = async (req, res) => {
     try {
         const { id, submissionId } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id;
 
         const challenge = await Challenge.findById(id);
         if (!challenge) {
@@ -336,7 +385,7 @@ const getTrendingChallenges = async (req, res) => {
 // Get user's challenges
 const getUserChallenges = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id;
         const { type = 'all' } = req.query;
 
         let filter = {};
@@ -374,7 +423,7 @@ const getUserChallenges = async (req, res) => {
 const deleteChallenge = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.user._id;
 
         const challenge = await Challenge.findById(id);
         if (!challenge) {

@@ -677,10 +677,31 @@ export const foldersAPI = {
     // Create new folder
     createFolder: async (folderData) => {
         try {
+            console.log('Creating folder with data:', folderData);
+            
+            // Validate required fields
+            if (!folderData.name || !folderData.name.trim()) {
+                throw { message: 'Folder name is required' };
+            }
+            
             const response = await API.post('/folders', folderData);
+            console.log('Folder creation response:', response.data);
             return response.data;
         } catch (error) {
-            throw error.response?.data || { message: 'Failed to create folder' };
+            console.error('Folder creation error:', error);
+            
+            // Handle different types of errors
+            if (error.response) {
+                // Server responded with error status
+                const errorData = error.response.data;
+                throw errorData || { message: `Server error: ${error.response.status}` };
+            } else if (error.request) {
+                // Request was made but no response received
+                throw { message: 'Network error: No response from server. Please check if the backend server is running.' };
+            } else {
+                // Something else happened
+                throw error.message ? { message: error.message } : { message: 'Failed to create folder' };
+            }
         }
     },
 
@@ -1247,6 +1268,16 @@ export const challengesAPI = {
         }
     },
 
+    // Get challenge by ID
+    getChallengeById: async (id) => {
+        try {
+            const response = await API.get(`/challenges/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch challenge' };
+        }
+    },
+
     // Get trending challenges
     getTrending: async () => {
         try {
@@ -1264,6 +1295,68 @@ export const challengesAPI = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to fetch user challenges' };
+        }
+    },
+
+    // Create new challenge
+    createChallenge: async (challengeData) => {
+        try {
+            console.log('Creating challenge with data:', challengeData);
+            const response = await API.post('/challenges', challengeData);
+            return response.data;
+        } catch (error) {
+            console.error('Challenge creation error:', error);
+            throw error.response?.data || { message: 'Failed to create challenge' };
+        }
+    },
+
+    // Update challenge
+    updateChallenge: async (id, challengeData) => {
+        try {
+            const response = await API.put(`/challenges/${id}`, challengeData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to update challenge' };
+        }
+    },
+
+    // Delete challenge
+    deleteChallenge: async (id) => {
+        try {
+            const response = await API.delete(`/challenges/${id}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete challenge' };
+        }
+    },
+
+    // Join challenge
+    joinChallenge: async (id) => {
+        try {
+            const response = await API.post(`/challenges/${id}/join`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to join challenge' };
+        }
+    },
+
+    // Submit meme to challenge
+    submitMeme: async (id, memeId) => {
+        try {
+            const response = await API.post(`/challenges/${id}/submit`, { memeId });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to submit meme' };
+        }
+    },
+
+    // Vote on submission
+    voteOnSubmission: async (challengeId, submissionId) => {
+        try {
+            const response = await API.post(`/challenges/${challengeId}/submissions/${submissionId}/vote`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to vote on submission' };
         }
     }
 };

@@ -39,6 +39,7 @@ import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ReportButton from '../components/moderation/ReportButton';
 import FollowButton from '../components/common/FollowButton';
+import AddToFolderButton from '../components/common/AddToFolderButton';
 
 const MemeGallery = () => {
     const navigate = useNavigate();
@@ -594,6 +595,11 @@ const MemeGallery = () => {
                                                     >
                                                         <DownloadIcon />
                                                     </IconButton>
+                                                    <AddToFolderButton 
+                                                        memeId={meme.id} 
+                                                        variant="icon"
+                                                        size="small"
+                                                    />
                                                     <ReportButton
                                                         contentType="meme"
                                                         contentId={meme.id}

@@ -6,31 +6,58 @@ const Meme = require('../models/Meme');
 // @access  Private
 const createFolder = async (req, res) => {
     try {
+        console.log('🟦 Folder creation request received');
+        console.log('🟦 Request body:', req.body);
+        console.log('🟦 User ID:', req.user?._id);
+        console.log('🟦 Full user object:', req.user);
+        
         const { name, description, color, icon, isPrivate } = req.body;
 
+        // Validate required fields
+        if (!name || !name.trim()) {
+            console.log('🟥 Validation failed: name is required');
+            return res.status(400).json({
+                success: false,
+                message: 'Folder name is required'
+            });
+        }
+
+        if (name.length > 50) {
+            console.log('🟥 Validation failed: name too long');
+            return res.status(400).json({
+                success: false,
+                message: 'Folder name must be 50 characters or less'
+            });
+        }
+
         // Check if folder name already exists for this user
+        console.log('🟦 Checking for existing folder with name:', name.trim());
         const existingFolder = await Folder.findOne({
-            owner: req.user.id,
-            name: { $regex: new RegExp(`^${name}$`, 'i') } // Case-insensitive
+            owner: req.user._id,
+            name: { $regex: new RegExp(`^${name.trim()}$`, 'i') } // Case-insensitive
         });
 
         if (existingFolder) {
+            console.log('🟥 Folder already exists');
             return res.status(400).json({
                 success: false,
                 message: 'A folder with this name already exists'
             });
         }
 
+        console.log('🟦 Creating new folder...');
         const folder = new Folder({
-            name,
-            description,
-            color,
-            icon,
-            isPrivate,
-            owner: req.user.id
+            name: name.trim(),
+            description: description || '',
+            color: color || '#6366f1',
+            icon: icon || 'folder',
+            isPrivate: isPrivate !== undefined ? isPrivate : true,
+            owner: req.user._id
         });
 
+        console.log('🟦 Saving folder to database...');
         await folder.save();
+        console.log('🟩 Folder created successfully:', folder._id);
 
         res.status(201).json({
             success: true,
@@ -38,6 +65,8 @@ const createFolder = async (req, res) => {
             folder
         });
     } catch (error) {
+        console.error('🟥 Folder creation error:', error);
+        console.error('🟥 Error stack:', error.stack);
         res.status(500).json({
             success: false,
             message: 'Server error',
@@ -53,14 +82,14 @@ const getUserFolders = async (req, res) => {
     try {
         const { page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
-        const folders = await Folder.findUserFolders(req.user.id, {
+        const folders = await Folder.findUserFolders(req.user._id, {
             page: parseInt(page),
             limit: parseInt(limit),
             sortBy,
             sortOrder
         });
 
-        const totalFolders = await Folder.countDocuments({ owner: req.user.id });
+        const totalFolders = await Folder.countDocuments({ owner: req.user._id });
         const totalPages = Math.ceil(totalFolders / limit);
 
         res.json({
@@ -90,7 +119,7 @@ const getFolder = async (req, res) => {
     try {
         const folder = await Folder.findOne({
             _id: req.params.id,
-            owner: req.user.id
+            owner: req.user._id
         }).populate({
             path: 'memes',
             select: 'title description imageUrl category createdAt stats tags',
@@ -126,7 +155,7 @@ const updateFolder = async (req, res) => {
 
         const folder = await Folder.findOne({
             _id: req.params.id,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {
@@ -139,7 +168,7 @@ const updateFolder = async (req, res) => {
         // Check if new name conflicts with existing folders
         if (name && name !== folder.name) {
             const existingFolder = await Folder.findOne({
-                owner: req.user.id,
+                owner: req.user._id,
                 name: { $regex: new RegExp(`^${name}$`, 'i') },
                 _id: { $ne: req.params.id }
             });
@@ -182,7 +211,7 @@ const deleteFolder = async (req, res) => {
     try {
         const folder = await Folder.findOne({
             _id: req.params.id,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {
@@ -216,7 +245,7 @@ const addMemeToFolder = async (req, res) => {
 
         const folder = await Folder.findOne({
             _id: folderId,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {
@@ -229,7 +258,7 @@ const addMemeToFolder = async (req, res) => {
         // Check if meme exists and belongs to user
         const meme = await Meme.findOne({
             _id: memeId,
-            createdBy: req.user.id
+            creator: req.user._id
         });
 
         if (!meme) {
@@ -271,7 +300,7 @@ const removeMemeFromFolder = async (req, res) => {
 
         const folder = await Folder.findOne({
             _id: folderId,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {
@@ -301,35 +330,52 @@ const removeMemeFromFolder = async (req, res) => {
 // @access  Private
 const bulkAddMemesToFolder = async (req, res) => {
     try {
+        console.log('🗂️ BULK ADD MEMES - Starting request');
         const { memeIds } = req.body;
         const folderId = req.params.id;
 
+        console.log('🗂️ BULK ADD MEMES - Raw request body:', req.body);
+        console.log('🗂️ BULK ADD MEMES - Folder ID:', folderId);
+        console.log('🗂️ BULK ADD MEMES - User ID:', req.user._id);
+        console.log('🗂️ BULK ADD MEMES - Meme IDs:', memeIds);
+
         if (!Array.isArray(memeIds) || memeIds.length === 0) {
+            console.log('❌ BULK ADD MEMES - Invalid meme IDs array');
             return res.status(400).json({
                 success: false,
                 message: 'Please provide an array of meme IDs'
             });
         }
 
+        console.log('🗂️ BULK ADD MEMES - Finding folder...');
         const folder = await Folder.findOne({
             _id: folderId,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {
+            console.log('❌ BULK ADD MEMES - Folder not found');
             return res.status(404).json({
                 success: false,
                 message: 'Folder not found'
             });
         }
 
+        console.log('🗂️ BULK ADD MEMES - Folder found:', folder.name);
+
         // Verify all memes belong to user
+        console.log('🗂️ BULK ADD MEMES - Searching for memes with creator field...');
         const memes = await Meme.find({
             _id: { $in: memeIds },
-            createdBy: req.user.id
+            creator: req.user._id
         });
 
+        console.log('🗂️ BULK ADD MEMES - Found memes:', memes.length, 'out of', memeIds.length);
+        console.log('🗂️ BULK ADD MEMES - Meme details:', memes.map(m => ({ id: m._id, title: m.title, creator: m.creator })));
+
         if (memes.length !== memeIds.length) {
+            console.log('❌ BULK ADD MEMES - Some memes not found or no permission');
+            console.log('❌ BULK ADD MEMES - Expected:', memeIds.length, 'Found:', memes.length);
             return res.status(400).json({
                 success: false,
                 message: 'Some memes were not found or you do not have permission'
@@ -338,17 +384,25 @@ const bulkAddMemesToFolder = async (req, res) => {
 
         // Add memes that aren't already in folder
         let addedCount = 0;
+        console.log('🗂️ BULK ADD MEMES - Current folder memes:', folder.memes.length);
+        
         for (const memeId of memeIds) {
             if (!folder.memes.includes(memeId)) {
                 folder.memes.push(memeId);
                 addedCount++;
+                console.log('🗂️ BULK ADD MEMES - Added meme:', memeId);
+            } else {
+                console.log('🗂️ BULK ADD MEMES - Meme already in folder:', memeId);
             }
         }
 
         folder.memeCount = folder.memes.length;
         folder.stats.lastUpdated = new Date();
+        
+        console.log('🗂️ BULK ADD MEMES - Saving folder with', addedCount, 'new memes...');
         await folder.save();
 
+        console.log('✅ BULK ADD MEMES - Success! Added:', addedCount, 'Total in folder:', folder.memeCount);
         res.json({
             success: true,
             message: `${addedCount} memes added to folder successfully`,
@@ -356,6 +410,7 @@ const bulkAddMemesToFolder = async (req, res) => {
             totalInFolder: folder.memeCount
         });
     } catch (error) {
+        console.error('❌ BULK ADD MEMES - Error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error',
@@ -371,7 +426,7 @@ const generateShareLink = async (req, res) => {
     try {
         const folder = await Folder.findOne({
             _id: req.params.id,
-            owner: req.user.id
+            owner: req.user._id
         });
 
         if (!folder) {

@@ -376,7 +376,9 @@ const Challenges = () => {
                 </Button>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
+                <Button onClick={() => setCreateDialogOpen(false)}>
+                    Cancel
+                </Button>
             </DialogActions>
         </Dialog>
     );

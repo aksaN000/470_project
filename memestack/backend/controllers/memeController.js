@@ -579,12 +579,16 @@ const shareMeme = async (req, res) => {
 // @access  Private
 const getMyMemes = async (req, res) => {
     try {
+        console.log('🔍 MY MEMES - User ID:', req.user._id);
         const { includePrivate = 'true' } = req.query;
         
         const memes = await Meme.getUserMemes(
             req.user._id, 
             includePrivate === 'true'
         );
+
+        console.log('🔍 MY MEMES - Found memes:', memes.length);
+                console.log('🔍 MY MEMES - Sample meme data:', memes.slice(0, 2).map(m => ({ id: m._id, title: m.title, creator: m.creator })));
 
         res.json({
             success: true,

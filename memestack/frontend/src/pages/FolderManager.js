@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Container,
     Typography,
@@ -57,6 +58,7 @@ import { foldersAPI } from '../services/api';
 
 const FolderManager = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const theme = useTheme();
     const { mode, currentThemeColors } = useThemeMode() || { mode: 'light' };
     const [folders, setFolders] = useState([]);
@@ -103,11 +105,24 @@ const FolderManager = () => {
 
     const loadFolders = async () => {
         try {
+            if (!user) {
+                setError('Please log in to view your folders');
+                setLoading(false);
+                return;
+            }
+            
             setLoading(true);
+            setError(''); // Clear any previous errors
             const response = await foldersAPI.getFolders();
+            console.log('Folders loaded:', response);
             setFolders(response.folders || []);
         } catch (err) {
-            setError('Failed to load folders');
+            console.error('Failed to load folders:', err);
+            if (err.response?.status === 401) {
+                setError('Please log in to view your folders');
+            } else {
+                setError('Failed to load folders');
+            }
         } finally {
             setLoading(false);
         }
@@ -140,17 +155,60 @@ const FolderManager = () => {
 
     const handleSubmit = async () => {
         try {
+            setError(''); // Clear any previous errors
+            
+            // Check if user is authenticated
+            if (!user) {
+                setError('You must be logged in to create folders');
+                return;
+            }
+            
+            // Validate form data
+            if (!formData.name || !formData.name.trim()) {
+                setError('Folder name is required');
+                return;
+            }
+            
+            if (formData.name.length > 50) {
+                setError('Folder name must be 50 characters or less');
+                return;
+            }
+            
+            console.log('🟦 Submitting folder with data:', formData);
+            console.log('🟦 User authenticated:', user);
+            console.log('🟦 User ID:', user?.id || user?._id);
+            
             if (selectedFolder) {
+                console.log('🟦 Updating existing folder');
                 await foldersAPI.updateFolder(selectedFolder._id, formData);
                 setSuccess('Folder updated successfully');
             } else {
-                await foldersAPI.createFolder(formData);
+                console.log('🟦 Creating new folder');
+                const result = await foldersAPI.createFolder(formData);
+                console.log('🟩 Folder creation result:', result);
                 setSuccess('Folder created successfully');
             }
             setDialogOpen(false);
             loadFolders();
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to save folder');
+            console.error('🟥 Folder submission error:', err);
+            console.error('🟥 Error response:', err.response);
+            console.error('🟥 Error data:', err.response?.data);
+            
+            // Handle different types of errors
+            if (err.message) {
+                setError(err.message);
+            } else if (err.response?.data?.message) {
+                setError(err.response.data.message);
+            } else if (err.response?.status === 401) {
+                setError('Authentication failed. Please log in again.');
+            } else if (err.response?.status === 403) {
+                setError('You do not have permission to perform this action.');
+            } else if (err.response?.status >= 500) {
+                setError('Server error. Please try again later.');
+            } else {
+                setError('Failed to save folder. Please try again.');
+            }
         }
     };
 
@@ -391,6 +449,7 @@ const FolderManager = () => {
                                         transform: 'translateY(-2px)',
                                     },
                                 }}
+                                onClick={() => navigate(`/folders/${folder._id}`)}
                             >
                                 <CardContent>
                                     <Box display="flex" alignItems="center" mb={2}>
@@ -464,6 +523,20 @@ const FolderManager = () => {
                                         Created {formatDate(folder.createdAt)}
                                     </Typography>
                                 </CardContent>
+                                <CardActions sx={{ pt: 0, px: 2, pb: 2 }}>
+                                    <Button 
+                                        size="small" 
+                                        variant="outlined" 
+                                        startIcon={<FolderIcon />}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/folders/${folder._id}`);
+                                        }}
+                                        sx={{ flex: 1 }}
+                                    >
+                                        Manage Memes
+                                    </Button>
+                                </CardActions>
                             </Card>
                         </Grid>
                     ))}
