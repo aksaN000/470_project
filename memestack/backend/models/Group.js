@@ -13,7 +13,7 @@ const groupSchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        required: true,
+        required: true, // will be auto-generated in pre('validate') so validation still enforces presence
         unique: true,
         lowercase: true,
         trim: true
@@ -251,15 +251,17 @@ groupSchema.index({ 'members.user': 1 });
 groupSchema.index({ creator: 1 });
 groupSchema.index({ createdAt: -1 });
 
-// Pre-save middleware to generate slug
-groupSchema.pre('save', function(next) {
-    if (this.isModified('name') && !this.slug) {
-        this.slug = this.name
+// Generate slug BEFORE validation so the required validator passes
+groupSchema.pre('validate', function(next) {
+    if ((!this.slug || this.isModified('name')) && this.name) {
+        const base = this.name;
+        this.slug = base
             .toLowerCase()
             .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
             .replace(/\s+/g, '-')
             .replace(/-+/g, '-')
-            .trim('-');
+            .replace(/^-+|-+$/g, '');
     }
     next();
 });
@@ -269,23 +271,26 @@ groupSchema.virtual('memberCount').get(function() {
     return this.members.length;
 });
 
-// Virtual for checking if user is member
-groupSchema.virtual('isMember').get(function() {
-    return function(userId) {
-        return this.members.some(member => 
-            member.user.toString() === userId.toString()
-        );
-    }.bind(this);
-});
+// Instance helpers expected by controller
+groupSchema.methods.isMember = function(userId) {
+    if (!userId) return false;
+    return this.members.some(m => m.user && m.user.toString() === userId.toString());
+};
 
-// Virtual for getting user role
+groupSchema.methods.getMemberRole = function(userId) {
+    if (!userId) return null;
+    const member = this.members.find(m => m.user && m.user.toString() === userId.toString());
+    return member ? member.role : null;
+};
+
+groupSchema.methods.hasPendingRequest = function(userId) {
+    if (!userId) return false;
+    return this.pendingMembers.some(pm => pm.user && pm.user.toString() === userId.toString());
+};
+
+// Maintain backwards compatibility with earlier virtual names if used elsewhere
 groupSchema.virtual('getUserRole').get(function() {
-    return function(userId) {
-        const member = this.members.find(member => 
-            member.user.toString() === userId.toString()
-        );
-        return member ? member.role : null;
-    }.bind(this);
+    return (userId) => this.getMemberRole(userId);
 });
 
 // Instance method to add member
@@ -384,6 +389,12 @@ groupSchema.statics.searchGroups = function(query, category = null) {
     return this.find(searchQuery)
         .sort({ 'stats.memberCount': -1 })
         .populate('creator', 'username profile.displayName profile.avatar');
+};
+
+// Static helper to find by slug (case-insensitive)
+groupSchema.statics.findBySlug = function(slug) {
+    if (!slug) return null;
+    return this.findOne({ slug: slug.toLowerCase() });
 };
 
 const Group = mongoose.model('Group', groupSchema);

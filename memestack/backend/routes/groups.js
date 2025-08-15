@@ -136,6 +136,17 @@ router.get('/:slug', getGroupBySlug);
 // Protected routes
 router.use(auth); // All routes below require authentication
 
+// Debug middleware to inspect req.user and controller version during create attempts
+router.use((req, res, next) => {
+    if (req.method === 'POST' && req.path === '/') {
+        const controller = require('../controllers/groupController');
+        console.log('🔍 [groupsRouteDebug] controller version =', controller.__version);
+        console.log('🔍 [groupsRouteDebug] req.user after auth =', req.user);
+        console.log('🔍 [groupsRouteDebug] headers.authorization =', req.headers.authorization);
+    }
+    next();
+});
+
 // Group management
 router.post('/', validateGroup, createGroup);
 router.put('/:slug', validateGroup, updateGroup);

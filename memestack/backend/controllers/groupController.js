@@ -1,5 +1,5 @@
 // 👥 Group Controller
-// Handles all community group related operations
+// Handles all community group related operations for the memestack
 
 const Group = require('../models/Group');
 const User = require('../models/User');
@@ -20,7 +20,7 @@ const getGroups = async (req, res) => {
         // Build filter object
         const filter = { 
             privacy: 'public',
-            visibility: 'listed'
+            isActive: true
         };
         
         if (category && category !== 'all') {
@@ -39,40 +39,72 @@ const getGroups = async (req, res) => {
         let sortObj = {};
         switch (sort) {
             case 'popular':
-                sortObj = { 'stats.memberCount': -1, 'stats.weeklyActiveMembers': -1 };
+                sortObj = { 'stats.memberCount': -1, 'stats.totalLikes': -1 };
                 break;
             case 'newest':
                 sortObj = { createdAt: -1 };
                 break;
             case 'active':
-                sortObj = { 'stats.weeklyActiveMembers': -1, updatedAt: -1 };
+                sortObj = { lastActivity: -1 };
                 break;
-            case 'featured':
-                sortObj = { featured: -1, 'stats.memberCount': -1 };
+            case 'memes':
+                sortObj = { 'stats.memeCount': -1 };
                 break;
             default:
                 sortObj = { 'stats.memberCount': -1 };
-                break;
         }
 
+        // Pagination
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        // Execute query
         const groups = await Group.find(filter)
             .populate('creator', 'username profile.displayName profile.avatar')
+            .populate('members.user', 'username profile.displayName profile.avatar')
             .sort(sortObj)
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
+            .skip(skip)
+            .limit(parseInt(limit))
             .lean();
 
+        // Get total count for pagination
         const total = await Group.countDocuments(filter);
 
         res.json({
             groups,
-            totalPages: Math.ceil(total / limit),
-            currentPage: parseInt(page),
-            total
+            pagination: {
+                current: parseInt(page),
+                pages: Math.ceil(total / parseInt(limit)),
+                total
+            }
         });
     } catch (error) {
-        console.error('Error getting groups:', error);
+        console.error('Error fetching groups:', error);
         res.status(500).json({ message: 'Error fetching groups', error: error.message });
+    }
+};
+
+// Get trending groups
+const getTrendingGroups = async (req, res) => {
+    try {
+        const { limit = 10 } = req.query;
+
+        const groups = await Group.find({
+            privacy: 'public',
+            isActive: true
+        })
+        .populate('creator', 'username profile.displayName profile.avatar')
+        .sort({ 
+            'stats.memberCount': -1, 
+            lastActivity: -1,
+            'stats.memeCount': -1 
+        })
+        .limit(parseInt(limit))
+        .lean();
+
+        res.json(groups);
+    } catch (error) {
+        console.error('Error fetching trending groups:', error);
+        res.status(500).json({ message: 'Error fetching trending groups', error: error.message });
     }
 };
 
@@ -80,11 +112,10 @@ const getGroups = async (req, res) => {
 const getGroupBySlug = async (req, res) => {
     try {
         const { slug } = req.params;
-        const userId = req.user?.id;
-        
-        const group = await Group.findOne({ slug })
-            .populate('creator', 'username profile.displayName profile.avatar stats.totalMemes')
-            .populate('members.user', 'username profile.displayName profile.avatar stats.totalMemes')
+
+        const group = await Group.findBySlug(slug)
+            .populate('creator', 'username profile.displayName profile.avatar')
+            .populate('members.user', 'username profile.displayName profile.avatar')
             .populate('pendingMembers.user', 'username profile.displayName profile.avatar');
 
         if (!group) {
@@ -92,36 +123,16 @@ const getGroupBySlug = async (req, res) => {
         }
 
         // Check if user can view this group
-        if (group.privacy === 'private' && userId) {
-            const isMember = group.members.some(member => 
-                member.user._id.toString() === userId
-            );
-            if (!isMember) {
+        if (group.privacy === 'private') {
+            const userId = req.user?.id;
+            if (!userId || !group.isMember(userId)) {
                 return res.status(403).json({ message: 'This group is private' });
             }
         }
 
-        // Increment view count
-        group.stats.totalViews++;
-        await group.save();
-
-        // Get recent memes from this group
-        const recentMemes = await Meme.find({ group: group._id })
-            .populate('creator', 'username profile.displayName profile.avatar')
-            .sort({ createdAt: -1 })
-            .limit(12)
-            .lean();
-
-        const response = {
-            ...group.toJSON(),
-            recentMemes,
-            userRole: userId ? group.getUserRole(userId) : null,
-            isMember: userId ? group.isMember(userId) : false
-        };
-
-        res.json(response);
+        res.json(group);
     } catch (error) {
-        console.error('Error getting group:', error);
+        console.error('Error fetching group:', error);
         res.status(500).json({ message: 'Error fetching group', error: error.message });
     }
 };
@@ -129,20 +140,35 @@ const getGroupBySlug = async (req, res) => {
 // Create new group
 const createGroup = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const {
-            name,
-            description,
-            longDescription,
-            category,
-            privacy,
-            visibility,
-            membershipType,
-            rules,
-            settings,
-            tags,
-            socialLinks
-        } = req.body;
+        console.log('🧪 [createGroup] ENTER function (v2 diagnostics)');
+        console.log('🧪 [createGroup] Incoming headers.authorization =', req.headers.authorization);
+        console.log('🧪 [createGroup] req.user BEFORE resolution =', req.user);
+
+        // Robust user id resolution
+        let userId = (req.user && (req.user.userId || req.user._id || req.user.id)) || null;
+
+        // Fallback: decode JWT directly if auth middleware somehow skipped (shouldn't happen after router.use(auth))
+        if (!userId && req.headers.authorization?.startsWith('Bearer ')) {
+            try {
+                const token = req.headers.authorization.split(' ')[1];
+                const jwt = require('jsonwebtoken');
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                userId = decoded.userId || decoded.id || decoded._id || null;
+                console.log('🧪 [createGroup] Fallback decoded token userId =', userId);
+            } catch (decodeErr) {
+                console.warn('⚠️ [createGroup] JWT fallback decode failed:', decodeErr.message);
+            }
+        }
+        const { name, description, longDescription, category, privacy, membershipType, rules, tags, avatar, banner } = req.body;
+
+        console.log('📦 [createGroup] req.user =', req.user);
+        console.log('📦 [createGroup] body =', req.body);
+
+        if (!userId) {
+            console.warn('⚠️ [createGroup] STILL no userId after fallback. req.user =', req.user);
+            return res.status(401).json({ message: 'Unauthorized: user not resolved' });
+        }
+        console.log('🧪 [createGroup] Resolved userId =', userId);
 
         // Check if group name is unique
         const existingGroup = await Group.findOne({ 
@@ -153,6 +179,18 @@ const createGroup = async (req, res) => {
             return res.status(400).json({ message: 'Group name already exists' });
         }
 
+        // Basic inline validation (mirrors express-validator) to avoid generic 500s
+        if (!name || name.trim().length < 3 || name.trim().length > 100) {
+            return res.status(400).json({ message: 'Group name must be between 3 and 100 characters' });
+        }
+        if (!/^[a-zA-Z0-9\s\-_]+$/.test(name)) {
+            return res.status(400).json({ message: 'Group name has invalid characters' });
+        }
+        if (!description || description.trim().length < 10 || description.trim().length > 500) {
+            return res.status(400).json({ message: 'Description must be between 10 and 500 characters' });
+        }
+
+        // Create the group
         const group = new Group({
             name,
             description,
@@ -160,24 +198,37 @@ const createGroup = async (req, res) => {
             creator: userId,
             category: category || 'general',
             privacy: privacy || 'public',
-            visibility: visibility || 'listed',
             membershipType: membershipType || 'open',
             rules: Array.isArray(rules) ? rules : [],
-            settings: settings || {},
             tags: Array.isArray(tags) ? tags : [],
-            socialLinks: socialLinks || {},
+            avatar: avatar || null,
+            banner: banner || null,
             members: [{
                 user: userId,
                 role: 'owner',
                 permissions: [
-                    'manage_posts', 'manage_members', 'manage_settings',
-                    'ban_members', 'delete_posts', 'pin_posts',
-                    'create_challenges', 'manage_challenges'
+                    // map to existing enum capabilities in schema where possible
+                    'manage_posts','manage_members','manage_settings','create_challenges','manage_challenges'
                 ]
-            }]
+            }],
+            stats: { memberCount: 1 }
         });
 
-        await group.save();
+        // Force-generate slug if somehow missing
+        if (!group.slug) {
+            group.slug = (name || '')
+                .toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+    console.log('🛠️ [createGroup] Pre-save group doc:', { slug: group.slug, creator: group.creator, firstMember: group.members?.[0] });
+
+    await group.save();
+    console.log('✅ [createGroup] Saved group _id:', group._id);
         
         // Populate created group
         const populatedGroup = await Group.findById(group._id)
@@ -186,7 +237,17 @@ const createGroup = async (req, res) => {
 
         res.status(201).json(populatedGroup);
     } catch (error) {
-        console.error('Error creating group:', error);
+        console.error('❌ Error creating group:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Group name or slug already exists' });
+        }
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                message: 'Validation failed',
+                errors: Object.values(error.errors).map(e => e.message),
+                raw: error.message
+            });
+        }
         res.status(500).json({ message: 'Error creating group', error: error.message });
     }
 };
@@ -195,29 +256,38 @@ const createGroup = async (req, res) => {
 const updateGroup = async (req, res) => {
     try {
         const { slug } = req.params;
-        const userId = req.user.id;
+    const userId = req.user?.userId || req.user?._id;
         const updates = req.body;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
-        // Check permissions
-        const userRole = group.getUserRole(userId);
+        // Check permissions - only owner and admins can update
+        const userRole = group.getMemberRole(userId);
         if (!['owner', 'admin'].includes(userRole)) {
             return res.status(403).json({ message: 'Not authorized to update this group' });
         }
 
-        // Prevent changing sensitive fields
-        delete updates.creator;
-        delete updates.members;
-        delete updates.slug;
-        delete updates.stats;
+        // Restrict certain fields from being updated
+        const allowedUpdates = [
+            'description', 'longDescription', 'category', 'privacy', 
+            'membershipType', 'rules', 'tags', 'avatar', 'banner'
+        ];
+        
+        const filteredUpdates = {};
+        allowedUpdates.forEach(field => {
+            if (updates[field] !== undefined) {
+                filteredUpdates[field] = updates[field];
+            }
+        });
 
-        Object.assign(group, updates);
+        // Apply updates
+        Object.assign(group, filteredUpdates);
         await group.save();
 
+        // Return updated group
         const updatedGroup = await Group.findById(group._id)
             .populate('creator', 'username profile.displayName profile.avatar')
             .populate('members.user', 'username profile.displayName profile.avatar');
@@ -229,14 +299,14 @@ const updateGroup = async (req, res) => {
     }
 };
 
-// Join group
+// Join a group
 const joinGroup = async (req, res) => {
     try {
         const { slug } = req.params;
-        const userId = req.user.id;
+    const userId = req.user?.userId || req.user?._id;
         const { message } = req.body;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
@@ -245,18 +315,17 @@ const joinGroup = async (req, res) => {
             return res.status(400).json({ message: 'You are already a member of this group' });
         }
 
-        // Check if group requires approval
+        // Check membership type
         if (group.membershipType === 'approval_required') {
             // Add to pending members
-            const existingRequest = group.pendingMembers.find(pm => 
-                pm.user.toString() === userId
-            );
-            
-            if (existingRequest) {
+            if (group.hasPendingRequest(userId)) {
                 return res.status(400).json({ message: 'You already have a pending request' });
             }
 
-            group.pendingMembers.push({ user: userId, message });
+            group.pendingMembers.push({ 
+                user: userId, 
+                requestMessage: message || '' 
+            });
             await group.save();
             
             return res.json({ message: 'Membership request sent for approval' });
@@ -264,52 +333,71 @@ const joinGroup = async (req, res) => {
             return res.status(403).json({ message: 'This group is invite-only' });
         } else {
             // Open membership
-            await group.addMember(userId);
-            return res.json({ message: 'Successfully joined group' });
+            group.members.push({
+                user: userId,
+                role: 'member',
+                permissions: ['create_memes', 'comment', 'like', 'share']
+            });
+            await group.save();
+            
+            return res.json({ message: 'Successfully joined the group' });
         }
     } catch (error) {
         console.error('Error joining group:', error);
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Error joining group', error: error.message });
     }
 };
 
-// Leave group
+// Leave a group
 const leaveGroup = async (req, res) => {
     try {
         const { slug } = req.params;
-        const userId = req.user.id;
+    const userId = req.user?.userId || req.user?._id;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
-        if (group.creator.toString() === userId) {
-            return res.status(400).json({ message: 'Group owner cannot leave. Transfer ownership first.' });
+        if (!group.isMember(userId)) {
+            return res.status(400).json({ message: 'You are not a member of this group' });
         }
 
-        await group.removeMember(userId);
-        res.json({ message: 'Successfully left group' });
+        // Check if user is the owner
+        const userRole = group.getMemberRole(userId);
+        if (userRole === 'owner') {
+            return res.status(400).json({ 
+                message: 'Group owner cannot leave. Transfer ownership or delete the group.' 
+            });
+        }
+
+        // Remove member
+        group.members = group.members.filter(member => 
+            member.user.toString() !== userId.toString()
+        );
+        
+        await group.save();
+        res.json({ message: 'Successfully left the group' });
     } catch (error) {
         console.error('Error leaving group:', error);
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Error leaving group', error: error.message });
     }
 };
 
-// Manage membership (approve/reject/ban)
+// Manage membership (approve/reject requests, remove members)
 const manageMembership = async (req, res) => {
     try {
         const { slug } = req.params;
         const { userId: targetUserId, action, reason } = req.body;
-        const userId = req.user.id;
+    const userId = req.user?.userId || req.user?._id;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
         // Check permissions
-        const userRole = group.getUserRole(userId);
+        const userRole = group.getMemberRole(userId);
         if (!['owner', 'admin', 'moderator'].includes(userRole)) {
             return res.status(403).json({ message: 'Not authorized to manage memberships' });
         }
@@ -323,42 +411,60 @@ const manageMembership = async (req, res) => {
                 if (pendingIndex === -1) {
                     return res.status(404).json({ message: 'Pending request not found' });
                 }
-                
+
+                // Remove from pending and add to members
                 group.pendingMembers.splice(pendingIndex, 1);
-                await group.addMember(targetUserId);
+                group.members.push({
+                    user: targetUserId,
+                    role: 'member',
+                    permissions: ['create_memes', 'comment', 'like', 'share']
+                });
                 break;
 
             case 'reject':
                 // Reject pending member
-                const rejectIndex = group.pendingMembers.findIndex(pm => 
-                    pm.user.toString() === targetUserId
+                group.pendingMembers = group.pendingMembers.filter(pm => 
+                    pm.user.toString() !== targetUserId
                 );
-                if (rejectIndex === -1) {
-                    return res.status(404).json({ message: 'Pending request not found' });
-                }
-                
-                group.pendingMembers.splice(rejectIndex, 1);
-                await group.save();
-                break;
-
-            case 'ban':
-                // Ban member
-                await group.banMember(targetUserId, userId, reason);
                 break;
 
             case 'remove':
-                // Remove member
-                await group.removeMember(targetUserId);
+                // Remove existing member
+                const targetRole = group.getMemberRole(targetUserId);
+                
+                // Prevent removal of owner or higher-ranked members
+                if (targetRole === 'owner') {
+                    return res.status(400).json({ message: 'Cannot remove group owner' });
+                }
+                
+                const roleHierarchy = { member: 1, moderator: 2, admin: 3, owner: 4 };
+                if (roleHierarchy[targetRole] >= roleHierarchy[userRole]) {
+                    return res.status(403).json({ message: 'Cannot remove member with equal or higher role' });
+                }
+
+                group.members = group.members.filter(member => 
+                    member.user.toString() !== targetUserId
+                );
                 break;
 
             default:
                 return res.status(400).json({ message: 'Invalid action' });
         }
 
-        res.json({ message: `Successfully ${action}ed user` });
+        await group.save();
+        
+        // Return updated group
+        const updatedGroup = await Group.findById(group._id)
+            .populate('members.user', 'username profile.displayName profile.avatar')
+            .populate('pendingMembers.user', 'username profile.displayName profile.avatar');
+
+        res.json({ 
+            message: `Successfully ${action}ed member`,
+            group: updatedGroup
+        });
     } catch (error) {
         console.error('Error managing membership:', error);
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: 'Error managing membership', error: error.message });
     }
 };
 
@@ -367,35 +473,69 @@ const updateMemberRole = async (req, res) => {
     try {
         const { slug } = req.params;
         const { userId: targetUserId, role } = req.body;
-        const userId = req.user.id;
+    const userId = req.user?.userId || req.user?._id;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
-        // Check permissions
-        const userRole = group.getUserRole(userId);
-        if (userRole !== 'owner') {
-            return res.status(403).json({ message: 'Only group owner can change roles' });
+        // Check permissions - only owner and admins can change roles
+        const userRole = group.getMemberRole(userId);
+        if (!['owner', 'admin'].includes(userRole)) {
+            return res.status(403).json({ message: 'Not authorized to change member roles' });
         }
 
-        await group.updateMemberRole(targetUserId, role, userId);
+        // Find target member
+        const memberIndex = group.members.findIndex(member => 
+            member.user.toString() === targetUserId
+        );
+        
+        if (memberIndex === -1) {
+            return res.status(404).json({ message: 'Member not found' });
+        }
+
+        const targetMember = group.members[memberIndex];
+        
+        // Prevent role changes that would create conflicts
+        if (targetMember.role === 'owner') {
+            return res.status(400).json({ message: 'Cannot change owner role' });
+        }
+        
+        if (role === 'owner' && userRole !== 'owner') {
+            return res.status(403).json({ message: 'Only owner can assign owner role' });
+        }
+
+        // Update role and permissions
+        targetMember.role = role;
+        
+        // Set default permissions based on role
+        switch (role) {
+            case 'moderator':
+                targetMember.permissions = [
+                    'create_memes', 'comment', 'like', 'share',
+                    'moderate_content'
+                ];
+                break;
+            case 'admin':
+                targetMember.permissions = [
+                    'create_memes', 'comment', 'like', 'share',
+                    'create_challenges', 'moderate_content', 
+                    'manage_members'
+                ];
+                break;
+            case 'member':
+            default:
+                targetMember.permissions = ['create_memes', 'comment', 'like', 'share'];
+                break;
+        }
+
+        await group.save();
+        
         res.json({ message: 'Member role updated successfully' });
     } catch (error) {
         console.error('Error updating member role:', error);
-        res.status(400).json({ message: error.message });
-    }
-};
-
-// Get trending groups
-const getTrendingGroups = async (req, res) => {
-    try {
-        const groups = await Group.getTrending();
-        res.json(groups);
-    } catch (error) {
-        console.error('Error getting trending groups:', error);
-        res.status(500).json({ message: 'Error fetching trending groups', error: error.message });
+        res.status(500).json({ message: 'Error updating member role', error: error.message });
     }
 };
 
@@ -405,48 +545,22 @@ const getUserGroups = async (req, res) => {
         const userId = req.user.id;
         const { type = 'all' } = req.query;
 
-        let filter = {};
-        switch (type) {
-            case 'created':
-                filter = { creator: userId };
-                break;
-            case 'joined':
-                filter = { 'members.user': userId };
-                break;
-            case 'moderated':
-                filter = { 
-                    'members': { 
-                        $elemMatch: { 
-                            user: userId, 
-                            role: { $in: ['moderator', 'admin', 'owner'] } 
-                        } 
-                    } 
-                };
-                break;
-            case 'all':
-            default:
-                filter = {
-                    $or: [
-                        { creator: userId },
-                        { 'members.user': userId }
-                    ]
-                };
-                break;
+        let filter = { 'members.user': userId };
+        
+        if (type === 'owned') {
+            filter = { creator: userId };
+        } else if (type === 'member') {
+            filter = { 'members.user': userId, creator: { $ne: userId } };
         }
 
         const groups = await Group.find(filter)
             .populate('creator', 'username profile.displayName profile.avatar')
-            .sort({ updatedAt: -1 });
+            .populate('members.user', 'username profile.displayName profile.avatar')
+            .sort({ lastActivity: -1 });
 
-        // Add user role to each group
-        const groupsWithRole = groups.map(group => ({
-            ...group.toJSON(),
-            userRole: group.getUserRole(userId)
-        }));
-
-        res.json(groupsWithRole);
+        res.json(groups);
     } catch (error) {
-        console.error('Error getting user groups:', error);
+        console.error('Error fetching user groups:', error);
         res.status(500).json({ message: 'Error fetching user groups', error: error.message });
     }
 };
@@ -454,13 +568,32 @@ const getUserGroups = async (req, res) => {
 // Search groups
 const searchGroups = async (req, res) => {
     try {
-        const { query, category } = req.query;
-        
-        if (!query || query.trim().length < 2) {
+        const { q, category, limit = 20 } = req.query;
+
+        if (!q || q.trim().length < 2) {
             return res.status(400).json({ message: 'Search query must be at least 2 characters' });
         }
 
-        const groups = await Group.searchGroups(query.trim(), category);
+        const filter = {
+            privacy: 'public',
+            isActive: true,
+            $or: [
+                { name: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } },
+                { tags: { $in: [new RegExp(q, 'i')] } }
+            ]
+        };
+
+        if (category) {
+            filter.category = category;
+        }
+
+        const groups = await Group.find(filter)
+            .populate('creator', 'username profile.displayName profile.avatar')
+            .sort({ 'stats.memberCount': -1 })
+            .limit(parseInt(limit))
+            .lean();
+
         res.json(groups);
     } catch (error) {
         console.error('Error searching groups:', error);
@@ -474,22 +607,14 @@ const deleteGroup = async (req, res) => {
         const { slug } = req.params;
         const userId = req.user.id;
 
-        const group = await Group.findOne({ slug });
+        const group = await Group.findBySlug(slug);
         if (!group) {
             return res.status(404).json({ message: 'Group not found' });
         }
 
-        // Check permissions
-        if (group.creator.toString() !== userId) {
+        // Check permissions - only owner can delete
+        if (group.creator.toString() !== userId.toString()) {
             return res.status(403).json({ message: 'Only group owner can delete the group' });
-        }
-
-        // Check if group has content
-        const memeCount = await Meme.countDocuments({ group: group._id });
-        if (memeCount > 0) {
-            return res.status(400).json({ 
-                message: 'Cannot delete group with existing content. Archive the group instead.' 
-            });
         }
 
         await Group.findByIdAndDelete(group._id);
@@ -502,6 +627,7 @@ const deleteGroup = async (req, res) => {
 
 module.exports = {
     getGroups,
+    getTrendingGroups,
     getGroupBySlug,
     createGroup,
     updateGroup,
@@ -509,8 +635,8 @@ module.exports = {
     leaveGroup,
     manageMembership,
     updateMemberRole,
-    getTrendingGroups,
     getUserGroups,
     searchGroups,
-    deleteGroup
+    deleteGroup,
+    __version: 'groupController-v3'
 };
