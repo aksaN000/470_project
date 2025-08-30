@@ -31,9 +31,11 @@ import {
     Download as DownloadIcon,
     Favorite as FavoriteIcon,
     FavoriteBorder as FavoriteBorderIcon,
+    Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useMemes } from '../contexts/MemeContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { memeAPI } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -43,6 +45,7 @@ import AddToFolderButton from '../components/common/AddToFolderButton';
 
 const MemeGallery = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const theme = useTheme();
     const { mode, currentThemeColors } = useThemeMode();
     const { 
@@ -136,6 +139,24 @@ const MemeGallery = () => {
             await toggleLike(memeId);
         } catch (error) {
             console.error('Error toggling like:', error);
+        }
+    };
+
+    // Handle meme deletion
+    const handleDelete = async (memeId, event) => {
+        event.stopPropagation();
+        
+        if (!window.confirm('Are you sure you want to delete this meme? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await memeAPI.deleteMeme(memeId);
+            // Refresh the memes list
+            fetchMemes(filters);
+        } catch (error) {
+            console.error('Error deleting meme:', error);
+            alert('Failed to delete meme. Please try again.');
         }
     };
 
@@ -607,6 +628,27 @@ const MemeGallery = () => {
                                                         variant="icon"
                                                         size="small"
                                                     />
+                                                    {/* Delete button for meme owner only */}
+                                                    {user && meme.creator && (
+                                                        meme.creator._id === user._id || 
+                                                        meme.creator._id === user.userId ||
+                                                        meme.creator === user._id ||
+                                                        meme.creator === user.userId
+                                                    ) && (
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={(e) => handleDelete(meme.id, e)}
+                                                            title="Delete meme"
+                                                            sx={{
+                                                                color: 'error.main',
+                                                                '&:hover': {
+                                                                    background: 'rgba(239, 68, 68, 0.1)',
+                                                                }
+                                                            }}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                    )}
                                                 </Box>
                                                 <Typography 
                                                     variant="caption" 

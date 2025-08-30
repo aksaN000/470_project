@@ -12,11 +12,30 @@ const commentSchema = new mongoose.Schema({
         maxlength: [500, 'Comment cannot exceed 500 characters']
     },
     
-    // References
+    // References - flexible to support different content types
     meme: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Meme',
-        required: [true, 'Meme reference is required']
+        default: null
+    },
+    
+    template: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MemeTemplate',
+        default: null
+    },
+    
+    // Content type indicator
+    contentType: {
+        type: String,
+        enum: ['meme', 'template'],
+        required: true
+    },
+    
+    // Generic content reference
+    contentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     },
     
     author: {

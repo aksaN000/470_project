@@ -1046,6 +1046,16 @@ export const collaborationsAPI = {
         }
     },
 
+    // Delete comment
+    deleteComment: async (id, commentId) => {
+        try {
+            const response = await API.delete(`/collaborations/${id}/comments/${commentId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete comment' };
+        }
+    },
+
     // Remove collaborator (admin only)
     removeCollaborator: async (id, collaboratorId) => {
         try {

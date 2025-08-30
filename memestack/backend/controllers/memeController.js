@@ -43,6 +43,10 @@ const getAllMemes = async (req, res) => {
         let memes;
         if (search) {
             memes = await Meme.searchMemes(search, searchOptions);
+            // Populate creator for search results if needed
+            if (memes && memes.length > 0) {
+                await Meme.populate(memes, { path: 'creator', select: 'username profile.avatar profile.displayName' });
+            }
         } else {
             memes = await Meme.find({
                 isPublic: true,
@@ -50,6 +54,7 @@ const getAllMemes = async (req, res) => {
                 visibility: { $in: ['public', 'gallery_only'] },
                 ...(category !== 'all' && { category })
             })
+            .populate('creator', 'username profile.avatar profile.displayName')
             .sort({ [sortBy]: sortOrderNum })
             .limit(parseInt(limit))
             .skip(skip);

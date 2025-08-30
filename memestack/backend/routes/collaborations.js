@@ -13,6 +13,7 @@ const {
     createVersion,
     forkCollaboration,
     addComment,
+    deleteComment,
     getTrendingCollaborations,
     getUserCollaborations,
     getMemeRemixes,
@@ -51,20 +52,12 @@ const validateCollaboration = [
         .isLength({ max: 1000 })
         .withMessage('Description cannot exceed 1000 characters'),
     body('type')
-        .isIn(['remix', 'collaboration', 'template_creation', 'challenge_response'])
+        .isIn(['remix', 'collaboration', 'template_creation'])
         .withMessage('Invalid collaboration type'),
     body('originalMeme')
         .optional()
         .isMongoId()
         .withMessage('Invalid original meme ID'),
-    body('challenge')
-        .optional()
-        .isMongoId()
-        .withMessage('Invalid challenge ID'),
-    body('group')
-        .optional()
-        .isMongoId()
-        .withMessage('Invalid group ID'),
     body('settings.maxCollaborators')
         .optional()
         .isInt({ min: 2, max: 50 })
@@ -98,7 +91,7 @@ const validateCollaborationUpdate = [
         .withMessage('Description cannot exceed 1000 characters'),
     body('type')
         .optional()
-        .isIn(['remix', 'collaboration', 'template_creation', 'challenge_response'])
+        .isIn(['remix', 'collaboration', 'template_creation'])
         .withMessage('Invalid collaboration type'),
     body('status')
         .optional()
@@ -263,7 +256,8 @@ router.post('/:id/fork', validateFork, forkCollaboration);
 router.post('/:id/versions', validateVersion, createVersion);
 
 // Comments
-router.post('/:id/comments', validateComment, addComment);
+router.post('/:id/comments', auth, validateComment, addComment);
+router.delete('/:id/comments/:commentId', auth, deleteComment);
 
 // User collaborations
 router.get('/user/collaborations', getUserCollaborations);

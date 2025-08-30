@@ -582,6 +582,28 @@ export const templatesAPI = {
         } catch (error) {
             throw error.response?.data || { message: 'Failed to track template usage' };
         }
+    },
+
+    // Get comments for a template
+    getComments: async (templateId, options = {}) => {
+        try {
+            const response = await API.get(`/templates/${templateId}/comments`, {
+                params: options
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch template comments' };
+        }
+    },
+
+    // Add comment to template
+    addComment: async (templateId, commentData) => {
+        try {
+            const response = await API.post(`/templates/${templateId}/comments`, commentData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to add template comment' };
+        }
     }
 };
 
@@ -1043,6 +1065,16 @@ export const collaborationsAPI = {
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to add comment' };
+        }
+    },
+
+    // Delete comment
+    deleteComment: async (id, commentId) => {
+        try {
+            const response = await API.delete(`/collaborations/${id}/comments/${commentId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to delete comment' };
         }
     },
 

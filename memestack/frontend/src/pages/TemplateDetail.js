@@ -42,11 +42,13 @@ import {
     Send,
     MoreVert,
     Flag,
+    Delete,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
-import { templatesAPI } from '../services/api';
+import { templatesAPI } from '../services/api_clean';
+import CommentSection from '../components/comments/CommentSection';
 
 // Utility function to get full image URL
 const getImageUrl = (imageUrl) => {
@@ -70,15 +72,11 @@ const TemplateDetail = () => {
     const [template, setTemplate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
-    const [comments, setComments] = useState([]);
-    const [newComment, setNewComment] = useState('');
-    const [showComments, setShowComments] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [hasTrackedView, setHasTrackedView] = useState(false);
 
     useEffect(() => {
         fetchTemplate();
-        fetchComments();
     }, [id]);
 
     const fetchTemplate = async () => {
@@ -102,15 +100,6 @@ const TemplateDetail = () => {
             console.error('Error fetching template:', error);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const fetchComments = async () => {
-        try {
-            // For now, use mock comments since we don't have a comments API yet
-            setComments([]);
-        } catch (error) {
-            console.error('Error fetching comments:', error);
         }
     };
 
@@ -188,6 +177,22 @@ const TemplateDetail = () => {
 
     const handleShare = () => {
         setShareDialogOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await templatesAPI.deleteTemplate(id);
+            alert('Template deleted successfully');
+            // Navigate back to templates page after deletion
+            navigate('/templates');
+        } catch (error) {
+            console.error('Error deleting template:', error);
+            alert('Failed to delete template');
+        }
     };
 
     const copyToClipboard = (text) => {
@@ -346,6 +351,30 @@ const TemplateDetail = () => {
                                                 >
                                                     <Share />
                                                 </IconButton>
+
+                                                {/* Delete button for template owner */}
+                                                {user && template.createdBy && (
+                                                    user._id === template.createdBy._id || 
+                                                    user._id === template.createdBy.id ||
+                                                    user.userId === template.createdBy._id ||
+                                                    user.userId === template.createdBy.id
+                                                ) && (
+                                                    <IconButton
+                                                        onClick={handleDelete}
+                                                        sx={{
+                                                            background: 'rgba(255, 255, 255, 0.9)',
+                                                            backdropFilter: 'blur(10px)',
+                                                            color: 'error.main',
+                                                            '&:hover': { 
+                                                                background: 'rgba(255, 255, 255, 1)',
+                                                                transform: 'scale(1.1)',
+                                                                color: 'error.dark'
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                )}
                                             </Box>
 
                                             {/* Category Chip */}
@@ -425,10 +454,25 @@ const TemplateDetail = () => {
                                                 {template.createdBy?.username?.[0]?.toUpperCase()}
                                             </Avatar>
                                             <Box>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                                <Typography 
+                                                    variant="subtitle1" 
+                                                    sx={{ 
+                                                        fontWeight: 600,
+                                                        color: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(255, 255, 255, 0.9)' 
+                                                            : 'rgba(0, 0, 0, 0.87)'
+                                                    }}
+                                                >
                                                     {template.createdBy?.profile?.displayName || template.createdBy?.username || 'Unknown'}
                                                 </Typography>
-                                                <Typography variant="caption" color="text.secondary">
+                                                <Typography 
+                                                    variant="caption" 
+                                                    sx={{
+                                                        color: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(255, 255, 255, 0.6)' 
+                                                            : 'rgba(0, 0, 0, 0.6)'
+                                                    }}
+                                                >
                                                     Created {new Date(template.createdAt).toLocaleDateString()}
                                                 </Typography>
                                             </Box>
@@ -437,7 +481,15 @@ const TemplateDetail = () => {
                                         {/* Description */}
                                         {template.description && (
                                             <Box mb={3}>
-                                                <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                                                <Typography 
+                                                    variant="body1" 
+                                                    sx={{ 
+                                                        lineHeight: 1.6,
+                                                        color: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(255, 255, 255, 0.8)' 
+                                                            : 'rgba(0, 0, 0, 0.8)'
+                                                    }}
+                                                >
                                                     {template.description}
                                                 </Typography>
                                             </Box>
@@ -446,7 +498,16 @@ const TemplateDetail = () => {
                                         {/* Tags */}
                                         {template.tags && template.tags.length > 0 && (
                                             <Box mb={3}>
-                                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                                                <Typography 
+                                                    variant="subtitle2" 
+                                                    sx={{ 
+                                                        mb: 1, 
+                                                        fontWeight: 600,
+                                                        color: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(255, 255, 255, 0.9)' 
+                                                            : 'rgba(0, 0, 0, 0.87)'
+                                                    }}
+                                                >
                                                     Tags
                                                 </Typography>
                                                 <Box display="flex" flexWrap="wrap" gap={1}>
@@ -456,8 +517,13 @@ const TemplateDetail = () => {
                                                             label={tag}
                                                             size="small"
                                                             sx={{
-                                                                background: `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}20, ${currentThemeColors?.secondary || '#8b5cf6'}20)`,
+                                                                background: theme.palette.mode === 'dark'
+                                                                    ? `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}30, ${currentThemeColors?.secondary || '#8b5cf6'}30)`
+                                                                    : `linear-gradient(135deg, ${currentThemeColors?.primary || '#6366f1'}20, ${currentThemeColors?.secondary || '#8b5cf6'}20)`,
                                                                 border: `1px solid ${currentThemeColors?.primary || '#6366f1'}40`,
+                                                                color: theme.palette.mode === 'dark' 
+                                                                    ? 'rgba(255, 255, 255, 0.9)' 
+                                                                    : 'rgba(0, 0, 0, 0.8)'
                                                             }}
                                                         />
                                                     ))}
@@ -469,40 +535,100 @@ const TemplateDetail = () => {
                                         <Grid container spacing={2} sx={{ mb: 3 }}>
                                             <Grid item xs={6}>
                                                 <Box textAlign="center">
-                                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                                    <Typography 
+                                                        variant="h6" 
+                                                        sx={{ 
+                                                            fontWeight: 700,
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.9)' 
+                                                                : 'rgba(0, 0, 0, 0.87)'
+                                                        }}
+                                                    >
                                                         {template.viewCount || 0}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography 
+                                                        variant="caption" 
+                                                        sx={{
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.6)' 
+                                                                : 'rgba(0, 0, 0, 0.6)'
+                                                        }}
+                                                    >
                                                         Views
                                                     </Typography>
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <Box textAlign="center">
-                                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                                    <Typography 
+                                                        variant="h6" 
+                                                        sx={{ 
+                                                            fontWeight: 700,
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.9)' 
+                                                                : 'rgba(0, 0, 0, 0.87)'
+                                                        }}
+                                                    >
                                                         {template.usageCount || 0}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography 
+                                                        variant="caption" 
+                                                        sx={{
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.6)' 
+                                                                : 'rgba(0, 0, 0, 0.6)'
+                                                        }}
+                                                    >
                                                         Uses
                                                     </Typography>
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <Box textAlign="center">
-                                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                                    <Typography 
+                                                        variant="h6" 
+                                                        sx={{ 
+                                                            fontWeight: 700,
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.9)' 
+                                                                : 'rgba(0, 0, 0, 0.87)'
+                                                        }}
+                                                    >
                                                         {template.downloadCount || 0}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography 
+                                                        variant="caption" 
+                                                        sx={{
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.6)' 
+                                                                : 'rgba(0, 0, 0, 0.6)'
+                                                        }}
+                                                    >
                                                         Downloads
                                                     </Typography>
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={6}>
                                                 <Box textAlign="center">
-                                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                                                    <Typography 
+                                                        variant="h6" 
+                                                        sx={{ 
+                                                            fontWeight: 700,
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.9)' 
+                                                                : 'rgba(0, 0, 0, 0.87)'
+                                                        }}
+                                                    >
                                                         {template.favoriteCount || 0}
                                                     </Typography>
-                                                    <Typography variant="caption" color="text.secondary">
+                                                    <Typography 
+                                                        variant="caption" 
+                                                        sx={{
+                                                            color: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(255, 255, 255, 0.6)' 
+                                                                : 'rgba(0, 0, 0, 0.6)'
+                                                        }}
+                                                    >
                                                         Favorites
                                                     </Typography>
                                                 </Box>
@@ -517,7 +643,15 @@ const TemplateDetail = () => {
                                                 precision={0.1}
                                                 size="large"
                                             />
-                                            <Typography variant="caption" color="text.secondary" display="block">
+                                            <Typography 
+                                                variant="caption" 
+                                                display="block"
+                                                sx={{
+                                                    color: theme.palette.mode === 'dark' 
+                                                        ? 'rgba(255, 255, 255, 0.6)' 
+                                                        : 'rgba(0, 0, 0, 0.6)'
+                                                }}
+                                            >
                                                 ({template.ratingCount || 0} ratings)
                                             </Typography>
                                         </Box>
@@ -567,6 +701,15 @@ const TemplateDetail = () => {
                                 </Fade>
                             </Grid>
                         </Grid>
+
+                        {/* Comments Section */}
+                        <Box sx={{ mt: 6 }}>
+                            <CommentSection 
+                                memeId={id} 
+                                contentType="template"
+                                apiEndpoint={`templates/${id}/comments`}
+                            />
+                        </Box>
 
                         {/* Share Dialog */}
                         <Dialog

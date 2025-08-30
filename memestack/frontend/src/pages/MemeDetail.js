@@ -35,7 +35,8 @@ import {
     Download as DownloadIcon,
     Visibility as ViewIcon,
     Report as ReportIcon,
-    ArrowBack as ArrowBackIcon
+    ArrowBack as ArrowBackIcon,
+    Delete as DeleteIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -201,6 +202,24 @@ const MemeDetail = () => {
         } catch (error) {
             console.error('Error submitting report:', error);
             setSnackbar({ open: true, message: 'Failed to submit report', severity: 'error' });
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!window.confirm('Are you sure you want to delete this meme? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await memeAPI.deleteMeme(id);
+            setSnackbar({ open: true, message: 'Meme deleted successfully', severity: 'success' });
+            // Navigate back to gallery after deletion
+            setTimeout(() => {
+                navigate('/memes');
+            }, 1000);
+        } catch (error) {
+            console.error('Error deleting meme:', error);
+            setSnackbar({ open: true, message: 'Failed to delete meme', severity: 'error' });
         }
     };
 
@@ -400,6 +419,20 @@ const MemeDetail = () => {
                             <IconButton onClick={handleDownload}>
                                 <DownloadIcon />
                             </IconButton>
+                            {/* Delete button for meme owner */}
+                            {isAuthenticated && user && meme.creator && (
+                                user._id === meme.creator._id || 
+                                user._id === meme.creator.id ||
+                                user.userId === meme.creator._id ||
+                                user.userId === meme.creator.id
+                            ) && (
+                                <IconButton 
+                                    onClick={handleDelete}
+                                    color="error"
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            )}
                             {isAuthenticated && user?.id !== meme.creator?.id && (
                                 <IconButton 
                                     onClick={() => setReportDialogOpen(true)}

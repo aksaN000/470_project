@@ -35,7 +35,8 @@ import {
     CircularProgress,
     Divider,
     LinearProgress,
-    Autocomplete
+    Autocomplete,
+    Menu
 } from '@mui/material';
 import {
     Edit as EditIcon,
@@ -53,7 +54,9 @@ import {
     EmojiEvents as ChallengeIcon,
     ArrowBack as BackIcon,
     Analytics as AnalyticsIcon,
-    Settings as AdvancedIcon
+    Settings as AdvancedIcon,
+    MoreVert as MoreVertIcon,
+    Delete as DeleteIcon
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -98,6 +101,10 @@ const CollaborationDetail = () => {
     const [versionDescription, setVersionDescription] = useState('');
     const [selectedMeme, setSelectedMeme] = useState(null);
     const [userMemes, setUserMemes] = useState([]);
+    
+    // Comment menu states
+    const [commentMenuAnchor, setCommentMenuAnchor] = useState(null);
+    const [selectedComment, setSelectedComment] = useState(null);
     
     // Activity states
     const [lastActivity, setLastActivity] = useState(null);
@@ -300,6 +307,32 @@ const CollaborationDetail = () => {
         } catch (error) {
             setError(error.message || 'Failed to update collaborator role');
         }
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        if (!window.confirm('Are you sure you want to delete this comment?')) {
+            return;
+        }
+        
+        try {
+            await collaborationsAPI.deleteComment(id, commentId);
+            setSuccess('Comment deleted successfully!');
+            setCommentMenuAnchor(null);
+            setSelectedComment(null);
+            loadCollaboration();
+        } catch (error) {
+            setError(error.message || 'Failed to delete comment');
+        }
+    };
+
+    const openCommentMenu = (event, comment) => {
+        setCommentMenuAnchor(event.currentTarget);
+        setSelectedComment(comment);
+    };
+
+    const closeCommentMenu = () => {
+        setCommentMenuAnchor(null);
+        setSelectedComment(null);
     };
 
     const getStatusColor = (status) => {
@@ -1193,9 +1226,19 @@ const CollaborationDetail = () => {
                                                             <Typography variant="subtitle2">
                                                                 {comment.user?.username}
                                                             </Typography>
-                                                            <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto' }}>
+                                                            <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', mr: 1 }}>
                                                                 {new Date(comment.createdAt).toLocaleDateString()}
                                                             </Typography>
+                                                            {user && (
+                                                                (comment.user?._id === user._id || collaboration?.owner?._id === user._id) && (
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={(e) => openCommentMenu(e, comment)}
+                                                                    >
+                                                                        <MoreVertIcon />
+                                                                    </IconButton>
+                                                                )
+                                                            )}
                                                         </Box>
                                                         <Typography variant="body2">
                                                             {comment.content}
@@ -1486,6 +1529,18 @@ const CollaborationDetail = () => {
                             </Button>
                         </DialogActions>
                     </Dialog>
+
+                    {/* Comment Menu */}
+                    <Menu
+                        anchorEl={commentMenuAnchor}
+                        open={Boolean(commentMenuAnchor)}
+                        onClose={closeCommentMenu}
+                    >
+                        <MenuItem onClick={() => handleDeleteComment(selectedComment?._id)}>
+                            <DeleteIcon sx={{ mr: 1 }} />
+                            Delete Comment
+                        </MenuItem>
+                    </Menu>
                 </Container>
             </Fade>
         </Box>

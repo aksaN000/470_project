@@ -51,6 +51,7 @@ import {
     Sort,
     ViewModule,
     ViewList,
+    Delete,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -275,7 +276,35 @@ const Templates = () => {
         }
     };
 
-    const TemplateCard = ({ template }) => (
+    const handleDeleteTemplate = async (templateId, event) => {
+        event.stopPropagation();
+        
+        if (!window.confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            await templatesAPI.deleteTemplate(templateId);
+            // Remove the deleted template from the state
+            setTemplates(prevTemplates => 
+                prevTemplates.filter(t => t._id !== templateId)
+            );
+        } catch (error) {
+            console.error('Error deleting template:', error);
+            alert('Failed to delete template. Please try again.');
+        }
+    };
+
+    const TemplateCard = ({ template }) => {
+        // Check if current user is the owner
+        const isOwner = user && template.createdBy && (
+            template.createdBy._id === user._id || 
+            template.createdBy._id === user.userId ||
+            template.createdBy === user._id ||
+            template.createdBy === user.userId
+        );
+
+        return (
         <Zoom in={true} timeout={600}>
             <Card
                 elevation={0}
@@ -359,6 +388,26 @@ const Templates = () => {
                                     <Favorite sx={{ color: '#e91e63' }} /> : 
                                     <FavoriteBorder />
                                 }
+                            </IconButton>
+                        )}
+
+                        {/* Delete button for template owner */}
+                        {isOwner && (
+                            <IconButton
+                                size="small"
+                                onClick={(e) => handleDeleteTemplate(template._id, e)}
+                                sx={{
+                                    background: 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(10px)',
+                                    color: 'error.main',
+                                    '&:hover': { 
+                                        background: 'rgba(255, 255, 255, 1)',
+                                        color: 'error.dark'
+                                    }
+                                }}
+                                title="Delete template"
+                            >
+                                <Delete />
                             </IconButton>
                         )}
                         
@@ -507,7 +556,8 @@ const Templates = () => {
                 </CardContent>
             </Card>
         </Zoom>
-    );
+        );
+    };
 
     const CreateTemplateDialog = () => (
         <Dialog

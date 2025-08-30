@@ -51,6 +51,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { collaborationsAPI } from '../services/api';
 import PendingInvites from '../components/PendingInvites';
+import CollaborationCard from '../components/CollaborationCard';
 
 const Collaborations = () => {
     const navigate = useNavigate();
@@ -189,6 +190,13 @@ const Collaborations = () => {
             case 'draft': return 'default';
             default: return 'default';
         }
+    };
+
+    const handleDeleteCollaboration = (collaborationId) => {
+        // Remove the deleted collaboration from the state
+        setCollaborations(prevCollaborations => 
+            prevCollaborations.filter(collaboration => collaboration._id !== collaborationId)
+        );
     };
 
     const handlePublishDraft = async (collaborationId, event) => {
@@ -805,7 +813,10 @@ const Collaborations = () => {
                                     
                                     return !loading && collaborations && collaborations.length > 0 ? collaborations.map((collaboration) => (
                                         <Grid item xs={12} sm={6} md={4} key={collaboration._id}>
-                                            <CollaborationCard collaboration={collaboration} />
+                                            <CollaborationCard 
+                                                collaboration={collaboration}
+                                                onDelete={handleDeleteCollaboration}
+                                            />
                                         </Grid>
                                     )) : null;
                                 })()}

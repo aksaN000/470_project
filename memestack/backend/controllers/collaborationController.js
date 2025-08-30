@@ -203,9 +203,7 @@ const createCollaboration = async (req, res) => {
         // Populate created collaboration
         const populatedCollaboration = await Collaboration.findById(collaboration._id)
             .populate('owner', 'username profile.displayName profile.avatar')
-            .populate('originalMeme', 'title imageUrl')
-            .populate('challenge', 'title type')
-            .populate('group', 'name slug');
+            .populate('originalMeme', 'title imageUrl');
 
         res.status(201).json(populatedCollaboration);
     } catch (error) {
@@ -471,6 +469,54 @@ const addComment = async (req, res) => {
     } catch (error) {
         console.error('Error adding comment:', error);
         res.status(500).json({ message: 'Error adding comment', error: error.message });
+    }
+};
+
+// Delete comment from collaboration
+const deleteComment = async (req, res) => {
+    try {
+        const { id, commentId } = req.params;
+        const userId = req.user?._id || req.user?.userId || req.user?.id;
+        
+        console.log('🗑️ Delete comment request:', { collaborationId: id, commentId, userId });
+
+        const collaboration = await Collaboration.findById(id);
+        if (!collaboration) {
+            return res.status(404).json({ message: 'Collaboration not found' });
+        }
+
+        // Find the comment
+        const comment = collaboration.comments.id(commentId);
+        if (!comment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+
+        // Check if user is the comment author or collaboration owner
+        const isCommentAuthor = comment.user.toString() === userId.toString();
+        const isCollaborationOwner = collaboration.owner.toString() === userId.toString();
+        
+        if (!isCommentAuthor && !isCollaborationOwner) {
+            return res.status(403).json({ 
+                message: 'You can only delete your own comments or comments in your collaborations' 
+            });
+        }
+
+        // Remove the comment
+        collaboration.comments.pull(commentId);
+        collaboration.stats.totalComments = collaboration.comments.length;
+        await collaboration.save();
+
+        res.json({
+            success: true,
+            message: 'Comment deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Error deleting comment', 
+            error: error.message 
+        });
     }
 };
 
@@ -1380,6 +1426,7 @@ module.exports = {
     createVersion,
     forkCollaboration,
     addComment,
+    deleteComment,
     getTrendingCollaborations,
     getUserCollaborations,
     getMemeRemixes,

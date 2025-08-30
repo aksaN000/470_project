@@ -36,9 +36,9 @@ import {
     Send as SendIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import { commentsAPI } from '../../services/api';
+import { commentsAPI, templatesAPI } from '../../services/api_clean';
 
-const CommentSection = ({ memeId }) => {
+const CommentSection = ({ memeId, contentType = 'meme' }) => {
     const { user, isAuthenticated } = useAuth();
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,13 +59,20 @@ const CommentSection = ({ memeId }) => {
     // Load comments when component mounts
     useEffect(() => {
         loadComments();
-    }, [memeId]);
+    }, [memeId, contentType]);
 
     const loadComments = async () => {
         try {
             setLoading(true);
             setError('');
-            const response = await commentsAPI.getComments(memeId);
+            
+            let response;
+            if (contentType === 'template') {
+                response = await templatesAPI.getComments(memeId);
+            } else {
+                response = await commentsAPI.getComments(memeId);
+            }
+            
             if (response.success) {
                 setComments(response.data.comments);
             } else {
@@ -93,9 +100,16 @@ const CommentSection = ({ memeId }) => {
             setSubmitting(true);
             setError('');
             
-            const response = await commentsAPI.addComment(memeId, {
-                content: newComment.trim()
-            });
+            let response;
+            if (contentType === 'template') {
+                response = await templatesAPI.addComment(memeId, {
+                    content: newComment.trim()
+                });
+            } else {
+                response = await commentsAPI.addComment(memeId, {
+                    content: newComment.trim()
+                });
+            }
             
             if (response.success) {
                 setNewComment('');
@@ -125,10 +139,18 @@ const CommentSection = ({ memeId }) => {
             setSubmitting(true);
             setError('');
             
-            const response = await commentsAPI.addComment(memeId, {
-                content: replyText.trim(),
-                parentComment: commentId
-            });
+            let response;
+            if (contentType === 'template') {
+                response = await templatesAPI.addComment(memeId, {
+                    content: replyText.trim(),
+                    parentComment: commentId
+                });
+            } else {
+                response = await commentsAPI.addComment(memeId, {
+                    content: replyText.trim(),
+                    parentComment: commentId
+                });
+            }
             
             if (response.success) {
                 setReplyTo(null);
@@ -526,19 +548,34 @@ const CommentSection = ({ memeId }) => {
                 open={Boolean(menuAnchor)}
                 onClose={closeMenu}
             >
-                {selectedComment && user && selectedComment.author.id === user._id && (
+                {selectedComment && user && (
+                    selectedComment.author.id === user._id || 
+                    selectedComment.author.id === user.userId ||
+                    selectedComment.author._id === user._id ||
+                    selectedComment.author._id === user.userId
+                ) && (
                     <MenuItem onClick={() => startEdit(selectedComment)}>
                         <EditIcon sx={{ mr: 1 }} />
                         Edit
                     </MenuItem>
                 )}
-                {selectedComment && user && selectedComment.author.id === user._id && (
+                {selectedComment && user && (
+                    selectedComment.author.id === user._id || 
+                    selectedComment.author.id === user.userId ||
+                    selectedComment.author._id === user._id ||
+                    selectedComment.author._id === user.userId
+                ) && (
                     <MenuItem onClick={() => handleDeleteComment(selectedComment.id)}>
                         <DeleteIcon sx={{ mr: 1 }} />
                         Delete
                     </MenuItem>
                 )}
-                {selectedComment && user && selectedComment.author.id !== user._id && (
+                {selectedComment && user && !(
+                    selectedComment.author.id === user._id || 
+                    selectedComment.author.id === user.userId ||
+                    selectedComment.author._id === user._id ||
+                    selectedComment.author._id === user.userId
+                ) && (
                     <MenuItem onClick={startReport}>
                         <ReportIcon sx={{ mr: 1 }} />
                         Report

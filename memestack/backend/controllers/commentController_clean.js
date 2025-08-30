@@ -49,28 +49,9 @@ const getComments = async (req, res) => {
                 .sort({ createdAt: 1 })
                 .limit(5); // Limit replies shown initially
                 
-                // Get public data for comment and include isLiked status
-                const commentData = comment.getPublicData();
-                if (req.user) {
-                    commentData.isLiked = comment.isLikedBy(req.user._id);
-                } else {
-                    commentData.isLiked = false;
-                }
-                
-                // Process replies with isLiked status
-                const repliesWithLikes = replies.map(reply => {
-                    const replyData = reply.getPublicData();
-                    if (req.user) {
-                        replyData.isLiked = reply.isLikedBy(req.user._id);
-                    } else {
-                        replyData.isLiked = false;
-                    }
-                    return replyData;
-                });
-                
                 return {
-                    ...commentData,
-                    replies: repliesWithLikes
+                    ...comment.getPublicData(),
+                    replies: replies.map(reply => reply.getPublicData())
                 };
             })
         );
@@ -150,8 +131,6 @@ const addComment = async (req, res) => {
         const newComment = new Comment({
             content: content.trim(),
             meme: memeId,
-            contentType: 'meme',
-            contentId: memeId,
             author: req.user._id,
             parentComment
         });
@@ -541,18 +520,14 @@ const getUserComments = async (req, res) => {
 // @access  Public
 const getTemplateComments = async (req, res) => {
     try {
-        const { id: templateId } = req.params;
+        const { templateId } = req.params;
         const { page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
-        
-        console.log('🔍 getTemplateComments called with:', { templateId, params: req.params });
         
         const skip = (page - 1) * limit;
         const sortOrderValue = sortOrder === 'desc' ? -1 : 1;
         
         // Check if template exists
         const template = await MemeTemplate.findById(templateId);
-        console.log('📋 Template lookup result:', { templateId, found: !!template });
-        
         if (!template) {
             return res.status(404).json({
                 success: false,
@@ -593,28 +568,9 @@ const getTemplateComments = async (req, res) => {
                 .sort({ createdAt: 1 })
                 .limit(5); // Limit replies shown initially
                 
-                // Get public data for comment and include isLiked status
-                const commentData = comment.getPublicData();
-                if (req.user) {
-                    commentData.isLiked = comment.isLikedBy(req.user._id);
-                } else {
-                    commentData.isLiked = false;
-                }
-                
-                // Process replies with isLiked status
-                const repliesWithLikes = replies.map(reply => {
-                    const replyData = reply.getPublicData();
-                    if (req.user) {
-                        replyData.isLiked = reply.isLikedBy(req.user._id);
-                    } else {
-                        replyData.isLiked = false;
-                    }
-                    return replyData;
-                });
-                
                 return {
-                    ...commentData,
-                    replies: repliesWithLikes
+                    ...comment.getPublicData(),
+                    replies: replies.map(reply => reply.getPublicData())
                 };
             })
         );
@@ -650,7 +606,7 @@ const getTemplateComments = async (req, res) => {
 // @access  Private
 const addTemplateComment = async (req, res) => {
     try {
-        const { id: templateId } = req.params;
+        const { templateId } = req.params;
         const { content, parentComment = null } = req.body;
         
         console.log('💬 Adding template comment:', { templateId, content: content?.substring(0, 50), parentComment, userId: req.user._id });

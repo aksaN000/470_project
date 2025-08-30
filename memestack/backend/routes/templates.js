@@ -26,6 +26,12 @@ const {
     trackTemplateUsage
 } = require('../controllers/templateController');
 
+// Import comment controller functions
+const {
+    getTemplateComments,
+    addTemplateComment
+} = require('../controllers/commentController');
+
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -103,6 +109,20 @@ router.get('/:id/download', downloadTemplate);
 // @route   POST /api/templates/:id/use
 // @access  Public
 router.post('/:id/use', trackTemplateUsage);
+
+// ========================================
+// COMMENT ROUTES
+// ========================================
+
+// @desc    Get comments for a template
+// @route   GET /api/templates/:id/comments
+// @access  Public
+router.get('/:id/comments', getTemplateComments);
+
+// @desc    Add comment to template
+// @route   POST /api/templates/:id/comments
+// @access  Private
+router.post('/:id/comments', protect, addTemplateComment);
 
 // @desc    Update template
 // @route   PUT /api/templates/:id

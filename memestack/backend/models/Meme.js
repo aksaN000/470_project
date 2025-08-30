@@ -470,6 +470,7 @@ memeSchema.statics.searchMemes = function(query, options = {}) {
     sortObj[sortBy] = sortOrder;
     
     return this.find(searchQuery)
+        .populate('creator', 'username profile.avatar profile.displayName')
         .sort(sortObj)
         .limit(limit)
         .skip(skip);
