@@ -42,7 +42,7 @@ import ThemeDemo from './pages/ThemeDemo';
 import TestForm from './pages/TestForm';
 import SystemStatus from './pages/SystemStatus';
 import NotFound from './pages/NotFound';
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 // Protected Route Component
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
