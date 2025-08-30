@@ -23,29 +23,10 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
  */
 const uploadToCloudinary = async (buffer, options = {}) => {
     try {
-        // If Cloudinary is not configured, use a fallback
-        if (!process.env.CLOUDINARY_CLOUD_NAME) {
-            console.log('📁 Using local storage fallback (Cloudinary not configured)');
-            
-            // Generate a mock response for development
-            const timestamp = Date.now();
-            const mockId = `local_${timestamp}`;
-            
-            return {
-                public_id: mockId,
-                secure_url: `/uploads/mock_${timestamp}.jpg`,
-                url: `/uploads/mock_${timestamp}.jpg`,
-                width: 800,
-                height: 600,
-                format: 'jpg',
-                resource_type: 'image',
-                created_at: new Date().toISOString(),
-                bytes: buffer.length,
-                type: 'upload',
-                etag: mockId,
-                placeholder: false,
-                access_mode: 'public'
-            };
+        // If Cloudinary is not configured, throw an error immediately
+        if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+            console.log('📁 Cloudinary not fully configured - missing environment variables');
+            throw new Error('Cloudinary configuration incomplete. Missing required environment variables.');
         }
 
         return new Promise((resolve, reject) => {
@@ -58,10 +39,15 @@ const uploadToCloudinary = async (buffer, options = {}) => {
                 ...options
             };
 
+            console.log('🔄 Uploading to Cloudinary with options:', {
+                folder: uploadOptions.folder,
+                transformation: uploadOptions.transformation
+            });
+
             cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
                 if (error) {
                     console.error('❌ Cloudinary upload error:', error);
-                    reject(error);
+                    reject(new Error(`Cloudinary upload failed: ${error.message || 'Unknown error'}`));
                 } else {
                     console.log('✅ File uploaded to Cloudinary:', result.public_id);
                     resolve(result);

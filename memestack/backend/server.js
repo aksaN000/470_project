@@ -64,7 +64,18 @@ if (process.env.NODE_ENV === 'production') {
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? process.env.CLIENT_URL 
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+        : function(origin, callback) {
+            // Allow requests with no origin (like mobile apps or curl requests)
+            if (!origin) return callback(null, true);
+            
+            // Allow localhost and 127.0.0.1 on any port
+            if (origin.match(/^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.1[6-9]\.\d+\.\d+|172\.2[0-9]\.\d+\.\d+|172\.3[0-1]\.\d+\.\d+)(:\d+)?$/)) {
+                return callback(null, true);
+            }
+            
+            // Allow any development origin for now
+            return callback(null, true);
+        },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

@@ -90,7 +90,13 @@ const handleUploadError = (err, req, res, next) => {
 };
 
 // Helper function to get file URL
-const getFileUrl = (filename) => {
+const getFileUrl = (filename, req = null) => {
+    if (req) {
+        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'localhost:5000';
+        return `${protocol}://${host}/uploads/memes/${filename}`;
+    }
+    // Fallback for cases where request is not available
     const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
     return `${baseUrl}/uploads/memes/${filename}`;
 };
