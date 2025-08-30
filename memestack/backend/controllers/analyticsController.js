@@ -148,6 +148,16 @@ const getDashboardAnalytics = async (req, res) => {
             message: 'Analytics dashboard data fetched successfully'
         });
 
+        // Update user stats in background (non-blocking)
+        updateUserStats(userId, {
+            memesCreated: totalMemes,
+            totalLikes,
+            totalViews,
+            totalShares
+        }).catch(err => {
+            console.error('❌ Error updating user stats:', err);
+        });
+
     } catch (error) {
         console.error('❌ Error fetching dashboard analytics:', error);
         res.status(500).json({
@@ -368,6 +378,22 @@ const getPlatformAnalytics = async (req, res) => {
             message: 'Error fetching platform analytics',
             error: error.message
         });
+    }
+};
+
+// Helper function to update user stats
+const updateUserStats = async (userId, stats) => {
+    try {
+        await User.findByIdAndUpdate(userId, {
+            'stats.memesCreated': stats.memesCreated,
+            'stats.totalLikes': stats.totalLikes,
+            'stats.totalViews': stats.totalViews,
+            'stats.totalShares': stats.totalShares
+        });
+        console.log('✅ User stats updated successfully');
+    } catch (error) {
+        console.error('❌ Error updating user stats:', error);
+        throw error;
     }
 };
 

@@ -1,7 +1,7 @@
 // 👤 Profile Page Component
 // User profile management
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Typography,
@@ -17,6 +17,7 @@ import {
     useTheme,
     Fade,
     Zoom,
+    Skeleton,
 } from '@mui/material';
 import {
     Edit as EditIcon,
@@ -26,12 +27,35 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
+import analyticsAPI from '../services/analyticsAPI';
 
 const Profile = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const { mode, currentThemeColors } = useThemeMode();
     const { user } = useAuth();
+    const [analyticsData, setAnalyticsData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Fetch analytics data for stats
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                setLoading(true);
+                const response = await analyticsAPI.getDashboardAnalytics(30);
+                if (response.success) {
+                    setAnalyticsData(response.data);
+                }
+            } catch (err) {
+                console.error('Error fetching analytics for profile:', err);
+                // If analytics fail, we'll fall back to user stats
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnalytics();
+    }, []);
 
     const handleEditProfile = () => {
         navigate('/profile/edit');
@@ -44,6 +68,33 @@ const Profile = () => {
             month: 'long',
             day: 'numeric'
         });
+    };
+
+    // Format numbers for display
+    const formatNumber = (num) => {
+        if (isNaN(num)) return '0';
+        if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+        if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
+        return num.toString();
+    };
+
+    // Get stats from analytics data or fallback to user stats
+    const getStats = () => {
+        if (analyticsData?.overview) {
+            return [
+                { label: 'Memes Created', value: analyticsData.overview.totalMemes || 0, icon: '🎨' },
+                { label: 'Total Likes', value: analyticsData.overview.totalLikes || 0, icon: '❤️' },
+                { label: 'Total Views', value: analyticsData.overview.totalViews || 0, icon: '👀' },
+                { label: 'Total Shares', value: analyticsData.overview.totalShares || 0, icon: '📤' },
+            ];
+        }
+        // Fallback to user stats if analytics not available
+        return [
+            { label: 'Memes Created', value: user?.stats?.memesCreated || 0, icon: '🎨' },
+            { label: 'Total Likes', value: user?.stats?.totalLikes || 0, icon: '❤️' },
+            { label: 'Total Views', value: user?.stats?.totalViews || 0, icon: '👀' },
+            { label: 'Total Shares', value: user?.stats?.totalShares || 0, icon: '📤' },
+        ];
     };
 
     return (
@@ -333,12 +384,7 @@ const Profile = () => {
                                 </Typography>
                                 
                                 <Grid container spacing={3} justifyContent="center">
-                                    {[
-                                        { label: 'Memes Created', value: user?.stats?.memesCreated || 0, icon: '🎨' },
-                                        { label: 'Total Likes', value: user?.stats?.totalLikes || 0, icon: '❤️' },
-                                        { label: 'Total Views', value: user?.stats?.totalViews || 0, icon: '👀' },
-                                        { label: 'Total Shares', value: user?.stats?.totalShares || 0, icon: '📤' },
-                                    ].map((stat, index) => (
+                                    {getStats().map((stat, index) => (
                                         <Grid item xs={6} sm={3} key={stat.label}>
                                             <Zoom in={true} timeout={1400 + index * 200}>
                                                 <Paper
@@ -396,7 +442,11 @@ const Profile = () => {
                                                             mb: 1,
                                                         }}
                                                     >
-                                                        {stat.value}
+                                                        {loading ? (
+                                                            <Skeleton variant="text" width="60%" height={40} sx={{ mx: 'auto' }} />
+                                                        ) : (
+                                                            formatNumber(stat.value)
+                                                        )}
                                                     </Typography>
                                                     <Typography 
                                                         variant="body2" 
@@ -405,7 +455,11 @@ const Profile = () => {
                                                             fontWeight: 500,
                                                         }}
                                                     >
-                                                        {stat.label}
+                                                        {loading ? (
+                                                            <Skeleton variant="text" width="80%" />
+                                                        ) : (
+                                                            stat.label
+                                                        )}
                                                     </Typography>
                                                 </Paper>
                                             </Zoom>

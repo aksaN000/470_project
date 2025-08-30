@@ -20,6 +20,7 @@ import {
     Fade,
     Slide,
     Zoom,
+    Skeleton,
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -40,6 +41,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import StatCard from '../components/common/StatCard';
 import ActionCard from '../components/common/ActionCard';
+import analyticsAPI from '../services/analyticsAPI';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -47,6 +49,9 @@ const Dashboard = () => {
     const { mode, currentThemeColors } = useThemeMode();
     const { user } = useAuth();
     const [animationStep, setAnimationStep] = useState(0);
+    const [analyticsData, setAnalyticsData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -55,33 +60,101 @@ const Dashboard = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // Enhanced stats data
-    const userStats = [
-        {
-            icon: <MemoryIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
-            title: 'Total Memes',
-            value: user?.stats?.totalMemes || '12',
-            change: '+3 this week',
-        },
-        {
-            icon: <FavoriteIcon sx={{ fontSize: 40, color: '#ef4444' }} />,
-            title: 'Total Likes',
-            value: user?.stats?.totalLikes || '1.2k',
-            change: '+127 this week',
-        },
-        {
-            icon: <VisibilityIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
-            title: 'Total Views',
-            value: user?.stats?.totalViews || '15.7k',
-            change: '+2.1k this week',
-        },
-        {
-            icon: <ShareIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
-            title: 'Shares',
-            value: user?.stats?.totalShares || '89',
-            change: '+12 this week',
-        },
-    ];
+    // Fetch analytics data
+    useEffect(() => {
+        const fetchAnalytics = async () => {
+            try {
+                setLoading(true);
+                const response = await analyticsAPI.getDashboardAnalytics(30);
+                if (response.success) {
+                    setAnalyticsData(response.data);
+                } else {
+                    throw new Error(response.message || 'Failed to fetch analytics');
+                }
+            } catch (err) {
+                console.error('Error fetching analytics:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnalytics();
+    }, []);
+
+    // Format numbers for display
+    const formatNumber = (num) => {
+        if (isNaN(num)) return '0';
+        if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+        if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
+        return num.toString();
+    };
+
+    // Get user stats from analytics data
+    const getUserStats = () => {
+        if (!analyticsData?.overview) {
+            // Return default values while loading
+            return [
+                {
+                    icon: <MemoryIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
+                    title: 'Total Memes',
+                    value: '0',
+                    change: 'Loading...',
+                },
+                {
+                    icon: <FavoriteIcon sx={{ fontSize: 40, color: '#ef4444' }} />,
+                    title: 'Total Likes',
+                    value: '0',
+                    change: 'Loading...',
+                },
+                {
+                    icon: <VisibilityIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
+                    title: 'Total Views',
+                    value: '0',
+                    change: 'Loading...',
+                },
+                {
+                    icon: <ShareIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
+                    title: 'Shares',
+                    value: '0',
+                    change: 'Loading...',
+                },
+            ];
+        }
+
+        const { overview, growth } = analyticsData;
+        
+        return [
+            {
+                icon: <MemoryIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
+                title: 'Total Memes',
+                value: formatNumber(overview.totalMemes || 0),
+                change: growth?.memesGrowth 
+                    ? `${growth.memesGrowth > 0 ? '+' : ''}${growth.memesGrowth.toFixed(1)}% this period`
+                    : 'No change',
+            },
+            {
+                icon: <FavoriteIcon sx={{ fontSize: 40, color: '#ef4444' }} />,
+                title: 'Total Likes',
+                value: formatNumber(overview.totalLikes || 0),
+                change: `${formatNumber(overview.totalLikes || 0)} total`,
+            },
+            {
+                icon: <VisibilityIcon sx={{ fontSize: 40, color: '#6366f1' }} />,
+                title: 'Total Views',
+                value: formatNumber(overview.totalViews || 0),
+                change: `${formatNumber(overview.totalViews || 0)} total`,
+            },
+            {
+                icon: <ShareIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />,
+                title: 'Shares',
+                value: formatNumber(overview.totalShares || 0),
+                change: `${formatNumber(overview.totalShares || 0)} total`,
+            },
+        ];
+    };
+
+    const userStats = getUserStats();
 
     // Quick actions with enhanced styling
     const quickActions = [
@@ -350,7 +423,11 @@ const Dashboard = () => {
                                     <CardContent sx={{ p: 3, position: 'relative', zIndex: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                                             <Box sx={{ mr: 2 }}>
-                                                {stat.icon}
+                                                {loading ? (
+                                                    <Skeleton variant="circular" width={40} height={40} />
+                                                ) : (
+                                                    stat.icon
+                                                )}
                                             </Box>
                                             <Typography 
                                                 variant="h6" 
@@ -371,7 +448,11 @@ const Dashboard = () => {
                                                 color: theme.palette.text.primary
                                             }}
                                         >
-                                            {stat.value}
+                                            {loading ? (
+                                                <Skeleton variant="text" width="60%" height={40} />
+                                            ) : (
+                                                stat.value
+                                            )}
                                         </Typography>
                                         
                                         <Typography 
@@ -382,7 +463,11 @@ const Dashboard = () => {
                                                 mt: 'auto'
                                             }}
                                         >
-                                            {stat.change}
+                                            {loading ? (
+                                                <Skeleton variant="text" width="80%" />
+                                            ) : (
+                                                stat.change
+                                            )}
                                         </Typography>
                                     </CardContent>
                                 </Card>
