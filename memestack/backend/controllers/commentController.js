@@ -282,17 +282,19 @@ const deleteComment = async (req, res) => {
         
         console.log('🔍 Found comment:', {
             commentAuthor: comment.author,
-            commentAuthorString: comment.author.toString(),
+            commentAuthorId: comment.author._id || comment.author,
+            commentAuthorString: (comment.author._id || comment.author).toString(),
             requestUserId: userId,
             requestUserIdString: userId.toString(),
             userRole: req.user.role
         });
         
         // Check if user can delete (author or admin)
-        const canDelete = comment.author.toString() === userId.toString() || req.user.role === 'admin';
+        const authorId = comment.author._id || comment.author;
+        const canDelete = authorId.toString() === userId.toString() || req.user.role === 'admin';
         
         console.log('🔐 Authorization check:', {
-            isAuthor: comment.author.toString() === userId.toString(),
+            isAuthor: authorId.toString() === userId.toString(),
             isAdmin: req.user.role === 'admin',
             canDelete
         });

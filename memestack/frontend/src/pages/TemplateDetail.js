@@ -309,10 +309,21 @@ const TemplateDetail = () => {
                                                     <IconButton
                                                         onClick={handleToggleFavorite}
                                                         sx={{
-                                                            background: 'rgba(255, 255, 255, 0.9)',
+                                                            background: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(0, 0, 0, 0.8)' 
+                                                                : 'rgba(255, 255, 255, 0.95)',
                                                             backdropFilter: 'blur(10px)',
+                                                            border: theme.palette.mode === 'dark'
+                                                                ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                                : '1px solid rgba(0, 0, 0, 0.1)',
+                                                            boxShadow: theme.palette.mode === 'dark'
+                                                                ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                                                : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                            color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
                                                             '&:hover': { 
-                                                                background: 'rgba(255, 255, 255, 1)',
+                                                                background: theme.palette.mode === 'dark'
+                                                                    ? 'rgba(0, 0, 0, 0.9)'
+                                                                    : 'rgba(255, 255, 255, 1)',
                                                                 transform: 'scale(1.1)',
                                                             }
                                                         }}
@@ -327,10 +338,21 @@ const TemplateDetail = () => {
                                                 <IconButton
                                                     onClick={handleDownload}
                                                     sx={{
-                                                        background: 'rgba(255, 255, 255, 0.9)',
+                                                        background: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(0, 0, 0, 0.8)' 
+                                                            : 'rgba(255, 255, 255, 0.95)',
                                                         backdropFilter: 'blur(10px)',
+                                                        border: theme.palette.mode === 'dark'
+                                                            ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                            : '1px solid rgba(0, 0, 0, 0.1)',
+                                                        boxShadow: theme.palette.mode === 'dark'
+                                                            ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                                            : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                        color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
                                                         '&:hover': { 
-                                                            background: 'rgba(255, 255, 255, 1)',
+                                                            background: theme.palette.mode === 'dark'
+                                                                ? 'rgba(0, 0, 0, 0.9)'
+                                                                : 'rgba(255, 255, 255, 1)',
                                                             transform: 'scale(1.1)',
                                                         }
                                                     }}
@@ -341,10 +363,21 @@ const TemplateDetail = () => {
                                                 <IconButton
                                                     onClick={handleShare}
                                                     sx={{
-                                                        background: 'rgba(255, 255, 255, 0.9)',
+                                                        background: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(0, 0, 0, 0.8)' 
+                                                            : 'rgba(255, 255, 255, 0.95)',
                                                         backdropFilter: 'blur(10px)',
+                                                        border: theme.palette.mode === 'dark'
+                                                            ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                            : '1px solid rgba(0, 0, 0, 0.1)',
+                                                        boxShadow: theme.palette.mode === 'dark'
+                                                            ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                                            : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                        color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
                                                         '&:hover': { 
-                                                            background: 'rgba(255, 255, 255, 1)',
+                                                            background: theme.palette.mode === 'dark'
+                                                                ? 'rgba(0, 0, 0, 0.9)'
+                                                                : 'rgba(255, 255, 255, 1)',
                                                             transform: 'scale(1.1)',
                                                         }
                                                     }}
@@ -362,13 +395,23 @@ const TemplateDetail = () => {
                                                     <IconButton
                                                         onClick={handleDelete}
                                                         sx={{
-                                                            background: 'rgba(255, 255, 255, 0.9)',
+                                                            background: theme.palette.mode === 'dark' 
+                                                                ? 'rgba(244, 67, 54, 0.9)' 
+                                                                : 'rgba(255, 255, 255, 0.95)',
                                                             backdropFilter: 'blur(10px)',
-                                                            color: 'error.main',
+                                                            border: theme.palette.mode === 'dark'
+                                                                ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                                : '1px solid rgba(244, 67, 54, 0.3)',
+                                                            boxShadow: theme.palette.mode === 'dark'
+                                                                ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                                                : '0 2px 8px rgba(244, 67, 54, 0.2)',
+                                                            color: theme.palette.mode === 'dark' ? 'white' : 'error.main',
                                                             '&:hover': { 
-                                                                background: 'rgba(255, 255, 255, 1)',
+                                                                background: theme.palette.mode === 'dark'
+                                                                    ? 'rgba(244, 67, 54, 1)'
+                                                                    : 'rgba(244, 67, 54, 0.1)',
                                                                 transform: 'scale(1.1)',
-                                                                color: 'error.dark'
+                                                                color: theme.palette.mode === 'dark' ? 'white' : 'error.dark'
                                                             }
                                                         }}
                                                     >
@@ -388,8 +431,17 @@ const TemplateDetail = () => {
                                                 <Chip
                                                     label={template.category}
                                                     sx={{
-                                                        background: 'rgba(255, 255, 255, 0.9)',
+                                                        background: theme.palette.mode === 'dark' 
+                                                            ? 'rgba(0, 0, 0, 0.8)' 
+                                                            : 'rgba(255, 255, 255, 0.95)',
                                                         backdropFilter: 'blur(10px)',
+                                                        border: theme.palette.mode === 'dark'
+                                                            ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                            : '1px solid rgba(0, 0, 0, 0.1)',
+                                                        boxShadow: theme.palette.mode === 'dark'
+                                                            ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                                            : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                        color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
                                                         fontWeight: 600,
                                                         textTransform: 'capitalize',
                                                     }}

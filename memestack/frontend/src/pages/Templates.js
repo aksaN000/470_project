@@ -379,9 +379,23 @@ const Templates = () => {
                                     handleToggleFavorite(template._id);
                                 }}
                                 sx={{
-                                    background: 'rgba(255, 255, 255, 0.9)',
+                                    background: theme.palette.mode === 'dark' 
+                                        ? 'rgba(0, 0, 0, 0.8)' 
+                                        : 'rgba(255, 255, 255, 0.95)',
                                     backdropFilter: 'blur(10px)',
-                                    '&:hover': { background: 'rgba(255, 255, 255, 1)' }
+                                    border: theme.palette.mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.2)'
+                                        : '1px solid rgba(0, 0, 0, 0.1)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                        : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                    color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
+                                    '&:hover': { 
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'rgba(0, 0, 0, 0.9)'
+                                            : 'rgba(255, 255, 255, 1)',
+                                        transform: 'scale(1.05)'
+                                    }
                                 }}
                             >
                                 {favorites.has(template._id) ? 
@@ -397,12 +411,23 @@ const Templates = () => {
                                 size="small"
                                 onClick={(e) => handleDeleteTemplate(template._id, e)}
                                 sx={{
-                                    background: 'rgba(255, 255, 255, 0.9)',
+                                    background: theme.palette.mode === 'dark' 
+                                        ? 'rgba(244, 67, 54, 0.9)' 
+                                        : 'rgba(255, 255, 255, 0.95)',
                                     backdropFilter: 'blur(10px)',
-                                    color: 'error.main',
+                                    border: theme.palette.mode === 'dark'
+                                        ? '1px solid rgba(255, 255, 255, 0.2)'
+                                        : '1px solid rgba(244, 67, 54, 0.3)',
+                                    boxShadow: theme.palette.mode === 'dark'
+                                        ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                        : '0 2px 8px rgba(244, 67, 54, 0.2)',
+                                    color: theme.palette.mode === 'dark' ? 'white' : 'error.main',
                                     '&:hover': { 
-                                        background: 'rgba(255, 255, 255, 1)',
-                                        color: 'error.dark'
+                                        background: theme.palette.mode === 'dark'
+                                            ? 'rgba(244, 67, 54, 1)'
+                                            : 'rgba(244, 67, 54, 0.1)',
+                                        color: theme.palette.mode === 'dark' ? 'white' : 'error.dark',
+                                        transform: 'scale(1.05)'
                                     }
                                 }}
                                 title="Delete template"
@@ -415,8 +440,17 @@ const Templates = () => {
                             label={template.category}
                             size="small"
                             sx={{
-                                background: 'rgba(255, 255, 255, 0.9)',
+                                background: theme.palette.mode === 'dark' 
+                                    ? 'rgba(0, 0, 0, 0.8)' 
+                                    : 'rgba(255, 255, 255, 0.95)',
                                 backdropFilter: 'blur(10px)',
+                                border: theme.palette.mode === 'dark'
+                                    ? '1px solid rgba(255, 255, 255, 0.2)'
+                                    : '1px solid rgba(0, 0, 0, 0.1)',
+                                boxShadow: theme.palette.mode === 'dark'
+                                    ? '0 2px 8px rgba(0, 0, 0, 0.4)'
+                                    : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                color: theme.palette.mode === 'dark' ? 'white' : 'inherit',
                                 fontWeight: 600,
                             }}
                         />

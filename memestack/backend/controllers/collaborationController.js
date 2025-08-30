@@ -587,13 +587,27 @@ const deleteCollaboration = async (req, res) => {
         const { id } = req.params;
         const userId = req.user._id || req.user.userId;
 
+        console.log('🗑️ Delete collaboration request:', { 
+            collaborationId: id, 
+            userId,
+            userObject: req.user
+        });
+
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
             return res.status(404).json({ message: 'Collaboration not found' });
         }
 
+        console.log('🔍 Found collaboration:', {
+            collaborationOwner: collaboration.owner,
+            collaborationOwnerString: collaboration.owner.toString(),
+            requestUserId: userId,
+            requestUserIdString: userId.toString(),
+            isMatch: collaboration.owner.toString() === userId.toString()
+        });
+
         // Check permissions
-        if (collaboration.owner.toString() !== userId) {
+        if (collaboration.owner.toString() !== userId.toString()) {
             return res.status(403).json({ message: 'Only the owner can delete this collaboration' });
         }
 

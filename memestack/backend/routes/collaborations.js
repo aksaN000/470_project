@@ -245,7 +245,7 @@ router.use(auth); // All routes below require authentication
 // Collaboration management
 router.post('/', validateCollaboration, createCollaboration);
 router.put('/:id', auth, validateCollaborationUpdate, updateCollaboration);
-router.delete('/:id', deleteCollaboration);
+router.delete('/:id', auth, deleteCollaboration);
 
 // Participation
 router.post('/:id/join', validateJoin, joinCollaboration);
