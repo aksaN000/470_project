@@ -134,6 +134,9 @@ const connectDB = async () => {
     }
 };
 
+// Connect to database for both local and serverless
+connectDB().catch(console.error);
+
 // ========================================
 // ROUTES SETUP
 // ========================================
@@ -260,7 +263,7 @@ app.use((error, req, res, next) => {
 const startServer = async () => {
     try {
         // Connect to database first
-        await connectDB();
+        // await connectDB(); // Moved to top level for serverless compatibility
         
         // Start the server
         const server = app.listen(PORT, () => {
