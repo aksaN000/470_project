@@ -135,11 +135,38 @@ const connectDB = async () => {
 };
 
 // Connect to database for both local and serverless
-connectDB().catch(console.error);
+if (!process.env.VERCEL) {
+    // Only connect at startup for local development
+    connectDB().catch(console.error);
+} else {
+    // For Vercel serverless, connect on first request
+    console.log('🌐 Running on Vercel - database will connect on first request');
+}
 
 // ========================================
-// ROUTES SETUP
+// DATABASE CONNECTION MIDDLEWARE
 // ========================================
+
+// Middleware to ensure database connection for serverless
+const ensureDatabaseConnection = async (req, res, next) => {
+    try {
+        if (process.env.VERCEL && mongoose.connection.readyState !== 1) {
+            console.log('🔄 Establishing database connection...');
+            await connectDB();
+        }
+        next();
+    } catch (error) {
+        console.error('❌ Database connection middleware error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Database connection failed',
+            error: error.message
+        });
+    }
+};
+
+// Apply database connection middleware to all API routes
+app.use('/api', ensureDatabaseConnection);
 
 // Basic health check route
 app.get('/', (req, res) => {
@@ -159,30 +186,46 @@ app.get('/', (req, res) => {
 });
 
 // API health check with detailed system info
-app.get('/api/health', (req, res) => {
-    const healthStatus = {
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV,
-        version: '1.0.0',
-        database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-        memory: {
-            used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
-            total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+app.get('/api/health', async (req, res) => {
+    try {
+        // Ensure database connection for serverless
+        if (process.env.VERCEL && mongoose.connection.readyState !== 1) {
+            console.log('🔄 Establishing database connection for health check...');
+            await connectDB();
         }
-    };
-    
-    // Add more details in development
-    if (process.env.NODE_ENV === 'development') {
-        healthStatus.details = {
-            platform: process.platform,
-            nodeVersion: process.version,
-            databaseName: mongoose.connection.name
+
+        const healthStatus = {
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            environment: process.env.NODE_ENV,
+            version: '1.0.0',
+            database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
+            memory: {
+                used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
+                total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+            }
         };
+
+        // Add more details in development
+        if (process.env.NODE_ENV === 'development') {
+            healthStatus.details = {
+                platform: process.platform,
+                nodeVersion: process.version,
+                databaseName: mongoose.connection.name
+            };
+        }
+
+        res.json(healthStatus);
+    } catch (error) {
+        console.error('❌ Health check error:', error);
+        res.status(500).json({
+            status: 'ERROR',
+            timestamp: new Date().toISOString(),
+            database: 'Connection Failed',
+            error: error.message
+        });
     }
-    
-    res.json(healthStatus);
 });
 
 // Import and use route files
