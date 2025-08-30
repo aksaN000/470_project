@@ -1,33 +1,29 @@
-# Getting Started with Create React App
+# MemeStack Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React frontend for the MemeStack meme management platform.
 
-## Available Scripts
+## Development
 
-In the project directory, you can run:
+```bash
+npm start    # Start development server at http://localhost:3000
+npm run build # Build for production
+```
 
-### `npm start`
+## Environment Configuration
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Create a `.env` file with:
+```bash
+REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_NAME=MemeStack
+REACT_APP_VERSION=1.0.0
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- React 19.1.0
+- Material-UI (MUI) 7.2.0
+- React Router 7.6.3
+- Axios for API calls
 
 ### `npm run eject`
 

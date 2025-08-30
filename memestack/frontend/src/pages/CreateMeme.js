@@ -430,8 +430,8 @@ const CreateMeme = () => {
                                 p: 4,
                                 mb: 4,
                                 background: theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                 backdropFilter: 'blur(50px)',
                                 WebkitBackdropFilter: 'blur(50px)',
                                 border: theme.palette.mode === 'dark'
@@ -535,8 +535,8 @@ const CreateMeme = () => {
                             elevation={0}
                             sx={{
                                 background: theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                 backdropFilter: 'blur(40px)',
                                 WebkitBackdropFilter: 'blur(40px)',
                                 border: theme.palette.mode === 'dark'
@@ -553,8 +553,8 @@ const CreateMeme = () => {
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                     background: theme.palette.mode === 'dark'
-                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.15) 100%)'
-                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.25) 100%)',
+                                        ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
                                     border: theme.palette.mode === 'dark'
                                         ? '2px solid rgba(255, 255, 255, 0.4)'
                                         : '2px solid rgba(0, 0, 0, 0.25)',
@@ -599,8 +599,8 @@ const CreateMeme = () => {
                         <Card
                             sx={{
                                 background: theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                 backdropFilter: 'blur(40px)',
                                 WebkitBackdropFilter: 'blur(40px)',
                                 border: theme.palette.mode === 'dark'

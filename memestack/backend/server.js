@@ -11,6 +11,16 @@ const path = require('path');
 // Load environment variables from .env file
 dotenv.config();
 
+// Load all models to ensure they're registered with mongoose
+require('./models/User');
+require('./models/Meme');
+require('./models/Folder');
+require('./models/Comment');
+require('./models/Follow');
+require('./models/MemeTemplate');
+require('./models/Collaboration');
+require('./models/Report');
+
 // Create Express application instance
 const app = express();
 
@@ -111,32 +121,8 @@ const connectDB = async () => {
             return;
         }
         
-        // Priority 3: In-memory database (Testing only)
-        if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
-            console.log('🧪 Using in-memory database (Development/Testing)...');
-            const { MongoMemoryServer } = require('mongodb-memory-server');
-            
-            const mongod = new MongoMemoryServer({
-                instance: { dbName: 'memestack' }
-            });
-            
-            await mongod.start();
-            const uri = mongod.getUri();
-            
-            const conn = await mongoose.connect(uri);
-            console.log(`✅ In-Memory MongoDB Connected!`);
-            console.log(`📊 Database: ${conn.connection.name} (temporary)`);
-            console.log(`💡 Data will reset when server restarts`);
-            
-            // Store mongod instance for cleanup
-            global.mongod = mongod;
-            
-            // Create initial data for development
-            await createInitialData();
-            return;
-        }
-        
         throw new Error('No valid MongoDB connection string found in environment variables');
+        
         
     } catch (error) {
         console.error('❌ MongoDB connection error:', error.message);
@@ -222,10 +208,6 @@ console.log('✅ User routes loaded');
 // ========================================
 // COLLABORATION FEATURE ROUTES
 // ========================================
-app.use('/api/challenges', require('./routes/challenges'));
-console.log('✅ Challenge routes loaded');
-app.use('/api/groups', require('./routes/groups'));
-console.log('✅ Group routes loaded');
 app.use('/api/collaborations', require('./routes/collaborations'));
 console.log('✅ Collaboration routes loaded');
 
@@ -327,12 +309,6 @@ const gracefulShutdown = async (server) => {
         await mongoose.connection.close();
         console.log('✅ Database connection closed');
         
-        // Clean up in-memory database if it exists
-        if (global.mongod) {
-            await global.mongod.stop();
-            console.log('✅ In-memory database stopped');
-        }
-        
         console.log('✅ Graceful shutdown completed');
         process.exit(0);
         
@@ -349,12 +325,6 @@ process.on('SIGINT', async () => {
     try {
         await mongoose.connection.close();
         console.log('✅ Database connection closed');
-        
-        // Clean up in-memory database if it exists
-        if (global.mongod) {
-            await global.mongod.stop();
-            console.log('✅ In-memory database stopped');
-        }
         
         process.exit(0);
     } catch (error) {

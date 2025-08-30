@@ -102,7 +102,8 @@ folderSchema.pre('save', function(next) {
 
 // Method to add meme to folder
 folderSchema.methods.addMeme = function(memeId) {
-    if (!this.memes.includes(memeId)) {
+    const isAlreadyInFolder = this.memes.some(existingId => existingId.equals(memeId));
+    if (!isAlreadyInFolder) {
         this.memes.push(memeId);
         this.memeCount = this.memes.length;
         this.stats.lastUpdated = new Date();

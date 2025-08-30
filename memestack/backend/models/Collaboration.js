@@ -16,7 +16,7 @@ const collaborationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['remix', 'collaboration', 'template_creation', 'challenge_response'],
+        enum: ['remix', 'collaboration', 'template_creation'],
         required: true
     },
     status: {
@@ -32,16 +32,6 @@ const collaborationSchema = new mongoose.Schema({
     parentCollaboration: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Collaboration',
-        default: null
-    },
-    challenge: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Challenge',
-        default: null
-    },
-    group: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group',
         default: null
     },
     owner: {
@@ -364,8 +354,6 @@ collaborationSchema.index({ owner: 1, status: 1 });
 collaborationSchema.index({ 'collaborators.user': 1 });
 collaborationSchema.index({ originalMeme: 1 });
 collaborationSchema.index({ type: 1, status: 1 });
-collaborationSchema.index({ challenge: 1 });
-collaborationSchema.index({ group: 1 });
 collaborationSchema.index({ createdAt: -1 });
 
 // Virtual for getting current version
@@ -580,8 +568,6 @@ collaborationSchema.methods.fork = function(newOwner, title) {
         owner: newOwner,
         parentCollaboration: this._id,
         originalMeme: this.originalMeme,
-        challenge: this.challenge,
-        group: this.group,
         status: 'active',
         settings: {
             ...this.settings,
@@ -763,7 +749,7 @@ collaborationSchema.statics.createTemplate = function(templateData) {
     return {
         name,
         description,
-        category, // 'meme-remix', 'group-project', 'challenge-response', 'tutorial'
+        category, // 'meme-remix', 'team-project', 'tutorial', 'quick'
         defaultSettings: {
             isPublic: true,
             allowForks: true,
@@ -794,19 +780,12 @@ collaborationSchema.statics.getTemplates = function(category = null) {
             tags: ['remix', 'creative', 'quick']
         }),
         this.createTemplate({
-            name: 'Group Meme Project',
+            name: 'Team Meme Project',
             description: 'Large-scale collaborative meme creation with multiple contributors',
-            category: 'group-project',
+            category: 'team-project',
             defaultSettings: { maxCollaborators: 15, requireApproval: true },
             requiredRoles: ['owner', 'admin', 'editor', 'contributor'],
-            tags: ['group', 'structured', 'long-term']
-        }),
-        this.createTemplate({
-            name: 'Challenge Response',
-            description: 'Respond to community challenges with collaborative solutions',
-            category: 'challenge-response',
-            defaultSettings: { maxCollaborators: 8, allowForks: true },
-            tags: ['challenge', 'community', 'competitive']
+            tags: ['team', 'structured', 'long-term']
         }),
         this.createTemplate({
             name: 'Tutorial Creation',

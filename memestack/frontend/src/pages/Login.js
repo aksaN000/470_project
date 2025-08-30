@@ -138,8 +138,8 @@ const Login = () => {
                         sx={{
                             p: 6,
                             background: mode === 'dark'
-                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
-                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                             backdropFilter: 'blur(50px)',
                             border: mode === 'dark'
                                 ? '2px solid rgba(255, 255, 255, 0.15)'

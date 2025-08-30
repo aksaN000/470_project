@@ -23,13 +23,13 @@ const colorSchemes = {
             primary: '#6366f1',
             secondary: '#ec4899',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            surface: 'rgba(255, 255, 255, 0.25)',
+            surface: 'rgba(255, 255, 255, 0.15)',
         },
         dark: {
             primary: '#8b5cf6',
             secondary: '#f472b6',
             background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-            surface: 'rgba(255, 255, 255, 0.08)',
+            surface: 'rgba(255, 255, 255, 0.05)',
         }
     },
     ocean: {
@@ -38,13 +38,13 @@ const colorSchemes = {
             primary: '#0ea5e9',
             secondary: '#06b6d4',
             background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
-            surface: 'rgba(255, 255, 255, 0.25)',
+            surface: 'rgba(255, 255, 255, 0.15)',
         },
         dark: {
             primary: '#38bdf8',
             secondary: '#22d3ee',
             background: 'linear-gradient(135deg, #0c4a6e 0%, #164e63 100%)',
-            surface: 'rgba(255, 255, 255, 0.08)',
+            surface: 'rgba(255, 255, 255, 0.05)',
         }
     },
     sunset: {
@@ -180,7 +180,7 @@ export const ThemeProvider = ({ children }) => {
             },
             background: {
                 default: mode === 'light' ? '#f8fafc' : '#0f172a',
-                paper: currentScheme.surface || (mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)'),
+                paper: mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)',
             },
             text: {
                 primary: mode === 'light' ? '#1e293b' : '#f1f5f9',
@@ -304,7 +304,12 @@ export const ThemeProvider = ({ children }) => {
                 styleOverrides: {
                     root: {
                         backgroundImage: 'none',
-                        border: mode === 'dark' ? '1px solid #334155' : 'none',
+                        backgroundColor: mode === 'light' ? 'rgba(255, 255, 255, 0.95)' : 'rgba(30, 41, 59, 0.95)',
+                        backdropFilter: 'blur(10px)',
+                        border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.05)',
+                        boxShadow: mode === 'light' 
+                            ? '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)'
+                            : '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4)',
                     },
                 },
             },
@@ -352,6 +357,18 @@ export const ThemeProvider = ({ children }) => {
                                 borderColor: currentScheme.primary,
                             },
                         },
+                    },
+                },
+            },
+            MuiDialog: {
+                styleOverrides: {
+                    paper: {
+                        backgroundColor: mode === 'light' ? 'rgba(255, 255, 255, 0.98)' : 'rgba(30, 41, 59, 0.98)',
+                        backdropFilter: 'blur(16px)',
+                        border: mode === 'dark' ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
+                        boxShadow: mode === 'light' 
+                            ? '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+                            : '0 25px 50px -12px rgb(0 0 0 / 0.6)',
                     },
                 },
             },

@@ -556,8 +556,8 @@ const Templates = () => {
                                     p: 4,
                                     mb: 4,
                                     background: theme.palette.mode === 'dark'
-                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                        ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                     backdropFilter: 'blur(50px)',
                                     WebkitBackdropFilter: 'blur(50px)',
                                     border: theme.palette.mode === 'dark'
@@ -665,8 +665,8 @@ const Templates = () => {
                             sx={{
                                 mb: 4,
                                 background: theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
+                                    ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                 backdropFilter: 'blur(40px)',
                                 WebkitBackdropFilter: 'blur(40px)',
                                 border: theme.palette.mode === 'dark'

@@ -28,8 +28,6 @@ import {
     Step,
     StepLabel,
     StepContent,
-    Radio,
-    RadioGroup,
     Grid
 } from '@mui/material';
 import {
@@ -40,7 +38,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
-import { collaborationsAPI, memeAPI, challengesAPI, groupsAPI } from '../services/api';
+import { collaborationsAPI, memeAPI } from '../services/api';
 
 const CreateCollaboration = () => {
     const navigate = useNavigate();
@@ -61,8 +59,6 @@ const CreateCollaboration = () => {
         description: '',
         type: searchParams.get('type') || 'collaboration',
         originalMeme: '',
-        challenge: '',
-        group: '',
         settings: {
             isPublic: true,
             allowForks: true,
@@ -76,13 +72,11 @@ const CreateCollaboration = () => {
 
     // Available options
     const [memes, setMemes] = useState([]);
-    const [challenges, setChallenges] = useState([]);
-    const [groups, setGroups] = useState([]);
     const [templates, setTemplates] = useState([]);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [availableTags, setAvailableTags] = useState([
         'funny', 'creative', 'educational', 'artistic', 'meme', 'remix',
-        'challenge', 'community', 'trending', 'original'
+        'community', 'trending', 'original'
     ]);
 
     useEffect(() => {
@@ -125,24 +119,6 @@ const CreateCollaboration = () => {
             
             console.log('Normalized memes:', normalizedMemes);
             setMemes(normalizedMemes);
-
-            // Load available challenges
-            try {
-                const challengesResponse = await challengesAPI.getChallenges({ status: 'active' });
-                setChallenges(challengesResponse.challenges || challengesResponse.data || []);
-            } catch (challengeError) {
-                console.warn('Could not load challenges:', challengeError);
-                setChallenges([]);
-            }
-
-            // Load user's groups
-            try {
-                const groupsResponse = await groupsAPI.getUserGroups();
-                setGroups(groupsResponse.groups || groupsResponse.data || []);
-            } catch (groupError) {
-                console.warn('Could not load groups:', groupError);
-                setGroups([]);
-            }
 
             // Load collaboration templates
             try {
@@ -220,16 +196,10 @@ const CreateCollaboration = () => {
                 throw new Error('Original meme is required for remixes');
             }
 
-            if (formData.type === 'challenge_response' && !formData.challenge) {
-                throw new Error('Challenge is required for challenge responses');
-            }
-
             // Clean the data - remove empty strings for optional fields
             const cleanedData = {
                 ...formData,
                 originalMeme: formData.originalMeme || undefined,
-                challenge: formData.challenge || undefined,
-                group: formData.group || undefined,
                 description: formData.description.trim() || undefined,
                 templateUsed: selectedTemplate?._id || undefined
             };
@@ -263,8 +233,6 @@ const CreateCollaboration = () => {
                 description: '',
                 type: searchParams.get('type') || 'collaboration',
                 originalMeme: '',
-                challenge: '',
-                group: '',
                 settings: {
                     isPublic: true,
                     allowForks: true,
@@ -427,7 +395,6 @@ const CreateCollaboration = () => {
                             <MenuItem value="collaboration">General Collaboration</MenuItem>
                             <MenuItem value="remix">Meme Remix</MenuItem>
                             <MenuItem value="template_creation">Template Creation</MenuItem>
-                            <MenuItem value="challenge_response">Challenge Response</MenuItem>
                         </Select>
                     </FormControl>
 
@@ -469,7 +436,7 @@ const CreateCollaboration = () => {
                     {formData.type === 'collaboration' && (
                         <Box sx={{ p: 2, bgcolor: 'info.main', color: 'info.contrastText', borderRadius: 1, mb: 2 }}>
                             <Typography variant="body2">
-                                💡 For general collaborations, you can optionally select a group to collaborate within.
+                                💡 General collaborations allow you to work together on meme creation projects.
                             </Typography>
                         </Box>
                     )}
@@ -689,40 +656,6 @@ const CreateCollaboration = () => {
                         </Box>
                     )}
 
-                    {formData.type === 'challenge_response' && (
-                        <FormControl fullWidth margin="normal" required>
-                            <InputLabel id="challenge-label">Challenge</InputLabel>
-                            <Select
-                                labelId="challenge-label"
-                                value={formData.challenge || ''}
-                                label="Challenge"
-                                onChange={(e) => handleInputChange('challenge', e.target.value || '')}
-                            >
-                                {challenges.map((challenge) => (
-                                    <MenuItem key={challenge._id} value={challenge._id}>
-                                        {challenge.title} ({challenge.type})
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    )}
-
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="group-label">Group (Optional)</InputLabel>
-                        <Select
-                            labelId="group-label"
-                            value={formData.group || ''}
-                            label="Group (Optional)"
-                            onChange={(e) => handleInputChange('group', e.target.value || '')}
-                        >
-                            <MenuItem value="">None</MenuItem>
-                            {groups.map((group) => (
-                                <MenuItem key={group._id} value={group._id}>
-                                    {group.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
                 </Box>
             )
         },
@@ -828,9 +761,6 @@ const CreateCollaboration = () => {
                     });
                     return isValid;
                 }
-                if (formData.type === 'challenge_response') {
-                    return formData.challenge && formData.challenge.trim() !== '';
-                }
                 // For other types, this step is always valid
                 return true;
             case 2:
@@ -875,8 +805,8 @@ const CreateCollaboration = () => {
                         elevation={0}
                         sx={{
                             background: mode === 'dark' 
-                                ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
-                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+                                ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                             backdropFilter: 'blur(50px)',
                             borderRadius: 3,
                             border: mode === 'dark'

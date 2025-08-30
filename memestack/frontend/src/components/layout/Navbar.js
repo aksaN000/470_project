@@ -17,9 +17,11 @@ import {
     Drawer,
     List,
     ListItem,
+    ListItemButton,
     ListItemIcon,
     ListItemText,
     Divider,
+    Tooltip,
 } from '@mui/material';
 import {
     Menu as MenuIcon,
@@ -33,12 +35,11 @@ import {
     PersonAdd as RegisterIcon,
     Logout as LogoutIcon,
     Settings as SettingsIcon,
-    EmojiEvents,
-    Groups,
     Handshake,
     Brightness4,
     Brightness7,
     Palette as PaletteIcon,
+    MoreHoriz as MoreIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -49,7 +50,8 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isMobile = useMediaQuery(theme.breakpoints.down('lg')); // Mobile drawer for lg and below
+    const isSmallDesktop = useMediaQuery(theme.breakpoints.between('md', 'xl')); // Medium-sized screens
     
     const { user, isAuthenticated, logout } = useAuth();
     const { mode, toggleTheme, currentThemeColors } = useThemeMode();
@@ -67,6 +69,7 @@ const Navbar = () => {
     // State for mobile menu and user menu
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
 
     // Handle mobile menu toggle
     const handleDrawerToggle = () => {
@@ -82,6 +85,15 @@ const Navbar = () => {
         setAnchorEl(null);
     };
 
+    // Handle more menu for medium screens
+    const handleMoreMenu = (event) => {
+        setMoreMenuAnchor(event.currentTarget);
+    };
+
+    const handleCloseMoreMenu = () => {
+        setMoreMenuAnchor(null);
+    };
+
     // Handle logout
     const handleLogout = async () => {
         handleCloseMenu();
@@ -94,8 +106,6 @@ const Navbar = () => {
         { label: 'Home', path: '/', icon: <HomeIcon sx={{ color: themeColors?.primary || '#6366f1' }} /> },
         { label: 'Gallery', path: '/gallery', icon: <GalleryIcon sx={{ color: themeColors?.secondary || '#8b5cf6' }} /> },
         { label: 'Browse Users', path: '/browse-users', icon: <PeopleIcon sx={{ color: '#10b981' }} /> },
-        { label: 'Challenges', path: '/challenges', icon: <EmojiEvents sx={{ color: '#f59e0b' }} /> },
-        { label: 'Groups', path: '/groups', icon: <Groups sx={{ color: '#8b5cf6' }} /> },
         { label: 'Collaborations', path: '/collaborations', icon: <Handshake sx={{ color: '#ec4899' }} /> },
         { label: 'Theme Demo', path: '/theme-demo', icon: <PaletteIcon sx={{ color: themeColors?.accent || '#ec4899' }} /> },
     ];
@@ -124,81 +134,103 @@ const Navbar = () => {
     const isActive = (path) => location.pathname === path;
 
     // Desktop Navigation Items
-    const renderDesktopNav = () => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {publicNavItems.map((item) => (
-                <Button
-                    key={item.path}
-                    color="inherit"
-                    startIcon={item.icon}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                        fontWeight: isActive(item.path) ? 600 : 400,
-                        backgroundColor: isActive(item.path) 
-                            ? (mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.15)') 
-                            : 'transparent',
-                        color: mode === 'light' ? '#1f2937' : '#ffffff',
-                        borderRadius: 2,
-                        '&:hover': {
-                            backgroundColor: mode === 'light' 
-                                ? 'rgba(99, 102, 241, 0.08)' 
-                                : 'rgba(255,255,255,0.1)',
-                        },
-                    }}
-                >
-                    {item.label}
-                </Button>
-            ))}
+    const renderDesktopNav = () => {
+        const allNavItems = [
+            ...publicNavItems,
+            ...(isAuthenticated ? privateNavItems : []),
+            ...(isAuthenticated && user?.role === 'admin' ? adminNavItems : [])
+        ];
 
-            {isAuthenticated && privateNavItems.map((item) => (
-                <Button
-                    key={item.path}
-                    color="inherit"
-                    startIcon={item.icon}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                        fontWeight: isActive(item.path) ? 600 : 400,
-                        backgroundColor: isActive(item.path) 
-                            ? (mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.15)') 
-                            : 'transparent',
-                        color: mode === 'light' ? '#1f2937' : '#ffffff',
-                        borderRadius: 2,
-                        '&:hover': {
-                            backgroundColor: mode === 'light' 
-                                ? 'rgba(99, 102, 241, 0.08)' 
-                                : 'rgba(255,255,255,0.1)',
-                        },
-                    }}
-                >
-                    {item.label}
-                </Button>
-            ))}
+        // For smaller desktop screens, show fewer items and use "More" dropdown
+        const maxVisibleItems = isSmallDesktop ? 4 : allNavItems.length;
+        const visibleItems = allNavItems.slice(0, maxVisibleItems);
+        const moreItems = allNavItems.slice(maxVisibleItems);
 
-            {isAuthenticated && user?.role === 'admin' && adminNavItems.map((item) => (
-                <Button
-                    key={item.path}
-                    color="inherit"
-                    startIcon={item.icon}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                        fontWeight: isActive(item.path) ? 600 : 400,
-                        backgroundColor: isActive(item.path) 
-                            ? (mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.15)') 
-                            : 'transparent',
-                        color: mode === 'light' ? '#1f2937' : '#ffffff',
-                        borderRadius: 2,
-                        '&:hover': {
-                            backgroundColor: mode === 'light' 
-                                ? 'rgba(99, 102, 241, 0.08)' 
-                                : 'rgba(255,255,255,0.1)',
-                        },
-                    }}
-                >
-                    {item.label}
-                </Button>
-            ))}
-        </Box>
-    );
+        return (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {visibleItems.map((item) => (
+                    <Tooltip key={item.path} title={item.label} arrow>
+                        <Button
+                            color="inherit"
+                            startIcon={isSmallDesktop ? undefined : item.icon}
+                            onClick={() => navigate(item.path)}
+                            sx={{
+                                fontWeight: isActive(item.path) ? 600 : 400,
+                                backgroundColor: isActive(item.path) 
+                                    ? (mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.15)') 
+                                    : 'transparent',
+                                color: mode === 'light' ? '#1f2937' : '#ffffff',
+                                borderRadius: 2,
+                                fontSize: isSmallDesktop ? '0.8rem' : '0.875rem',
+                                px: isSmallDesktop ? 1 : 2,
+                                minWidth: isSmallDesktop ? '40px' : '64px',
+                                '&:hover': {
+                                    backgroundColor: mode === 'light' 
+                                        ? 'rgba(99, 102, 241, 0.08)' 
+                                        : 'rgba(255,255,255,0.1)',
+                                },
+                            }}
+                        >
+                            {isSmallDesktop ? item.icon : item.label}
+                        </Button>
+                    </Tooltip>
+                ))}
+
+                {moreItems.length > 0 && (
+                    <>
+                        <Tooltip title="More options" arrow>
+                            <IconButton
+                                color="inherit"
+                                onClick={handleMoreMenu}
+                                sx={{
+                                    borderRadius: 2,
+                                    backgroundColor: Boolean(moreMenuAnchor) 
+                                        ? (mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255,255,255,0.15)') 
+                                        : 'transparent',
+                                    '&:hover': {
+                                        backgroundColor: mode === 'light' 
+                                            ? 'rgba(99, 102, 241, 0.08)' 
+                                            : 'rgba(255,255,255,0.1)',
+                                    },
+                                }}
+                            >
+                                <MoreIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Menu
+                            anchorEl={moreMenuAnchor}
+                            open={Boolean(moreMenuAnchor)}
+                            onClose={handleCloseMoreMenu}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            {moreItems.map((item) => (
+                                <MenuItem
+                                    key={item.path}
+                                    onClick={() => {
+                                        navigate(item.path);
+                                        handleCloseMoreMenu();
+                                    }}
+                                    selected={isActive(item.path)}
+                                >
+                                    <ListItemIcon sx={{ minWidth: 36 }}>
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.label} />
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </>
+                )}
+            </Box>
+        );
+    };
 
     // Mobile Navigation Drawer
     const renderMobileNav = () => (
@@ -213,7 +245,11 @@ const Navbar = () => {
             sx={{
                 '& .MuiDrawer-paper': {
                     boxSizing: 'border-box',
-                    width: 280,
+                    width: 300, // Increased from 280 for better touch targets
+                    background: mode === 'light' 
+                        ? 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)'
+                        : 'linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%)',
+                    backdropFilter: 'blur(20px)',
                 },
             }}
         >
@@ -244,8 +280,7 @@ const Navbar = () => {
                     <>
                         <Divider sx={{ my: 1 }} />
                         {privateNavItems.map((item) => (
-                            <ListItem
-                                button
+                            <ListItemButton
                                 key={item.path}
                                 onClick={() => {
                                     navigate(item.path);
@@ -255,7 +290,7 @@ const Navbar = () => {
                             >
                                 <ListItemIcon>{item.icon}</ListItemIcon>
                                 <ListItemText primary={item.label} />
-                            </ListItem>
+                            </ListItemButton>
                         ))}
                         
                         {user?.role === 'admin' && adminNavItems.map((item) => (
@@ -279,8 +314,7 @@ const Navbar = () => {
 
                 {isAuthenticated ? (
                     <>
-                        <ListItem
-                            button
+                        <ListItemButton
                             onClick={() => {
                                 navigate('/profile');
                                 handleDrawerToggle();
@@ -289,9 +323,8 @@ const Navbar = () => {
                         >
                             <ListItemIcon><PersonIcon sx={{ color: themeColors?.primary || '#6366f1' }} /></ListItemIcon>
                             <ListItemText primary="Profile" />
-                        </ListItem>
-                        <ListItem
-                            button
+                        </ListItemButton>
+                        <ListItemButton
                             onClick={() => {
                                 navigate('/settings');
                                 handleDrawerToggle();
@@ -300,16 +333,15 @@ const Navbar = () => {
                         >
                             <ListItemIcon><SettingsIcon sx={{ color: '#6366f1' }} /></ListItemIcon>
                             <ListItemText primary="Settings" />
-                        </ListItem>
-                        <ListItem button onClick={handleLogout}>
+                        </ListItemButton>
+                        <ListItemButton onClick={handleLogout}>
                             <ListItemIcon><LogoutIcon sx={{ color: '#ef4444' }} /></ListItemIcon>
                             <ListItemText primary="Logout" />
-                        </ListItem>
+                        </ListItemButton>
                     </>
                 ) : (
                     authNavItems.map((item) => (
-                        <ListItem
-                            button
+                        <ListItemButton
                             key={item.path}
                             onClick={() => {
                                 navigate(item.path);
@@ -319,21 +351,18 @@ const Navbar = () => {
                         >
                             <ListItemIcon>{item.icon}</ListItemIcon>
                             <ListItemText primary={item.label} />
-                        </ListItem>
+                        </ListItemButton>
                     ))
                 )}
                 
                 {/* Theme Toggle in Mobile Menu */}
                 <Divider sx={{ my: 1 }} />
-                <ListItem 
-                    button 
-                    onClick={toggleTheme}
-                >
+                <ListItemButton onClick={toggleTheme}>
                     <ListItemIcon>
                         {mode === 'dark' ? <Brightness7 sx={{ color: '#f59e0b' }} /> : <Brightness4 sx={{ color: '#6366f1' }} />}
                     </ListItemIcon>
                     <ListItemText primary={`${mode === 'light' ? 'Dark' : 'Light'} Mode`} />
-                </ListItem>
+                </ListItemButton>
             </List>
         </Drawer>
     );

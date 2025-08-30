@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Folder = require('../models/Folder');
 const Meme = require('../models/Meme');
 
@@ -117,8 +118,10 @@ const getUserFolders = async (req, res) => {
 // @access  Private
 const getFolder = async (req, res) => {
     try {
+        const folderId = typeof req.params.id === 'string' ? new mongoose.Types.ObjectId(req.params.id) : req.params.id;
+        
         const folder = await Folder.findOne({
-            _id: req.params.id,
+            _id: folderId,
             owner: req.user._id
         }).populate({
             path: 'memes',
@@ -256,8 +259,9 @@ const addMemeToFolder = async (req, res) => {
         }
 
         // Check if meme exists and belongs to user
+        const memeObjectId = typeof memeId === 'string' ? new mongoose.Types.ObjectId(memeId) : memeId;
         const meme = await Meme.findOne({
-            _id: memeId,
+            _id: memeObjectId,
             creator: req.user._id
         });
 
@@ -269,14 +273,15 @@ const addMemeToFolder = async (req, res) => {
         }
 
         // Check if meme is already in folder
-        if (folder.memes.includes(memeId)) {
+        const isAlreadyInFolder = folder.memes.some(existingId => existingId.equals(memeObjectId));
+        if (isAlreadyInFolder) {
             return res.status(400).json({
                 success: false,
                 message: 'Meme is already in this folder'
             });
         }
 
-        await folder.addMeme(memeId);
+        await folder.addMeme(memeObjectId);
 
         res.json({
             success: true,
@@ -365,13 +370,24 @@ const bulkAddMemesToFolder = async (req, res) => {
 
         // Verify all memes belong to user
         console.log('🗂️ BULK ADD MEMES - Searching for memes with creator field...');
+        
+        // Ensure memeIds are ObjectIds
+        const objectIdMemeIds = memeIds.map(id => {
+            if (typeof id === 'string') {
+                return new mongoose.Types.ObjectId(id);
+            }
+            return id;
+        });
+        
         const memes = await Meme.find({
-            _id: { $in: memeIds },
+            _id: { $in: objectIdMemeIds },
             creator: req.user._id
         });
 
         console.log('🗂️ BULK ADD MEMES - Found memes:', memes.length, 'out of', memeIds.length);
         console.log('🗂️ BULK ADD MEMES - Meme details:', memes.map(m => ({ id: m._id, title: m.title, creator: m.creator })));
+        console.log('🗂️ BULK ADD MEMES - User ID:', req.user._id);
+        console.log('🗂️ BULK ADD MEMES - User ID type:', typeof req.user._id);
 
         if (memes.length !== memeIds.length) {
             console.log('❌ BULK ADD MEMES - Some memes not found or no permission');
@@ -387,8 +403,11 @@ const bulkAddMemesToFolder = async (req, res) => {
         console.log('🗂️ BULK ADD MEMES - Current folder memes:', folder.memes.length);
         
         for (const memeId of memeIds) {
-            if (!folder.memes.includes(memeId)) {
-                folder.memes.push(memeId);
+            const memeObjectId = typeof memeId === 'string' ? new mongoose.Types.ObjectId(memeId) : memeId;
+            const isAlreadyInFolder = folder.memes.some(existingId => existingId.equals(memeObjectId));
+            
+            if (!isAlreadyInFolder) {
+                folder.memes.push(memeObjectId);
                 addedCount++;
                 console.log('🗂️ BULK ADD MEMES - Added meme:', memeId);
             } else {

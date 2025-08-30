@@ -4,8 +4,6 @@
 const Collaboration = require('../models/Collaboration');
 const User = require('../models/User');
 const Meme = require('../models/Meme');
-const Challenge = require('../models/Challenge');
-const Group = require('../models/Group');
 const mongoose = require('mongoose');
 
 // Get all collaborations with filtering and pagination
@@ -60,8 +58,6 @@ const getCollaborations = async (req, res) => {
             .populate('owner', 'username profile.displayName profile.avatar')
             .populate('originalMeme', 'title imageUrl')
             .populate('finalMeme', 'title imageUrl')
-            .populate('challenge', 'title type')
-            .populate('group', 'name slug')
             .sort(sortObj)
             .limit(limit * 1)
             .skip((page - 1) * limit)
@@ -102,8 +98,6 @@ const getCollaborationById = async (req, res) => {
             .populate('collaborators.user', 'username profile.displayName profile.avatar')
             .populate('originalMeme', 'title imageUrl creator')
             .populate('finalMeme', 'title imageUrl stats.likes stats.views')
-            .populate('challenge', 'title type status')
-            .populate('group', 'name slug avatar')
             .populate('parentCollaboration', 'title type owner')
             .populate({
                 path: 'versions.createdBy',
@@ -157,8 +151,6 @@ const createCollaboration = async (req, res) => {
             description,
             type,
             originalMeme,
-            challenge,
-            group,
             settings,
             remixInfo,
             tags
@@ -172,35 +164,12 @@ const createCollaboration = async (req, res) => {
             }
         }
 
-        // Validate challenge if provided
-        if (challenge) {
-            const challengeDoc = await Challenge.findById(challenge);
-            if (!challengeDoc) {
-                return res.status(404).json({ message: 'Challenge not found' });
-            }
-        }
-
-        // Validate group if provided
-        if (group) {
-            const groupDoc = await Group.findById(group);
-            if (!groupDoc) {
-                return res.status(404).json({ message: 'Group not found' });
-            }
-            
-            // Check if user is member of the group
-            if (!groupDoc.isMember(userId)) {
-                return res.status(403).json({ message: 'You must be a member of the group' });
-            }
-        }
-
         const collaboration = new Collaboration({
             title,
             description,
             type,
             owner: userId,
             originalMeme,
-            challenge,
-            group,
             settings: {
                 isPublic: true,
                 allowForks: true,

@@ -13,7 +13,6 @@ import { ThemeProvider } from './contexts/ThemeContext';
 // Components
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import AuthStatus from './components/debug/AuthStatus';
 
 // Pages
 import Home from './pages/Home';
@@ -30,17 +29,12 @@ import FollowingFeed from './pages/FollowingFeed';
 import BrowseUsers from './pages/BrowseUsers';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import ModerationDashboard from './pages/ModerationDashboard';
-import FolderManager from './pages/FolderManager';
-import FolderDetail from './pages/FolderDetail';
+import FolderManagerEnhanced from './pages/FolderManagerEnhanced';
+import FolderDetailEnhanced from './pages/FolderDetailEnhanced';
 import Templates from './pages/Templates';
 import CreateTemplate from './pages/CreateTemplate';
 import TemplateDetail from './pages/TemplateDetail';
 import BatchProcessor from './pages/BatchProcessor';
-import Challenges from './pages/Challenges';
-import CreateChallenge from './pages/CreateChallenge';
-import CreateChallengeFixed from './pages/CreateChallengeFixed';
-import ChallengeDetail from './pages/ChallengeDetail';
-import Groups from './pages/Groups';
 import Collaborations from './pages/Collaborations';
 import CollaborationDetail from './pages/CollaborationDetail';
 import CreateCollaboration from './pages/CreateCollaboration';
@@ -68,14 +62,13 @@ function App() {
                 minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: 'background.default',
+                backgroundColor: (theme) => theme.palette.mode === 'light' 
+                  ? theme.palette.background.default
+                  : theme.palette.background.default,
               }}
             >
               {/* Navigation Bar */}
               <Navbar />
-              
-              {/* Debug Component - Remove in production */}
-              <AuthStatus />
 
               {/* Main Content Area */}
               <Box 
@@ -165,7 +158,7 @@ function App() {
                     path="/folders" 
                     element={
                       <ProtectedRoute>
-                        <FolderManager />
+                        <FolderManagerEnhanced />
                       </ProtectedRoute>
                     } 
                   />
@@ -173,7 +166,7 @@ function App() {
                     path="/folders/:folderId" 
                     element={
                       <ProtectedRoute>
-                        <FolderDetail />
+                        <FolderDetailEnhanced />
                       </ProtectedRoute>
                     } 
                   />
@@ -207,21 +200,8 @@ function App() {
                   />
 
                   {/* Collaboration Feature Routes */}
-                  <Route path="/challenges" element={<Challenges />} />
-                  <Route path="/challenges/create" element={
-                    <ProtectedRoute>
-                      <CreateChallengeFixed />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/challenges/create-fixed" element={
-                    <ProtectedRoute>
-                      <CreateChallengeFixed />
-                    </ProtectedRoute>
-                  } />
                   <Route path="/test-form" element={<TestForm />} />
                   <Route path="/system-status" element={<SystemStatus />} />
-                  <Route path="/challenges/:id" element={<ChallengeDetail />} />
-                  <Route path="/groups" element={<Groups />} />
                   <Route path="/collaborations" element={<Collaborations />} />
                   <Route path="/collaborations/create" element={
                     <ProtectedRoute>

@@ -219,13 +219,16 @@ const CreateTemplate = () => {
                         p: 6,
                         textAlign: 'center',
                         background: theme.palette.mode === 'dark'
-                            ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                            : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
-                        backdropFilter: 'blur(40px)',
+                            ? 'rgba(30, 41, 59, 0.95)'
+                            : 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px)',
                         borderRadius: '20px',
                         border: theme.palette.mode === 'dark'
-                            ? '2px solid rgba(255, 255, 255, 0.3)'
-                            : '2px solid rgba(0, 0, 0, 0.15)',
+                            ? '1px solid rgba(255, 255, 255, 0.2)'
+                            : '1px solid rgba(0, 0, 0, 0.1)',
+                        boxShadow: theme.palette.mode === 'light' 
+                            ? '0 25px 50px -12px rgb(0 0 0 / 0.25)'
+                            : '0 25px 50px -12px rgb(0 0 0 / 0.6)',
                     }}
                 >
                     <CheckIcon sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
@@ -257,14 +260,17 @@ const CreateTemplate = () => {
                                     p: 4,
                                     mb: 4,
                                     background: theme.palette.mode === 'dark'
-                                        ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
-                                    backdropFilter: 'blur(50px)',
+                                        ? 'rgba(30, 41, 59, 0.95)'
+                                        : 'rgba(255, 255, 255, 0.95)',
+                                    backdropFilter: 'blur(20px)',
                                     borderRadius: '24px',
                                     border: theme.palette.mode === 'dark'
-                                        ? '2px solid rgba(255, 255, 255, 0.3)'
-                                        : '2px solid rgba(0, 0, 0, 0.15)',
+                                        ? '1px solid rgba(255, 255, 255, 0.2)'
+                                        : '1px solid rgba(0, 0, 0, 0.1)',
                                     textAlign: 'center',
+                                    boxShadow: theme.palette.mode === 'light' 
+                                        ? '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                                        : '0 20px 25px -5px rgb(0 0 0 / 0.4)',
                                 }}
                             >
                                 <Typography
@@ -312,13 +318,16 @@ const CreateTemplate = () => {
                             sx={{
                                 p: 4,
                                 background: theme.palette.mode === 'dark'
-                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%)',
-                                backdropFilter: 'blur(40px)',
+                                    ? 'rgba(30, 41, 59, 0.95)'
+                                    : 'rgba(255, 255, 255, 0.95)',
+                                backdropFilter: 'blur(20px)',
                                 borderRadius: '20px',
                                 border: theme.palette.mode === 'dark'
-                                    ? '2px solid rgba(255, 255, 255, 0.3)'
-                                    : '2px solid rgba(0, 0, 0, 0.15)',
+                                    ? '1px solid rgba(255, 255, 255, 0.2)'
+                                    : '1px solid rgba(0, 0, 0, 0.1)',
+                                boxShadow: theme.palette.mode === 'light' 
+                                    ? '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                                    : '0 20px 25px -5px rgb(0 0 0 / 0.4)',
                             }}
                         >
                             <Grid container spacing={4}>
@@ -390,8 +399,8 @@ const CreateTemplate = () => {
                                             p: 3,
                                             mb: 3,
                                             background: theme.palette.mode === 'dark'
-                                                ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.05) 100%)'
-                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%)',
+                                                ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%)'
+                                                : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
                                             border: theme.palette.mode === 'dark'
                                                 ? '2px dashed rgba(255, 255, 255, 0.4)'
                                                 : '2px dashed rgba(0, 0, 0, 0.3)',
@@ -401,8 +410,8 @@ const CreateTemplate = () => {
                                             transition: 'all 0.3s ease',
                                             '&:hover': {
                                                 background: theme.palette.mode === 'dark'
-                                                    ? 'linear-gradient(145deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.1) 100%)'
-                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%)',
+                                                    ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%)'
+                                                    : 'linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
                                                 transform: 'translateY(-2px)',
                                             },
                                         }}
@@ -511,7 +520,17 @@ const CreateTemplate = () => {
                                     </Box>
 
                                     {textAreas.length === 0 ? (
-                                        <Paper sx={{ p: 3, textAlign: 'center', background: 'rgba(0,0,0,0.05)' }}>
+                                        <Paper sx={{ 
+                                            p: 3, 
+                                            textAlign: 'center', 
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'rgba(30, 41, 59, 0.95)'
+                                                : 'rgba(248, 250, 252, 0.95)',
+                                            border: theme.palette.mode === 'dark'
+                                                ? '1px solid rgba(255, 255, 255, 0.2)'
+                                                : '1px solid rgba(0, 0, 0, 0.1)',
+                                            borderRadius: 2
+                                        }}>
                                             <TextIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                                             <Typography variant="body1" color="text.secondary">
                                                 No text areas configured. Add text areas to define where users can place text on your template.

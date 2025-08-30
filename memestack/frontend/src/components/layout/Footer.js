@@ -167,9 +167,8 @@ const Footer = () => {
                             <Box component="nav" sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                 {[
                                     { label: 'Templates', href: '/templates' },
-                                    { label: 'Challenges', href: '/challenges' },
                                     { label: 'Community', href: '/community' },
-                                    { label: 'Groups', href: '/groups' },
+                                    { label: 'Collaborations', href: '/collaborations' },
                                 ].map((link, index) => (
                                     <Link
                                         key={index}
