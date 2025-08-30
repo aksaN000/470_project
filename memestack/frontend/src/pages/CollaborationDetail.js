@@ -108,6 +108,9 @@ const CollaborationDetail = () => {
     
     // Activity states
     const [lastActivity, setLastActivity] = useState(null);
+    
+    // Delete confirmation states
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [refreshInterval, setRefreshInterval] = useState(null);
     
     // Notifications
@@ -233,6 +236,21 @@ const CollaborationDetail = () => {
             });
         } catch (error) {
             setError(error.message || 'Failed to fork collaboration');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleDeleteCollaboration = async () => {
+        try {
+            setSubmitting(true);
+            await collaborationsAPI.deleteCollaboration(id);
+            setSuccess('Collaboration deleted successfully!');
+            setDeleteDialogOpen(false);
+            // Navigate back to collaborations list
+            navigate('/collaborations');
+        } catch (error) {
+            setError(error.message || 'Failed to delete collaboration');
         } finally {
             setSubmitting(false);
         }
@@ -681,6 +699,26 @@ const CollaborationDetail = () => {
                             >
                                 Share
                             </Button>
+
+                            {/* Delete button - only for collaboration owners */}
+                            {user && collaboration?.owner?._id === user._id && (
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    startIcon={<DeleteIcon />}
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                    sx={{
+                                        borderColor: 'error.main',
+                                        color: 'error.main',
+                                        '&:hover': {
+                                            background: 'rgba(244, 67, 54, 0.1)',
+                                            borderColor: 'error.dark',
+                                        }
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                            )}
                         </Box>
                     </Paper>
 
@@ -1405,6 +1443,45 @@ const CollaborationDetail = () => {
                                 disabled={submitting}
                             >
                                 {submitting ? <CircularProgress size={20} /> : 'Join'}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                    {/* Delete Confirmation Dialog */}
+                    <Dialog 
+                        open={deleteDialogOpen} 
+                        onClose={() => setDeleteDialogOpen(false)}
+                        maxWidth="sm"
+                        fullWidth
+                    >
+                        <DialogTitle sx={{ color: 'error.main' }}>
+                            Delete Collaboration
+                        </DialogTitle>
+                        <DialogContent>
+                            <Typography variant="body1" gutterBottom>
+                                Are you sure you want to delete "{collaboration?.title}"?
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                                This action cannot be undone. The collaboration and all its content will be permanently removed.
+                            </Typography>
+                            {collaboration?.collaborators?.length > 0 && (
+                                <Typography variant="body2" color="error.main" sx={{ mt: 2 }}>
+                                    Note: This collaboration has active contributors. Deletion may not be allowed.
+                                </Typography>
+                            )}
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={() => setDeleteDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button 
+                                variant="contained"
+                                color="error"
+                                onClick={handleDeleteCollaboration}
+                                disabled={submitting}
+                                startIcon={submitting ? <CircularProgress size={16} /> : <DeleteIcon />}
+                            >
+                                {submitting ? 'Deleting...' : 'Delete Collaboration'}
                             </Button>
                         </DialogActions>
                     </Dialog>
