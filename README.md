@@ -145,7 +145,7 @@ REACT_APP_NAME=MemeStack
 REACT_APP_VERSION=1.0.0
 ```
 
-## 🚀 Deployment
+##  Deployment
 
 ✅ **Currently deployed on Vercel**
 
@@ -207,5 +207,6 @@ This is a course project. For issues or suggestions, please contact the developm
 For technical support or questions about deployment, refer to:
 - `DEPLOYMENT.md` - Deployment guide
 - `DEPLOYMENT_CHECKLIST.md` - Pre-deployment checklist
+
 
 
