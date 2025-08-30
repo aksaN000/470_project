@@ -11,9 +11,9 @@
 - **CDN**: Global distribution
 
 ### Live URLs:
-- **Frontend**: [https://your-frontend-url.vercel.app](https://your-frontend-url.vercel.app)
-- **Backend API**: [https://your-backend-url.vercel.app](https://your-backend-url.vercel.app)
-- **Health Check**: [https://your-backend-url.vercel.app/api/health](https://your-backend-url.vercel.app/api/health)
+- **Frontend**: [https://470-project-25ao.vercel.app](https://470-project-25ao.vercel.app)
+- **Backend API**: [https://470-project.vercel.app](https://470-project.vercel.app)
+- **Health Check**: [https://470-project.vercel.app/api/health](https://470-project.vercel.app/api/health)
 
 ## Overview
 This codebase has been cleaned and optimized for production deployment. All test files, development dependencies, and in-memory database configurations have been removed.
@@ -71,7 +71,7 @@ JWT_SECRET=your-super-secret-jwt-key-min-32-chars
 NODE_ENV=production
 
 # Frontend URL (for CORS - Vercel auto-assigns)
-CLIENT_URL=https://your-frontend-url.vercel.app
+CLIENT_URL=https://470-project-25ao.vercel.app
 
 # Optional: File Uploads (if using Cloudinary)
 CLOUDINARY_CLOUD_NAME=your-cloud-name

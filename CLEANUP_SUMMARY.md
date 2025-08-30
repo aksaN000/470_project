@@ -91,8 +91,8 @@
 
 ### 🌐 Live Deployment
 - **Platform**: Vercel (Serverless)
-- **Frontend**: https://your-frontend-url.vercel.app
-- **Backend**: https://your-backend-url.vercel.app
+- **Frontend**: https://470-project-25ao.vercel.app
+- **Backend**: https://470-project.vercel.app
 - **Database**: MongoDB Atlas (Cloud)
 - **Status**: ✅ Live and operational
 

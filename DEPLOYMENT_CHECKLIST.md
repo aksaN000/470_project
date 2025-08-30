@@ -4,8 +4,8 @@
 
 **Successfully deployed on Vercel!**
 
-- ✅ Frontend deployed: [https://your-frontend-url.vercel.app](https://your-frontend-url.vercel.app)  
-- ✅ Backend deployed: [https://your-backend-url.vercel.app](https://your-backend-url.vercel.app)
+- ✅ Frontend deployed: [https://470-project-25ao.vercel.app](https://470-project-25ao.vercel.app)  
+- ✅ Backend deployed: [https://470-project.vercel.app](https://470-project.vercel.app)
 - ✅ Database: MongoDB Atlas connected
 - ✅ Environment variables configured
 - ✅ HTTPS enabled automatically
@@ -54,9 +54,9 @@
 6. [x] Verified both deployments are working
 
 ### Live Application URLs:
-- **Frontend**: https://your-frontend-url.vercel.app
-- **Backend**: https://your-backend-url.vercel.app  
-- **Health Check**: https://your-backend-url.vercel.app/api/health
+- **Frontend**: https://470-project-25ao.vercel.app
+- **Backend**: https://470-project.vercel.app  
+- **Health Check**: https://470-project.vercel.app/api/health
 
 ## Deployment Options
 
@@ -123,7 +123,7 @@ JWT_SECRET=your-super-secure-jwt-secret-minimum-32-characters
 NODE_ENV=production
 
 # CORS (Vercel URLs)
-CLIENT_URL=https://your-frontend-url.vercel.app
+CLIENT_URL=https://470-project-25ao.vercel.app
 
 # File Uploads (Optional)
 MAX_FILE_SIZE=5242880
@@ -152,7 +152,7 @@ UPLOAD_PATH=./uploads
 - **File Uploads**: ✅ Configured and working
 
 ### Health Check:
-- **Production**: https://your-backend-url.vercel.app/api/health ✅
+- **Production**: https://470-project.vercel.app/api/health ✅
 - **Database**: Check collections in MongoDB Atlas dashboard ✅
 - **CORS**: Cross-origin requests working ✅
 
