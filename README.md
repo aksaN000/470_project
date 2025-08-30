@@ -4,7 +4,7 @@ A full-stack web application for creating, sharing, and collaborating on memes. 
 
 ## 🌐 Live Deployment
 
-**🚀 Application is now live on Vercel!**
+** Application is now live on Vercel!**
 
 - **Frontend**: [https://470-project-25ao.vercel.app](https://470-project-25ao.vercel.app)
 - **Backend API**: [https://470-project.vercel.app](https://470-project.vercel.app)
@@ -207,4 +207,5 @@ This is a course project. For issues or suggestions, please contact the developm
 For technical support or questions about deployment, refer to:
 - `DEPLOYMENT.md` - Deployment guide
 - `DEPLOYMENT_CHECKLIST.md` - Pre-deployment checklist
+
 
