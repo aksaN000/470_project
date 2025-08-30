@@ -539,20 +539,38 @@ const Navbar = () => {
                                     <Button 
                                         color="inherit" 
                                         onClick={() => navigate('/login')}
-                                        sx={{ fontWeight: 500 }}
+                                        sx={{ 
+                                            fontWeight: 500,
+                                            color: mode === 'light' ? '#1f2937' : '#ffffff',
+                                            '&:hover': {
+                                                backgroundColor: mode === 'light' 
+                                                    ? 'rgba(99, 102, 241, 0.1)' 
+                                                    : 'rgba(255,255,255,0.1)',
+                                                color: mode === 'light' ? themeColors?.primary || '#6366f1' : '#ffffff',
+                                            },
+                                        }}
                                     >
                                         Login
                                     </Button>
                                     <Button 
                                         variant="outlined"
-                                        color="inherit"
                                         onClick={() => navigate('/register')}
                                         sx={{ 
                                             fontWeight: 500,
-                                            borderColor: 'rgba(255,255,255,0.5)',
+                                            color: mode === 'light' ? themeColors?.primary || '#6366f1' : '#ffffff',
+                                            borderColor: mode === 'light' 
+                                                ? themeColors?.primary || '#6366f1'
+                                                : 'rgba(255,255,255,0.5)',
                                             '&:hover': {
-                                                borderColor: 'white',
-                                                backgroundColor: 'rgba(255,255,255,0.1)',
+                                                borderColor: mode === 'light' 
+                                                    ? themeColors?.secondary || '#8b5cf6'
+                                                    : 'white',
+                                                backgroundColor: mode === 'light'
+                                                    ? 'rgba(99, 102, 241, 0.1)'
+                                                    : 'rgba(255,255,255,0.1)',
+                                                color: mode === 'light' 
+                                                    ? themeColors?.secondary || '#8b5cf6'
+                                                    : '#ffffff',
                                             },
                                         }}
                                     >
