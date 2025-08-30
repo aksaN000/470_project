@@ -333,8 +333,10 @@ process.on('SIGINT', async () => {
     }
 });
 
-// Start the server
-startServer();
+// Start the server (only if not on Vercel)
+if (!process.env.VERCEL) {
+    startServer();
+}
 
-// Export app for testing purposes
+// Export app for Vercel serverless
 module.exports = app;
