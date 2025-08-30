@@ -42,7 +42,8 @@ import ThemeDemo from './pages/ThemeDemo';
 import TestForm from './pages/TestForm';
 import SystemStatus from './pages/SystemStatus';
 import NotFound from './pages/NotFound';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 // Protected Route Component
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -224,6 +225,7 @@ function App() {
           </Router>
         </MemeProvider>
       </ThemeProvider>
+      <SpeedInsights />
     </AuthProvider>
   );
 }
