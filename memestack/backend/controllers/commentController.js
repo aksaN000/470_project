@@ -265,6 +265,12 @@ const deleteComment = async (req, res) => {
         const { id } = req.params;
         const userId = req.user._id;
         
+        console.log('🗑️ Delete meme comment request:', { 
+            commentId: id, 
+            userId,
+            userObject: req.user
+        });
+        
         // Find comment
         const comment = await Comment.findById(id);
         if (!comment || !comment.isActive) {
@@ -274,8 +280,22 @@ const deleteComment = async (req, res) => {
             });
         }
         
+        console.log('🔍 Found comment:', {
+            commentAuthor: comment.author,
+            commentAuthorString: comment.author.toString(),
+            requestUserId: userId,
+            requestUserIdString: userId.toString(),
+            userRole: req.user.role
+        });
+        
         // Check if user can delete (author or admin)
         const canDelete = comment.author.toString() === userId.toString() || req.user.role === 'admin';
+        
+        console.log('🔐 Authorization check:', {
+            isAuthor: comment.author.toString() === userId.toString(),
+            isAdmin: req.user.role === 'admin',
+            canDelete
+        });
         
         if (!canDelete) {
             return res.status(403).json({

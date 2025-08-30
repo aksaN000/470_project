@@ -1230,7 +1230,10 @@ const CollaborationDetail = () => {
                                                                 {new Date(comment.createdAt).toLocaleDateString()}
                                                             </Typography>
                                                             {user && (
-                                                                (comment.user?._id === user._id || collaboration?.owner?._id === user._id) && (
+                                                                (comment.user?._id === user._id || 
+                                                                 comment.user?._id === user.id ||
+                                                                 collaboration?.owner?._id === user._id ||
+                                                                 collaboration?.owner?._id === user.id) && (
                                                                     <IconButton
                                                                         size="small"
                                                                         onClick={(e) => openCommentMenu(e, comment)}

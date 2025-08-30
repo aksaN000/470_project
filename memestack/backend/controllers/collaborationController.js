@@ -478,7 +478,12 @@ const deleteComment = async (req, res) => {
         const { id, commentId } = req.params;
         const userId = req.user?._id || req.user?.userId || req.user?.id;
         
-        console.log('🗑️ Delete comment request:', { collaborationId: id, commentId, userId });
+        console.log('🗑️ Delete comment request:', { 
+            collaborationId: id, 
+            commentId, 
+            userId,
+            userObject: req.user
+        });
 
         const collaboration = await Collaboration.findById(id);
         if (!collaboration) {
@@ -491,9 +496,23 @@ const deleteComment = async (req, res) => {
             return res.status(404).json({ message: 'Comment not found' });
         }
 
+        console.log('🔍 Found comment:', {
+            commentUser: comment.user,
+            commentUserString: comment.user.toString(),
+            requestUserId: userId,
+            requestUserIdString: userId.toString(),
+            collaborationOwner: collaboration.owner.toString()
+        });
+
         // Check if user is the comment author or collaboration owner
         const isCommentAuthor = comment.user.toString() === userId.toString();
         const isCollaborationOwner = collaboration.owner.toString() === userId.toString();
+        
+        console.log('🔐 Authorization check:', {
+            isCommentAuthor,
+            isCollaborationOwner,
+            authorized: isCommentAuthor || isCollaborationOwner
+        });
         
         if (!isCommentAuthor && !isCollaborationOwner) {
             return res.status(403).json({ 
